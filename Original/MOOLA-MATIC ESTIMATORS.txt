@@ -1,5 +1,11 @@
 MOOLA-MATIC ESTIMATORS.txt
 
+QUICK REFERENCE
+- Use best-effort estimates; label assumptions briefly.
+- Ask only ONE question if missing info changes shipping tier.
+- Use single best-point estimates (no ranges unless asked).
+- Round shipping/fees to clean dollars; prices to .99 per rules.
+
 MOOLA-MATIC — ESTIMATORS (SHIPPING / FEES / LABOR / TIME / PRICING)
 
 PURPOSE
@@ -19,6 +25,8 @@ GLOBAL ESTIMATION RULES
 3) If user doesn’t know, proceed with best assumption and label it.
 4) Always label assumptions briefly.
 5) MSRP estimate (best effort): if brand/model MSRP can be inferred, use it; if not, default MSRP to the buyer-pays-shipping price.
+6) Use a single best-point estimate (no wide ranges) unless the user explicitly asks for ranges.
+7) Round shipping/packing/fees to clean dollars; round prices to .99 per pricing rules.
 
 ESTIMATION DEFAULT ROUTE
 Atlanta, GA → Los Angeles, CA

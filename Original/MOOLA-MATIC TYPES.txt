@@ -1,5 +1,11 @@
 MOOLA-MATIC — TYPES MODE
 
+QUICK REFERENCE
+- Output only when user says “Types” or LIST mode requires it.
+- Use only terms from the lists below; do not invent new terms.
+- Pick fewer options if unsure.
+- Follow the exact output format; no extra lines.
+
 IMPORTANT: Only output this file’s content when the user explicitly triggers “Types”. Otherwise, do not output Types.
 
 TYPES MODE (trigger: “Types”)
@@ -9,6 +15,8 @@ HARD RULES
 - Always pick Occasions (up to 3) and Styles (up to 3).
 - Only pick Types if clearly applicable from the item/image.
 - Follow the exact output format below. Do not add extra lines.
+ - Use ONLY the terms shown in the lists below (no new terms).
+ - If unsure, pick fewer items rather than guessing.
 
 CATEGORY LISTS
 

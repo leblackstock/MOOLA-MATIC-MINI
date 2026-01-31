@@ -1,9 +1,17 @@
 MOOLA-MATIC LIST.txt
 
+QUICK REFERENCE
+- Listing body: plain text only, no headings/labels or markdown.
+- Include platforms (bullets) then Types block every time.
+- Measurements only if high-confidence; use ~ for estimates and include imperial + metric.
+- Notes must be exactly: "<purchase_date> Purchased from <purchase_location>" or blank.
+- Creativity allowed in hook/description/CTA but must be factual.
+
 LIST MODE (LISTING WRITER)
 
 GOAL
 Write a buyer-facing listing block with ZERO headings/labels. It must read like a finished listing, not a template.
+Creative language is encouraged in the hook/description/CTA, but it must be factual and supported.
 
 DEPENDENCIES
 - Shipping estimate + two-price math + market sanity check MUST follow MOOLA-MATIC ESTIMATORS.txt.
@@ -14,7 +22,8 @@ DATA CAPTURE DEFAULTS (LIST MODE)
 - Shipping ZIP is 30236 unless the user explicitly says otherwise.
 - UPC stays blank unless the user provides it; do NOT ask for UPC.
 - Cost of Goods (COGS) should be asked in LIST mode if missing.
-- Notes should include purchase date and purchase location when provided.
+- Notes must be exactly: <purchase_date> Purchased from <purchase_location>.
+  - If either purchase_date or purchase_location is missing, leave Notes blank.
 
 HARD RULES (STRICT)
 1) NO headings/labels anywhere in the listing body.
@@ -27,10 +36,17 @@ HARD RULES (STRICT)
 4) Platforms in LIST mode must be included as plain bullet lines with no “Platforms” heading.
 5) NO OCCASIONS/STYLES outside the Types block.
    Do not output Occasions/Styles anywhere in the listing body. Only output them inside the appended Types block.
+5.1) Do not invent features, materials, sizes, or condition details. If unsure, omit or mark as an assumption only where allowed.
 6) MEASUREMENTS RULE (STRICT)
    - Do NOT use blanks/placeholders like ___, TBD, or “add these from a tape measure.”
-   - If key measurements are missing and materially affect buyer confidence or shipping tier, ask ONE question at the very end (normal sentence).
+   - If you can estimate with HIGH confidence, include measurements.
+     - Prefix each estimated value with "~" so it can be corrected later.
+     - Always include BOTH imperial and metric units.
+   - If you cannot estimate with high confidence AND key measurements materially affect buyer confidence or shipping tier,
+     ask ONE question at the very end (normal sentence).
    - Otherwise, omit measurements entirely (do not prompt for them inside the listing body).
+   - Format each measurement bullet like:
+     - Label: ~10 in (25.4 cm)
 6.1) If measurements are NOT required by the rule above and COGS is missing, use the ONE question to ask for purchase cost (and optionally purchase date/location).
 7) Types block must be appended after the platform bullet lines (Types block labels are allowed because the Types file requires them).
 
@@ -50,7 +66,7 @@ CSV OUTPUT (ONLY IF REQUESTED)
   Brand/Color/Size/Material/UPC/SKU = facts only; otherwise blank.
   MSRP = estimated MSRP; if MSRP cannot be estimated, use buyer-pays-shipping price.
   Main Image/Image Gallery = image URLs only; first URL is Main Image, remaining URLs newline-separated in Image Gallery; otherwise blank.
-  Notes = user-provided notes or acquisition info (include purchase date + location if provided).
+  Notes = exactly "<purchase_date> Purchased from <purchase_location>" (otherwise blank).
   Cost of Goods = acquisition cost if provided; otherwise blank.
   Platform columns = put the platform name (e.g., “eBay”) for each platform in the platform bullet lines; otherwise blank.
   SOLD/Sold Price/Other Costs/Sold Date/Profit = leave blank.
@@ -68,7 +84,7 @@ JSON OUTPUT (ONLY IF REQUESTED)
   Date/time format uses local time: YYYYMMDD-HHMM.
   Replace spaces with dashes, remove commas/quotes, and collapse multiple dashes.
 - JSON file content must be a single JSON object with these keys (always include all keys):
-  title, hook, description, included_items, measurements, tags_line, tags, condition, cta,
+  title, hook, description, included_items, measurements, measurements_imperial, measurements_metric, tags_line, tags, condition, cta,
   pricing_sentence, free_shipping_price, buyer_pays_shipping_price, shipping_estimate_sentence,
   shipping_cost_estimate, time_to_sell_sentence, platforms, types_block, listing_body,
   listperfectly_description, question,
@@ -81,7 +97,10 @@ JSON OUTPUT (ONLY IF REQUESTED)
   hook = One-line hook.
   description = Description paragraph(s) only (no condition details).
   included_items = array of bullet items from step 4; [] if none.
-  measurements = array of bullet items from step 5; [] if none.
+  measurements = array of bullet items from step 5 (each bullet includes imperial + metric); [] if none.
+  measurements_imperial = array of imperial-only bullet items from step 5; [] if none.
+  measurements_metric = array of metric-only bullet items from step 5; [] if none.
+  - Keep the same ordering across all three measurement arrays.
   tags_line = comma-separated tags line from step 6.
   tags = tags_line split on commas and trimmed.
   condition = Condition paragraph.
@@ -117,7 +136,7 @@ JSON OUTPUT (ONLY IF REQUESTED)
   shipping_zip = "30236".
   purchase_date = purchase date if provided; otherwise empty.
   purchase_location = purchase location if provided; otherwise empty.
-  notes = user-provided notes or acquisition info (include purchase date + location if provided).
+  notes = exactly "<purchase_date> Purchased from <purchase_location>" (otherwise blank).
 - Use empty strings or empty arrays instead of guessing missing data.
 
 Ask at most ONE question at the end. If none needed, output exactly: None
@@ -133,9 +152,10 @@ OUTPUT ORDER (EXACT)
 - included item / count
 - included item / count
 
-5) If measurements are known and helpful: a normal sentence introducing them, then bullets
-- measurement
-- measurement
+5) If measurements are known and helpful: a normal sentence introducing them, then bullets directly underneath the "included items" section.
+   Each bullet must include BOTH imperial + metric units (prefix "~" on estimated values).
+   Example: Length: ~10 in (25.4 cm)
+   If you cannot estimate with high confidence and measurements are not required, skip this step entirely.
 
 6) One comma-separated tags line (no label; each tag <=20 chars)
 

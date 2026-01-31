@@ -158,11 +158,11 @@
       <h2>Auto‑fill helper</h2>
       <div class="field">
         <label>Project folder path</label>
-        <input id="projectPathInput" type="text" placeholder="C:\\Users\\outdo\\Documents\\Moola-Matic" />
+        <input id="projectPathInput" type="text" placeholder="C:\\Users\\outdo\\Documents\\MOOLA-MATIC MINI" />
       </div>
       <div class="field">
         <label>JSON file path</label>
-        <input id="jsonPathInput" type="text" placeholder="C:\\path\\to\\listing.json" />
+        <input id="jsonPathInput" type="text" placeholder="C:\\Users\\outdo\\Downloads\\listing.json" />
       </div>
       <div class="row">
         <input id="jsonPicker" type="file" accept=".json" style="display:none;" />
@@ -442,6 +442,27 @@
           { label: "Short Description (ListPerfectly)", key: "listperfectly_description", multiline: true },
           { label: "Title", key: "title" },
           { label: "Listing body", key: "listing_body", multiline: true },
+          {
+            label: "Measurements (Combined)",
+            key: "measurements",
+            multiline: true,
+            format: (value) => toStringValue(value),
+            parse: (value) => parseList(value)
+          },
+          {
+            label: "Measurements (Imperial)",
+            key: "measurements_imperial",
+            multiline: true,
+            format: (value) => toStringValue(value),
+            parse: (value) => parseList(value)
+          },
+          {
+            label: "Measurements (Metric)",
+            key: "measurements_metric",
+            multiline: true,
+            format: (value) => toStringValue(value),
+            parse: (value) => parseList(value)
+          },
           { label: "Buyer pays shipping price", key: "buyer_pays_shipping_price" },
           { label: "Free shipping price", key: "free_shipping_price" },
           { label: "Shipping cost estimate", key: "shipping_cost_estimate" },
@@ -496,9 +517,16 @@
 
       function loadSavedAutofillInputs() {
         const savedProject = window.localStorage.getItem("moola_project_path");
-        if (savedProject) projectPathInput.value = savedProject;
+        if (savedProject) {
+          if (savedProject.includes("Moola-Matic")) {
+            projectPathInput.value = "C:\\\\Users\\\\outdo\\\\Documents\\\\MOOLA-MATIC MINI";
+            window.localStorage.setItem("moola_project_path", projectPathInput.value);
+          } else {
+            projectPathInput.value = savedProject;
+          }
+        }
         if (!projectPathInput.value) {
-          projectPathInput.value = "C:\\\\Users\\\\outdo\\\\Documents\\\\Moola-Matic";
+          projectPathInput.value = "C:\\\\Users\\\\outdo\\\\Documents\\\\MOOLA-MATIC MINI";
         }
         jsonPathInput.value = "C:\\\\Users\\\\outdo\\\\Downloads";
         const current = jsonPathInput.value.trim();
