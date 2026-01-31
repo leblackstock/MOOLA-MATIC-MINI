@@ -1,0 +1,188 @@
+MOOLA-MATIC ESTIMATORS.txt
+
+MOOLA-MATIC — ESTIMATORS (SHIPPING / FEES / LABOR / TIME / PRICING)
+
+PURPOSE
+Single source of truth for best-effort estimates:
+- Shipping (Atlanta, GA → Los Angeles, CA)
+- Prep + packing
+- Fees (typical planning)
+- Labor ($20/hr when non-trivial)
+- Time-to-sell
+- Two-price math (Free shipping vs Buyer pays shipping)
+- Market sanity check for free-shipping competitiveness
+- Max profitable purchase amount (MAP) using your Profit Floor rules
+
+GLOBAL ESTIMATION RULES
+1) Estimate using available info (images + text + typical packing).
+2) Ask ONLY ONE question if missing info materially changes shipping tier (C/D/E/F).
+3) If user doesn’t know, proceed with best assumption and label it.
+4) Always label assumptions briefly.
+5) MSRP estimate (best effort): if brand/model MSRP can be inferred, use it; if not, default MSRP to the buyer-pays-shipping price.
+
+ESTIMATION DEFAULT ROUTE
+Atlanta, GA → Los Angeles, CA
+
+--------------------------------------------
+A) SHIPPING ESTIMATOR (ATL → LA)
+--------------------------------------------
+
+STEP A1 — Category (best match)
+A) Very small/light: jewelry, coins, small parts, single thin paperback, small card lots
+B) Small boxed: most shoes, single book/hardback, small handbag, mug, small ceramic, small toy
+C) Medium boxed: small appliances, multiple-book lots, medium ceramics, 12–18" décor items
+D) Large/light: large canvas/painting, large framed art (not super heavy), oversized but light-ish
+E) Large/heavy: bulky items, heavy ceramics sets, large lots, big décor, 15–40 lb packed
+F) Oversize / freight-ish: very large dimensions and/or >40 lb packed
+
+STEP A2 — Packed size + weight (best effort)
+- Add packing: +1–3 inches padding per side typical.
+- Fragile (fine china/glass): double-box; +4–6 inches overall; extra packing weight.
+- Shoes (pair): ~3–5 lb packed, ~14×10×6 in.
+- Boots (pair): ~4–7 lb packed, ~16×12×6 in.
+- Single hardback: ~2–3 lb packed, ~10×8×3 in.
+- Multiple books: 3–6 books ~6–12 lb packed; 10+ books often category E.
+- Fine china set: weight escalates fast; if set size unclear, ask ONE question (pieces or weight).
+- Art: unframed canvas light but oversize; framed glass heavier + fragile.
+
+STEP A3 — Carrier/service + cost (choose one best-point estimate)
+A) Very small/light
+- Ground Advantage: $6–$10
+- Priority: $9–$14
+
+B) Small boxed
+- Ground Advantage: $8–$14 (ONLY if clearly light and not fragile)
+- Priority: $12–$22 (default for shoes and most small boxes)
+
+C) Medium boxed
+- Priority: $20–$40
+- UPS Ground: $18–$38
+Fragile ceramics/china: lean high end (+$5–$15)
+
+D) Large/light (art/oversize)
+- UPS Ground: $35–$95
+Framed/glass: lean high end (+$10–$25 packing)
+
+E) Large/heavy
+- UPS/FedEx Ground: $60–$160
+Add warning: shipping may dominate profit; consider calculated/local pickup.
+
+F) Oversize / freight-ish
+- $120–$350+
+Recommend calculated shipping/local pickup/freight.
+
+ONE-QUESTION SHIPPING RULE
+If cannot choose between C/D/E/F:
+Ask exactly ONE question:
+“Approx packed size (L×W×H) and weight, or at least largest dimension + weight?”
+
+OUTPUT SHIPPING LINE
+Shipping estimate (assumptions): $Z (Carrier/Service + why)
+
+--------------------------------------------
+B) PREP + PACKING ESTIMATOR
+--------------------------------------------
+Packing materials (assumptions)
+- Very small/light: $1–$3
+- Small boxed: $2–$6
+- Medium boxed: $4–$12
+- Fragile ceramics/china/glass: $8–$20
+- Large art: unframed $8–$18; framed/glass $15–$35
+- Oversize/heavy: $10–$40+
+
+Output line:
+Prep + packing estimate (assumptions): $P (brief why)
+
+--------------------------------------------
+C) LABOR ESTIMATOR
+--------------------------------------------
+- $20/hour.
+- Include only if non-trivial.
+
+Typical buckets:
+- Minimal: 0–0.25 hr
+- Normal: 0.5 hr
+- Non-trivial: 1–3 hr
+- Heavy: 3+ hr
+
+--------------------------------------------
+D) FEE ESTIMATOR (PLANNING)
+--------------------------------------------
+Use typical planning assumptions (label them):
+- eBay: ~12–15% + ~$0.30
+- Etsy: ~9–12%
+- Poshmark: ~20%
+- Mercari: ~10–15% planning
+- Depop: ~10–15% planning
+- Grailed: ~9–15% planning
+- Vestiaire: ~15–25% planning
+- Vinted: ~0–5% planning (varies)
+- Whatnot: ~10–15% planning (varies)
+
+--------------------------------------------
+E) TIME-TO-SELL (BRIEF)
+--------------------------------------------
+- Hot items priced right: 1–14 days
+- Average: 2–8 weeks
+- Niche: 1–6 months
+- Oversize/high shipping friction: slower unless local/calc shipping
+
+--------------------------------------------
+F) TWO-PRICE MATH
+--------------------------------------------
+Definitions:
+- BPS = Buyer pays shipping price (item price only)
+- FS = Free shipping price (BPS + shipping)
+
+Rules:
+- Compute Ship using Shipping Estimator.
+- FS_candidate = BPS + Ship, rounded to .99.
+- Output line format:
+Free shipping: $X.XX | Buyer pays shipping: $Y.XX
+
+--------------------------------------------
+G) MARKET SANITY CHECK (FREE SHIPPING COMPETITIVENESS)
+--------------------------------------------
+- Choose BPS based on market range first.
+- Compute FS_candidate.
+- If FS_candidate is above competitive ceiling, cap FS to competitive high end (.99).
+- If capped, recommend buyer-pays-shipping as primary.
+
+--------------------------------------------
+H) MAX PROFITABLE PURCHASE AMOUNT (MAP) — YOUR RULES
+--------------------------------------------
+
+PROFIT FLOOR (DEFAULT)
+Profit is: Sale - Fees - Labor - Prep/Packing - Shipping(if free ship) - PurchaseCost
+
+Profit floor per listing:
+- Minimum profit is $20 per listing.
+- If the purchase cost is > $100, minimum profit becomes 20% of purchase cost.
+  RequiredProfit = max(20, 0.20 × PurchaseCost)
+
+Sets vs items:
+- If a set is sold as ONE listing: apply the profit rule to the set total.
+- If items are sold as separate listings: apply the profit rule per item/listing.
+
+MAP CALCULATION (best effort)
+Let:
+- Sale_BPS = recommended BPS sale price
+- Sale_FS  = recommended FS sale price
+- Fees, Labor, Pack, Ship as estimated above
+
+Base_BPS = Sale_BPS - Fees - Labor - Pack
+Base_FS  = Sale_FS  - Fees - Labor - Pack - Ship
+
+Compute MAP with the profit floor:
+- If Base <= 20: MAP = 0 (not worth buying under default rule)
+- Else:
+  MAP_$20 = Base - 20
+  If MAP_$20 <= 100:
+    MAP = MAP_$20
+  Else:
+    MAP = Base / 1.2   (enforces profit >= 20% of purchase cost)
+
+Output labels:
+- Profit rule used (default unless specified): $20 minimum per listing OR 20% ROI if purchase > $100
+- Max purchase price (buyer pays shipping): MAP_BPS
+- Max purchase price (free shipping): MAP_FS

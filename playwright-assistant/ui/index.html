@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Moola Playwright Helper</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+        --violet-950: #0f0a1d;
+        --violet-900: #1b1033;
+        --violet-800: #2a1650;
+        --violet-700: #3c1e6b;
+        --violet-500: #7c3aed;
+        --violet-300: #c4b5fd;
+        --violet-200: #d8ccff;
+        --ink-100: #f4f0ff;
+        --ink-200: #d9cff6;
+      }
+      html,
+      body {
+        min-height: 100%;
+      }
+      body {
+        margin: 0;
+        color: var(--ink-100);
+        background: radial-gradient(circle at top, #22113f 0%, #120a22 45%, #0b0814 100%);
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 28px 22px 48px;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        color: var(--ink-100);
+      }
+      h2 {
+        margin: 0 0 10px;
+        font-size: 18px;
+        color: var(--violet-200);
+      }
+      p {
+        margin: 6px 0 16px;
+        color: var(--ink-200);
+      }
+      .panel {
+        border: 1px solid #3a245c;
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin: 14px 0;
+        background: rgba(19, 12, 33, 0.9);
+        box-shadow: 0 8px 24px rgba(12, 8, 22, 0.7);
+      }
+      .field {
+        margin: 14px 0;
+      }
+      .field label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--violet-200);
+      }
+      .field input,
+      .field textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #3b2a63;
+        border-radius: 10px;
+        font-size: 14px;
+        box-sizing: border-box;
+        background: #1a102b;
+        color: var(--ink-100);
+      }
+      .field input:focus,
+      .field textarea:focus {
+        outline: 2px solid #5b3a9f;
+        border-color: var(--violet-500);
+        background: #201236;
+      }
+      .field textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .row button {
+        padding: 9px 14px;
+        border: 1px solid #6b3ddb;
+        background: linear-gradient(145deg, #7c3aed, #5b2fc7);
+        color: #fff;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.05s ease, box-shadow 0.15s ease;
+      }
+      .row button:hover {
+        box-shadow: 0 8px 16px rgba(124, 58, 237, 0.35);
+      }
+      .row button:active {
+        transform: translateY(1px);
+      }
+      .row button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        background: #3b275e;
+        border-color: #3b275e;
+        box-shadow: none;
+      }
+      .note {
+        font-size: 12px;
+        color: #b29adf;
+      }
+      .status {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #bba6e7;
+      }
+      #fileInput {
+        padding: 8px;
+        background: #130c21;
+        color: var(--ink-100);
+        border: 1px solid #3b2a63;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Moola Playwright Helper</h1>
+      <p>Load your listing JSON, then copy fields into your listing form.</p>
+
+    <div class="panel">
+      <div class="row">
+        <input type="file" id="fileInput" accept=".json" multiple />
+        <button id="downloadBtn" disabled>Download JSON</button>
+        <button id="prevBtn" disabled>Prev</button>
+        <button id="nextBtn" disabled>Next</button>
+      </div>
+      <div class="note" style="margin-top: 10px;">
+        Edit mode is always on. Edits update the JSON used for auto‑fill and download.
+      </div>
+      <div class="status" id="status">No file loaded.</div>
+      <div class="note">
+        This page never shows raw JSON. It only displays copy-ready fields.
+      </div>
+    </div>
+
+    <div class="panel" id="autofillPanel">
+      <h2>Auto‑fill helper</h2>
+      <div class="field">
+        <label>Project folder path</label>
+        <input id="projectPathInput" type="text" placeholder="C:\\Users\\outdo\\Documents\\Moola-Matic" />
+      </div>
+      <div class="field">
+        <label>JSON file path</label>
+        <input id="jsonPathInput" type="text" placeholder="C:\\path\\to\\listing.json" />
+      </div>
+      <div class="row">
+        <input id="jsonPicker" type="file" accept=".json" style="display:none;" />
+        <button id="jsonBrowseBtn">Browse JSON</button>
+      </div>
+      <div class="row">
+        <button id="copyCmdBtn">Copy autofill command</button>
+        <button id="downloadBatBtn">Download run-autofill.bat</button>
+      </div>
+      <div class="note" id="autofillNote">
+        Browsers can’t run Playwright directly. Use the copied command or the .bat file.
+      </div>
+      <div class="note" style="margin-top: 8px;">
+        Need PowerShell? Press the Windows key, type "PowerShell", and open Windows PowerShell.
+      </div>
+    </div>
+
+    <div id="skuPanel" class="panel" style="display: none;">
+      <div class="field">
+        <label>SKU</label>
+        <div class="row">
+          <input id="skuInput" type="text" placeholder="Enter SKU" />
+          <button id="skuOkBtn">OK</button>
+          <button id="skuChangeBtn">Change</button>
+        </div>
+        <div class="note" id="skuHint"></div>
+      </div>
+    </div>
+
+      <div id="fields" class="panel" style="display: none;"></div>
+    </div>
+
+    <script>
+      const fileInput = document.getElementById("fileInput");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const fieldsContainer = document.getElementById("fields");
+      const status = document.getElementById("status");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const projectPathInput = document.getElementById("projectPathInput");
+      const jsonPathInput = document.getElementById("jsonPathInput");
+      const jsonPicker = document.getElementById("jsonPicker");
+      const jsonBrowseBtn = document.getElementById("jsonBrowseBtn");
+      const copyCmdBtn = document.getElementById("copyCmdBtn");
+      const downloadBatBtn = document.getElementById("downloadBatBtn");
+      const autofillNote = document.getElementById("autofillNote");
+      const skuPanel = document.getElementById("skuPanel");
+      const skuInput = document.getElementById("skuInput");
+      const skuOkBtn = document.getElementById("skuOkBtn");
+      const skuChangeBtn = document.getElementById("skuChangeBtn");
+      const skuHint = document.getElementById("skuHint");
+      let items = [];
+      let currentIndex = 0;
+      let currentData = null;
+      let skuConfirmed = false;
+      let editMode = true;
+      let fieldInputs = [];
+      let defaultJsonFolder = "C:\\\\Users\\\\outdo\\\\Downloads";
+
+      function toStringValue(value) {
+        if (value === null || value === undefined) return "";
+        if (Array.isArray(value)) {
+          return value
+            .map((item) => {
+              if (item && typeof item === "object") {
+                const platform = item.platform || "";
+                const reason = item.reason || "";
+                return platform && reason
+                  ? `${platform}: ${reason}`
+                  : platform || reason;
+              }
+              return String(item);
+            })
+            .join("\n");
+        }
+        if (typeof value === "object") return JSON.stringify(value);
+        return String(value);
+      }
+
+      function parseList(value) {
+        return String(value || "")
+          .split(/[,\\n]/)
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+
+      function parsePlatforms(value) {
+        const lines = String(value || "")
+          .split(/\\n/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+        return lines.map((line) => {
+          const idx = line.indexOf(":");
+          if (idx === -1) {
+            return { platform: line, reason: "" };
+          }
+          return {
+            platform: line.slice(0, idx).trim(),
+            reason: line.slice(idx + 1).trim()
+          };
+        });
+      }
+
+      function sanitizePart(value) {
+        return value
+          .toLowerCase()
+          .replace(/['",]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+
+      function buildFilename(data) {
+        const sku = data?.sku ? sanitizePart(String(data.sku)) : "";
+        const title = data?.title ? sanitizePart(String(data.title)) : "listing";
+        const now = new Date();
+        const yyyy = String(now.getFullYear());
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const dd = String(now.getDate()).padStart(2, "0");
+        const hh = String(now.getHours()).padStart(2, "0");
+        const min = String(now.getMinutes()).padStart(2, "0");
+        const stamp = `${yyyy}${mm}${dd}-${hh}${min}`;
+        const base = sku ? `${sku}_${title}` : title;
+        return `${base}_${stamp}.json`;
+      }
+
+      function getLastSku() {
+        return window.localStorage.getItem("moola_last_sku") || "";
+      }
+
+      function setLastSku(value) {
+        if (value) {
+          window.localStorage.setItem("moola_last_sku", value);
+        }
+      }
+
+      function suggestNextSku() {
+        const last = getLastSku();
+        const lastNum = Number.parseInt(last, 10);
+        if (Number.isFinite(lastNum)) {
+          return String(lastNum + 1);
+        }
+        return "";
+      }
+
+      function updateSkuPanel(data) {
+        skuPanel.style.display = "block";
+        skuConfirmed = items[currentIndex]?.skuConfirmed || false;
+
+        const existingSku = data?.sku || "";
+        const suggested = existingSku || suggestNextSku();
+        skuInput.value = suggested;
+        skuInput.readOnly = skuConfirmed;
+
+        if (skuConfirmed) {
+          skuHint.textContent = `SKU confirmed: ${skuInput.value}.`;
+        } else if (existingSku) {
+          skuHint.textContent = "SKU loaded from file. Click OK to confirm or Change to edit.";
+        } else if (suggested) {
+          skuHint.textContent = `Suggested next SKU: ${suggested}`;
+        } else {
+          skuHint.textContent = "Enter your starting SKU and click OK.";
+        }
+      }
+
+      function confirmSku() {
+        if (!currentData) return;
+        const value = skuInput.value.trim();
+        if (!value) {
+          skuHint.textContent = "SKU is empty. Enter a SKU and click OK.";
+          return;
+        }
+        currentData.sku = value;
+        setLastSku(value);
+        skuConfirmed = true;
+        if (items[currentIndex]) {
+          items[currentIndex].skuConfirmed = true;
+        }
+        skuInput.readOnly = true;
+        skuHint.textContent = `SKU set to ${value}.`;
+        renderFields(currentData);
+      }
+
+      function changeSku() {
+        skuConfirmed = false;
+        skuInput.readOnly = false;
+        skuInput.focus();
+        skuHint.textContent = "Enter a new SKU and click OK.";
+      }
+
+      skuOkBtn.addEventListener("click", confirmSku);
+      skuChangeBtn.addEventListener("click", changeSku);
+
+      function addField(field, data) {
+        const fieldEl = document.createElement("div");
+        fieldEl.className = "field";
+
+        const fieldLabel = document.createElement("label");
+        fieldLabel.textContent = field.label;
+        fieldEl.appendChild(fieldLabel);
+
+        const row = document.createElement("div");
+        row.className = "row";
+
+        const input = field.multiline ? document.createElement("textarea") : document.createElement("input");
+        const rawValue = data ? data[field.key] : "";
+        const displayValue = field.format ? field.format(rawValue) : toStringValue(rawValue);
+        input.value = displayValue;
+        input.readOnly = !editMode;
+        row.appendChild(input);
+
+        const button = document.createElement("button");
+        button.textContent = "Copy";
+        button.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(input.value);
+            button.textContent = "Copied";
+            setTimeout(() => (button.textContent = "Copy"), 1200);
+          } catch (err) {
+            button.textContent = "Copy failed";
+            setTimeout(() => (button.textContent = "Copy"), 1200);
+          }
+        });
+        row.appendChild(button);
+
+        if (field.key) {
+          input.addEventListener("input", () => {
+            if (!currentData) return;
+            const parsedValue = field.parse ? field.parse(input.value) : input.value;
+            currentData[field.key] = parsedValue;
+            if (field.key === "tags_line") {
+              currentData.tags = parseList(input.value);
+            }
+            if (field.key === "platforms") {
+              currentData.platforms = parsePlatforms(input.value);
+            }
+            items[currentIndex].data = currentData;
+          });
+        }
+
+        fieldEl.appendChild(row);
+        fieldsContainer.appendChild(fieldEl);
+        fieldInputs.push(input);
+      }
+
+      function renderFields(data) {
+        fieldsContainer.innerHTML = "";
+        fieldInputs = [];
+        const fields = [
+          { label: "SKU", key: "sku" },
+          { label: "Quantity", key: "quantity" },
+          { label: "COGS", key: "cogs" },
+          { label: "MSRP", key: "msrp" },
+          { label: "UPC", key: "upc" },
+          { label: "Brand / Maker", key: "brand" },
+          { label: "Color Shade", key: "color" },
+          { label: "Material", key: "material" },
+          { label: "Size or Fit", key: "size_or_fit" },
+          { label: "Style / Features", key: "style_features" },
+          { label: "Condition Status", key: "condition_status" },
+          {
+            label: "Intended For",
+            key: "intended_for",
+            multiline: true,
+            format: (value) => (Array.isArray(value) ? value.join(", ") : toStringValue(value)),
+            parse: (value) => parseList(value)
+          },
+          { label: "Shipping Weight (lb)", key: "shipping_weight_lb" },
+          { label: "Shipping Weight (oz)", key: "shipping_weight_oz" },
+          { label: "Package Length", key: "package_length" },
+          { label: "Package Width", key: "package_width" },
+          { label: "Package Height", key: "package_height" },
+          { label: "Shipping ZIP", key: "shipping_zip" },
+          { label: "Purchase Date", key: "purchase_date" },
+          { label: "Purchase Location", key: "purchase_location" },
+          { label: "Notes", key: "notes", multiline: true },
+          { label: "Short Description (ListPerfectly)", key: "listperfectly_description", multiline: true },
+          { label: "Title", key: "title" },
+          { label: "Listing body", key: "listing_body", multiline: true },
+          { label: "Buyer pays shipping price", key: "buyer_pays_shipping_price" },
+          { label: "Free shipping price", key: "free_shipping_price" },
+          { label: "Shipping cost estimate", key: "shipping_cost_estimate" },
+          { label: "Tags line", key: "tags_line" },
+          { label: "Condition", key: "condition", multiline: true },
+          {
+            label: "Platforms",
+            key: "platforms",
+            multiline: true,
+            format: (value) => toStringValue(value),
+            parse: (value) => parsePlatforms(value)
+          },
+          { label: "Types block", key: "types_block", multiline: true },
+          { label: "CTA", key: "cta" },
+          { label: "Pricing sentence", key: "pricing_sentence", multiline: true },
+          { label: "Shipping estimate sentence", key: "shipping_estimate_sentence", multiline: true },
+          { label: "Time-to-sell sentence", key: "time_to_sell_sentence", multiline: true }
+        ];
+        fields.forEach((field) => addField(field, data));
+      }
+
+      function updateFieldEditability() {
+        fieldInputs.forEach((input) => {
+          input.readOnly = !editMode;
+        });
+      }
+
+      updateFieldEditability();
+
+      jsonBrowseBtn.addEventListener("click", () => {
+        jsonPicker.click();
+      });
+
+      jsonPicker.addEventListener("change", () => {
+        const file = jsonPicker.files && jsonPicker.files[0];
+        if (!file) return;
+        const currentPath = jsonPathInput.value.trim();
+        const hasJsonPath = currentPath.toLowerCase().endsWith(".json");
+        const baseFolder = hasJsonPath
+          ? currentPath.slice(0, Math.max(0, currentPath.lastIndexOf("\\")))
+          : currentPath.replace(/\\+$/g, "");
+        const folderToUse = baseFolder || defaultJsonFolder;
+        if (folderToUse) {
+          jsonPathInput.value = `${folderToUse}\\${file.name}`;
+        } else {
+          jsonPathInput.value = file.name;
+        }
+        autofillNote.textContent =
+          `Selected ${file.name}. Path was auto-filled; edit if needed.`;
+        saveAutofillInputs();
+      });
+
+      function loadSavedAutofillInputs() {
+        const savedProject = window.localStorage.getItem("moola_project_path");
+        if (savedProject) projectPathInput.value = savedProject;
+        if (!projectPathInput.value) {
+          projectPathInput.value = "C:\\\\Users\\\\outdo\\\\Documents\\\\Moola-Matic";
+        }
+        jsonPathInput.value = "C:\\\\Users\\\\outdo\\\\Downloads";
+        const current = jsonPathInput.value.trim();
+        if (current.includes("\\")) {
+          if (current.toLowerCase().endsWith(".json")) {
+            defaultJsonFolder = current.slice(0, current.lastIndexOf("\\"));
+          } else {
+            defaultJsonFolder = current.replace(/\\+$/g, "");
+          }
+        }
+      }
+
+      function saveAutofillInputs() {
+        if (projectPathInput.value) {
+          window.localStorage.setItem("moola_project_path", projectPathInput.value);
+        }
+        if (jsonPathInput.value) {
+          window.localStorage.setItem("moola_json_path", jsonPathInput.value);
+        }
+      }
+
+      function buildAutofillCommand() {
+        const projectPath = projectPathInput.value.trim();
+        const jsonPath = jsonPathInput.value.trim();
+        if (!projectPath || !jsonPath) return "";
+        const scriptPath = `${projectPath}\\playwright-assistant\\scripts\\run-playwright.js`;
+        const selectorsPath = `${projectPath}\\playwright-assistant\\scripts\\selectors.json`;
+        const userDataDir = `${projectPath}\\playwright-assistant\\.user-data`;
+        return `node \"${scriptPath}\" --safe --json \"${jsonPath}\" --selectors \"${selectorsPath}\" --user-data-dir \"${userDataDir}\"`;
+      }
+
+      copyCmdBtn.addEventListener("click", async () => {
+        saveAutofillInputs();
+        const cmd = buildAutofillCommand();
+        if (!cmd) {
+          autofillNote.textContent = "Enter the project path and JSON file path first.";
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(cmd);
+          autofillNote.textContent = "Autofill command copied.";
+        } catch (err) {
+          autofillNote.textContent = "Could not copy. You can still download the .bat file.";
+        }
+      });
+
+      downloadBatBtn.addEventListener("click", () => {
+        saveAutofillInputs();
+        const cmd = buildAutofillCommand();
+        if (!cmd) {
+          autofillNote.textContent = "Enter the project path and JSON file path first.";
+          return;
+        }
+        const content = `@echo off\r\n${cmd}\r\npause\r\n`;
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "run-autofill.bat";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        autofillNote.textContent = "run-autofill.bat downloaded. Double-click it to run.";
+      });
+
+      function updateStatus() {
+        if (!items.length) {
+          status.textContent = "No file loaded.";
+          prevBtn.disabled = true;
+          nextBtn.disabled = true;
+          return;
+        }
+        const current = items[currentIndex];
+        status.textContent = `Loaded ${items.length} file(s). Viewing ${currentIndex + 1} of ${items.length}: ${current.name}`;
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === items.length - 1;
+      }
+
+      function loadCurrent() {
+        if (!items.length) return;
+        currentData = items[currentIndex].data;
+        fieldsContainer.style.display = "block";
+        updateSkuPanel(currentData);
+        renderFields(currentData);
+        updateFieldEditability();
+        downloadBtn.disabled = false;
+        updateStatus();
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex -= 1;
+          loadCurrent();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (!skuConfirmed) {
+          skuHint.textContent = "Confirm SKU first, then click Next.";
+          return;
+        }
+        if (currentIndex < items.length - 1) {
+          currentIndex += 1;
+          loadCurrent();
+        }
+      });
+
+      fileInput.addEventListener("change", async (event) => {
+        const files = Array.from(event.target.files || []);
+        if (!files.length) return;
+        items = [];
+        for (const file of files) {
+          try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            items.push({ name: file.name, data, skuConfirmed: false });
+          } catch (err) {
+            status.textContent = `Could not parse JSON: ${file.name}`;
+          }
+        }
+        if (!items.length) {
+          fieldsContainer.style.display = "none";
+          skuPanel.style.display = "none";
+          downloadBtn.disabled = true;
+          updateStatus();
+          return;
+        }
+        currentIndex = 0;
+        skuPanel.style.display = "block";
+        loadCurrent();
+      });
+
+      loadSavedAutofillInputs();
+
+      downloadBtn.addEventListener("click", () => {
+        if (!currentData) return;
+        const filename = buildFilename(currentData);
+        const blob = new Blob([JSON.stringify(currentData, null, 2)], {
+          type: "application/json"
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        jsonPathInput.value = `C:\\\\Users\\\\outdo\\\\Downloads\\\\${filename}`;
+        saveAutofillInputs();
+      });
+    </script>
+  </body>
+</html>

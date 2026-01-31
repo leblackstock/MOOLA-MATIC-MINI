@@ -1,0 +1,13 @@
+{
+  "name": "playwright-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "install:browsers": "playwright install",
+    "run": "node scripts/run-playwright.js"
+  },
+  "dependencies": {
+    "playwright": "^1.58.1"
+  }
+}

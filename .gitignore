@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Playwright user profile/cache
+playwright-assistant/.user-data/
+
+# Local runtime artifacts
+playwright-assistant/scripts/.last-sku
+*.log
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store

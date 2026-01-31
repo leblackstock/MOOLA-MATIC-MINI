@@ -1,0 +1,163 @@
+MOOLA-MATIC LIST.txt
+
+LIST MODE (LISTING WRITER)
+
+GOAL
+Write a buyer-facing listing block with ZERO headings/labels. It must read like a finished listing, not a template.
+
+DEPENDENCIES
+- Shipping estimate + two-price math + market sanity check MUST follow MOOLA-MATIC ESTIMATORS.txt.
+- Types block MUST follow MOOLA-MATIC TYPES.txt and MUST be output every time in LIST mode.
+
+DATA CAPTURE DEFAULTS (LIST MODE)
+- Quantity is always 1.
+- Shipping ZIP is 30236 unless the user explicitly says otherwise.
+- UPC stays blank unless the user provides it; do NOT ask for UPC.
+- Cost of Goods (COGS) should be asked in LIST mode if missing.
+- Notes should include purchase date and purchase location when provided.
+
+HARD RULES (STRICT)
+1) NO headings/labels anywhere in the listing body.
+   Do NOT output label lines like:
+   Title, Description, Description Title, What’s Included, Measurements, Condition, Suggested Price,
+   Estimated Time to Sell, Keywords/Tags, Call to Action, Platforms, Next needed detail.
+2) NO markdown formatting at all (no **bold**, no italics, no ###, no ---).
+2.1) NO emojis.
+3) You MAY use plain bullet lists, but they must be introduced by a normal sentence (not a heading label).
+4) Platforms in LIST mode must be included as plain bullet lines with no “Platforms” heading.
+5) NO OCCASIONS/STYLES outside the Types block.
+   Do not output Occasions/Styles anywhere in the listing body. Only output them inside the appended Types block.
+6) MEASUREMENTS RULE (STRICT)
+   - Do NOT use blanks/placeholders like ___, TBD, or “add these from a tape measure.”
+   - If key measurements are missing and materially affect buyer confidence or shipping tier, ask ONE question at the very end (normal sentence).
+   - Otherwise, omit measurements entirely (do not prompt for them inside the listing body).
+6.1) If measurements are NOT required by the rule above and COGS is missing, use the ONE question to ask for purchase cost (and optionally purchase date/location).
+7) Types block must be appended after the platform bullet lines (Types block labels are allowed because the Types file requires them).
+
+CSV OUTPUT (ONLY IF REQUESTED)
+- Triggered if the user asks for CSV, export, upload, or ListPerfectly CSV.
+- CSV block must be appended after the Types block and before the final question.
+- CSV block format: one header row + one data row, plain text only (no labels).
+- Use the user-provided CSV header/template if given. Otherwise use the default ListPerfectly header:
+  SKU, Title, Date, Main Image, Image Gallery, UPC, Brand, Color, Size, Material, Price, Notes, Quantity, Description, eBay, Etsy, Poshmark, Mercari, Tradesy, Amazon, Grailed, Facebook, Depop, Kidizen, Shopify, Vestiaire, Whatnot, Vinted, SOLD, Cost of Goods, Sold Price, Shipping Cost, Other Costs, Sold Date, Profit
+- Date format: M/D/YY H:MM (local time).
+- Field mapping (default header):
+  Title = Title line.
+  Description = listperfectly_description (steps 2–5 and step 8). Exclude platform lines, Types block, and final question.
+  Price = Buyer pays shipping price unless the user explicitly wants free shipping; then use the free-shipping price.
+  Shipping Cost = estimated shipping cost (your cost to ship), regardless of who pays shipping.
+  Quantity = 1.
+  Brand/Color/Size/Material/UPC/SKU = facts only; otherwise blank.
+  MSRP = estimated MSRP; if MSRP cannot be estimated, use buyer-pays-shipping price.
+  Main Image/Image Gallery = image URLs only; first URL is Main Image, remaining URLs newline-separated in Image Gallery; otherwise blank.
+  Notes = user-provided notes or acquisition info (include purchase date + location if provided).
+  Cost of Goods = acquisition cost if provided; otherwise blank.
+  Platform columns = put the platform name (e.g., “eBay”) for each platform in the platform bullet lines; otherwise blank.
+  SOLD/Sold Price/Other Costs/Sold Date/Profit = leave blank.
+- Quote fields that contain commas, quotes, or line breaks; escape quotes by doubling.
+- If a column cannot be inferred, leave it blank rather than guessing.
+
+JSON OUTPUT (ONLY IF REQUESTED)
+- Triggered if the user asks for JSON or mentions Playwright/automation.
+- JSON block must be appended after the CSV block (if any) and before the final question.
+- Do NOT display raw JSON unless the user explicitly asks to see it.
+- Create the JSON file (if the project supports file creation), then output a single plain-text download line instead:
+  JSON download: <YYYYMMDD-HHMM>_<Title>.json
+- Filename rules:
+  Use date/time first, then Title, separated by underscores. Do NOT include SKU.
+  Date/time format uses local time: YYYYMMDD-HHMM.
+  Replace spaces with dashes, remove commas/quotes, and collapse multiple dashes.
+- JSON file content must be a single JSON object with these keys (always include all keys):
+  title, hook, description, included_items, measurements, tags_line, tags, condition, cta,
+  pricing_sentence, free_shipping_price, buyer_pays_shipping_price, shipping_estimate_sentence,
+  shipping_cost_estimate, time_to_sell_sentence, platforms, types_block, listing_body,
+  listperfectly_description, question,
+  sku, quantity, cogs, upc, brand, color, material, size_or_fit, style_features, msrp,
+  condition_status, intended_for, shipping_weight_lb, shipping_weight_oz,
+  package_length, package_width, package_height, shipping_zip,
+  purchase_date, purchase_location, notes
+- Field rules:
+  title = Title line.
+  hook = One-line hook.
+  description = Description paragraph(s) only (no condition details).
+  included_items = array of bullet items from step 4; [] if none.
+  measurements = array of bullet items from step 5; [] if none.
+  tags_line = comma-separated tags line from step 6.
+  tags = tags_line split on commas and trimmed.
+  condition = Condition paragraph.
+  cta = CTA sentence.
+  pricing_sentence = sentence from step 9.
+  free_shipping_price / buyer_pays_shipping_price = values extracted from step 9.
+  shipping_estimate_sentence = sentence from step 10.
+  shipping_cost_estimate = estimated shipping dollar amount (string, e.g., "18.00").
+  time_to_sell_sentence = sentence from step 11.
+  platforms = array of objects like {"platform":"eBay","reason":"..."} from step 12.
+  types_block = Types block text from step 13 (preserve line breaks).
+  listing_body = steps 2–11 combined in order with the same line breaks/bullets as the listing output.
+  listperfectly_description = steps 2–5 and step 8 combined in order with the same line breaks/bullets. Use this in ListPerfectly’s Short Description field (not the Description field).
+  question = final question sentence or "None".
+  sku = SKU value if provided; otherwise empty.
+  quantity = "1".
+  cogs = acquisition cost if provided; otherwise empty.
+  upc = user-provided UPC only; otherwise empty.
+  brand = Brand/Maker if known; otherwise empty.
+  color = Color Shade if known; otherwise empty.
+  material = Material/Ingredient Composition if known; otherwise empty.
+  size_or_fit = Size or Fit if known; otherwise empty.
+  style_features = Style/Features if known; otherwise empty.
+  msrp = estimated MSRP; if cannot be estimated, use buyer-pays-shipping price.
+  condition_status = "New" or "Pre-Owned" if known; otherwise empty.
+  intended_for = array of intended-for values if known; otherwise []. Use ONLY these exact options:
+  Unisex, Men, Women, Unisex Kids, Girls, Boys, Babies, Maternity, Pets, Cats, Dogs, None.
+  shipping_weight_lb = estimated shipping weight in lb if known; otherwise empty.
+  shipping_weight_oz = estimated shipping weight in oz if known; otherwise empty.
+  package_length = estimated package length if known; otherwise empty.
+  package_width = estimated package width if known; otherwise empty.
+  package_height = estimated package height if known; otherwise empty.
+  shipping_zip = "30236".
+  purchase_date = purchase date if provided; otherwise empty.
+  purchase_location = purchase location if provided; otherwise empty.
+  notes = user-provided notes or acquisition info (include purchase date + location if provided).
+- Use empty strings or empty arrays instead of guessing missing data.
+
+Ask at most ONE question at the end. If none needed, output exactly: None
+
+OUTPUT ORDER (EXACT)
+1) Title line (<=80 chars)
+
+2) One-line hook
+
+3) Description paragraph(s) (no condition details)
+
+4) A normal sentence introducing included items/counts (when relevant), then bullets
+- included item / count
+- included item / count
+
+5) If measurements are known and helpful: a normal sentence introducing them, then bullets
+- measurement
+- measurement
+
+6) One comma-separated tags line (no label; each tag <=20 chars)
+
+7) Condition paragraph
+
+8) One-sentence CTA
+
+9) One sentence that includes retail estimate and BOTH prices, and must contain exactly:
+Free shipping: $X.XX | Buyer pays shipping: $Y.XX
+
+10) One sentence shipping estimate that includes a dollar amount (Carrier/Service + brief reason)
+
+11) One sentence time-to-sell estimate (brief + main driver)
+
+12) 2–6 platform bullet lines (no heading)
+- Platform: short reason
+- Platform: short reason
+
+13) Types block from MOOLA-MATIC TYPES.txt (paste exactly)
+
+14) If CSV was requested: CSV header row, then one data row
+
+15) If JSON was requested: JSON download line
+
+16) ONE question as a normal sentence OR the single word: None
