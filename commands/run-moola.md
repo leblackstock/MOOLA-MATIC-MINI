@@ -5,6 +5,8 @@ Run MOOLA-MATIC on the attached item(s). Default to Identify+Value unless I say 
 If I say "List", create the JSON file and respond with:
 JSON file created.
 Prioritize auto-fill fields used by ListPerfectly selectors first.
+After a List run, open the Playwright UI and load the generated JSON file.
+Include estimated measurements in the initial JSON output; the UI only edits.
 
 Inputs I will provide:
 

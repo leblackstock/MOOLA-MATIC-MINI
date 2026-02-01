@@ -1,0 +1,10 @@
+Measurements template — Standard L/W/H
+
+Format (combined line):
+Label: ~X in (Y cm)
+
+Use only what you can estimate; omit unknowns.
+
+- Length: ~__ in (__ cm)
+- Width: ~__ in (__ cm)
+- Height: ~__ in (__ cm)

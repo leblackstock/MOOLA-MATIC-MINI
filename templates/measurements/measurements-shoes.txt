@@ -1,0 +1,18 @@
+Measurements template — Shoes
+
+Format (combined line):
+Label: ~X in (Y cm)
+
+Use only what you can estimate; omit unknowns.
+
+Size tag format (if provided):
+US __ / UK __ / EU __ (Width __)
+
+- Outsole length (heel-to-toe): ~__ in (__ cm)
+- Outsole width (widest): ~__ in (__ cm)
+- Insole length (heel to toe): ~__ in (__ cm)
+- Insole width (ball area): ~__ in (__ cm)
+- Heel height: ~__ in (__ cm)
+- Platform height (forefoot): ~__ in (__ cm)
+- Toe box height: ~__ in (__ cm)
+- Weight (pair): ~__ lb (__ kg)

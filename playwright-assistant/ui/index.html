@@ -62,6 +62,19 @@
         background: rgba(19, 12, 33, 0.9);
         box-shadow: 0 8px 24px rgba(12, 8, 22, 0.7);
       }
+      .panel summary {
+        cursor: pointer;
+        list-style: none;
+      }
+      .panel summary::-webkit-details-marker {
+        display: none;
+      }
+      .panel summary h2 {
+        margin: 0;
+      }
+      .panel[open] summary {
+        margin-bottom: 10px;
+      }
       .field {
         margin: 14px 0;
       }
@@ -72,7 +85,8 @@
         color: var(--violet-200);
       }
       .field input,
-      .field textarea {
+      .field textarea,
+      .field select {
         width: 100%;
         padding: 10px 12px;
         border: 1px solid #3b2a63;
@@ -125,6 +139,16 @@
         font-size: 12px;
         color: #b29adf;
       }
+      .inline-check {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #b29adf;
+      }
+      .inline-check input {
+        width: auto;
+      }
       .status {
         margin-top: 8px;
         font-size: 14px;
@@ -144,7 +168,8 @@
       <h1>Moola Playwright Helper</h1>
       <p>Load your listing JSON, then copy fields into your listing form.</p>
 
-      <div class="panel">
+      <details class="panel" open>
+        <summary><h2>JSON Loader</h2></summary>
         <div class="row">
           <input type="file" id="fileInput" accept=".json" multiple />
           <button id="downloadBtn" disabled>Download JSON</button>
@@ -157,12 +182,15 @@
         </div>
         <div class="status" id="status">No file loaded.</div>
         <div class="note">
+          Generate JSON with /run-moola List, then load it here to review/edit.
+        </div>
+        <div class="note">
           This page never shows raw JSON. It only displays copy-ready fields.
         </div>
-      </div>
+      </details>
 
-      <div class="panel" id="autofillPanel">
-        <h2>Auto‑fill helper</h2>
+      <details class="panel" id="autofillPanel">
+        <summary><h2>Auto‑fill helper</h2></summary>
         <div class="field">
           <label>Project folder path</label>
           <input
@@ -200,9 +228,10 @@
           Need PowerShell? Press the Windows key, type "PowerShell", and open
           Windows PowerShell.
         </div>
-      </div>
+      </details>
 
-      <div id="skuPanel" class="panel" style="display: none">
+      <details id="skuPanel" class="panel" style="display: none" open>
+        <summary><h2>SKU</h2></summary>
         <div class="field">
           <label>SKU</label>
           <div class="row">
@@ -212,38 +241,187 @@
           </div>
           <div class="note" id="skuHint"></div>
         </div>
-      </div>
+      </details>
 
-      <div id="lpPanel" class="panel" style="display: none">
-        <h2>ListPerfectly selectors (auto-fill priority)</h2>
+      <details id="lpPanel" class="panel" style="display: none" open>
+        <summary><h2>ListPerfectly selectors (auto-fill priority)</h2></summary>
         <div class="note" style="margin-top: 6px">
           Includes combined fields like intended_for, tags_line, condition
           notes, and measurements. Package measurements are L x W x H (in).
         </div>
         <div id="lpFields"></div>
-      </div>
+      </details>
 
-      <div id="platformPanel" class="panel" style="display: none">
-        <h2>Platform specifics</h2>
+      <details
+        id="measurementsHelperPanel"
+        class="panel"
+        style="display: none"
+        open
+      >
+        <summary><h2>Measurements helper</h2></summary>
+        <div class="note" style="margin-top: 6px">
+          Enter inches; cm is auto-calculated. Auto-generated values use "~".
+        </div>
+        <div class="field">
+          <label>Auto-generate measurements</label>
+          <div class="row">
+            <input id="autoMeasurementsToggle" type="checkbox" checked />
+            <span class="note"
+              >Turns off if you edit measurement arrays manually.</span
+            >
+          </div>
+        </div>
+        <div class="field">
+          <label>Measurement template</label>
+          <select id="measurementTemplateSelect">
+            <option value="auto">Auto (detect)</option>
+            <option value="shoe">Shoes</option>
+            <option value="boot">Boots</option>
+            <option value="garment">Garments</option>
+            <option value="standard">Standard L/W/H</option>
+          </select>
+        </div>
+        <div id="shoeFields">
+          <div class="field">
+            <label>Size tag (US / UK / EU / Width)</label>
+            <div class="row">
+              <input id="sizeUsInput" type="text" placeholder="US" />
+              <input id="sizeUkInput" type="text" placeholder="UK" />
+              <input id="sizeEuInput" type="text" placeholder="EU" />
+              <input
+                id="sizeWidthInput"
+                type="text"
+                placeholder="Width (D, EE)"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <label>Outsole length (heel-to-toe, in)</label>
+            <input id="outsoleLengthInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Outsole width (widest part, in)</label>
+            <input id="outsoleWidthInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Insole length (heel cup to toe, in)</label>
+            <input id="insoleLengthInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Insole width (ball area, in)</label>
+            <input id="insoleWidthInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Heel height (floor to top of heel, in)</label>
+            <input id="heelHeightInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Platform height (forefoot, in)</label>
+            <input id="platformHeightInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Toe box height (inside height at toes, in)</label>
+            <input id="toeBoxHeightInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Weight (lb)</label>
+            <div class="row">
+              <input id="weightValueInput" type="number" step="0.1" />
+              <select id="weightPerSelect">
+                <option value="pair">Per pair</option>
+                <option value="boot">Per boot</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div id="bootFields">
+          <div class="field">
+            <label>Shaft height (top of outsole to top, in)</label>
+            <input id="shaftHeightInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Shaft opening / circumference (in)</label>
+            <input id="shaftCircInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Calf circumference (widest point, in)</label>
+            <input id="calfCircInput" type="number" step="0.1" />
+          </div>
+        </div>
+        <div id="garmentFields">
+          <div class="field">
+            <label>Chest (pit to pit, in)</label>
+            <input id="garmentChestInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Length (shoulder to hem, in)</label>
+            <input id="garmentLengthInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Shoulder width (in)</label>
+            <input id="garmentShoulderInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Sleeve length (in)</label>
+            <input id="garmentSleeveInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Waist (in)</label>
+            <input id="garmentWaistInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Inseam (in)</label>
+            <input id="garmentInseamInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Rise (in)</label>
+            <input id="garmentRiseInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Hip (in)</label>
+            <input id="garmentHipInput" type="number" step="0.1" />
+          </div>
+        </div>
+        <div id="standardFields">
+          <div class="field">
+            <label>Length (in)</label>
+            <input id="standardLengthInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Width (in)</label>
+            <input id="standardWidthInput" type="number" step="0.1" />
+          </div>
+          <div class="field">
+            <label>Height (in)</label>
+            <input id="standardHeightInput" type="number" step="0.1" />
+          </div>
+        </div>
+      </details>
+
+      <details id="platformPanel" class="panel" style="display: none" open>
+        <summary><h2>Platform specifics</h2></summary>
         <div class="note" style="margin-top: 6px">
           Platform recommendations and Types block outputs.
         </div>
         <div id="platformFields"></div>
-      </div>
+      </details>
 
-      <div id="additionalPanel" class="panel" style="display: none">
-        <h2>Additional information</h2>
+      <details id="additionalPanel" class="panel" style="display: none" open>
+        <summary><h2>Additional information</h2></summary>
         <div class="note" style="margin-top: 6px">
           Listing content and other non-selector fields.
         </div>
         <div id="additionalFields"></div>
-      </div>
+      </details>
     </div>
 
     <script>
       const fileInput = document.getElementById("fileInput");
       const downloadBtn = document.getElementById("downloadBtn");
       const lpPanel = document.getElementById("lpPanel");
+      const measurementsHelperPanel = document.getElementById(
+        "measurementsHelperPanel"
+      );
       const platformPanel = document.getElementById("platformPanel");
       const additionalPanel = document.getElementById("additionalPanel");
       const lpFieldsContainer = document.getElementById("lpFields");
@@ -265,6 +443,51 @@
       const skuOkBtn = document.getElementById("skuOkBtn");
       const skuChangeBtn = document.getElementById("skuChangeBtn");
       const skuHint = document.getElementById("skuHint");
+      const autoMeasurementsToggle = document.getElementById(
+        "autoMeasurementsToggle"
+      );
+      const measurementTemplateSelect = document.getElementById(
+        "measurementTemplateSelect"
+      );
+      const shoeFields = document.getElementById("shoeFields");
+      const bootFields = document.getElementById("bootFields");
+      const garmentFields = document.getElementById("garmentFields");
+      const standardFields = document.getElementById("standardFields");
+      const sizeUsInput = document.getElementById("sizeUsInput");
+      const sizeUkInput = document.getElementById("sizeUkInput");
+      const sizeEuInput = document.getElementById("sizeEuInput");
+      const sizeWidthInput = document.getElementById("sizeWidthInput");
+      const outsoleLengthInput = document.getElementById("outsoleLengthInput");
+      const outsoleWidthInput = document.getElementById("outsoleWidthInput");
+      const insoleLengthInput = document.getElementById("insoleLengthInput");
+      const insoleWidthInput = document.getElementById("insoleWidthInput");
+      const heelHeightInput = document.getElementById("heelHeightInput");
+      const platformHeightInput = document.getElementById(
+        "platformHeightInput"
+      );
+      const toeBoxHeightInput = document.getElementById("toeBoxHeightInput");
+      const weightValueInput = document.getElementById("weightValueInput");
+      const weightPerSelect = document.getElementById("weightPerSelect");
+      const shaftHeightInput = document.getElementById("shaftHeightInput");
+      const shaftCircInput = document.getElementById("shaftCircInput");
+      const calfCircInput = document.getElementById("calfCircInput");
+      const garmentChestInput = document.getElementById("garmentChestInput");
+      const garmentLengthInput = document.getElementById("garmentLengthInput");
+      const garmentShoulderInput = document.getElementById(
+        "garmentShoulderInput"
+      );
+      const garmentSleeveInput = document.getElementById("garmentSleeveInput");
+      const garmentWaistInput = document.getElementById("garmentWaistInput");
+      const garmentInseamInput = document.getElementById("garmentInseamInput");
+      const garmentRiseInput = document.getElementById("garmentRiseInput");
+      const garmentHipInput = document.getElementById("garmentHipInput");
+      const standardLengthInput = document.getElementById(
+        "standardLengthInput"
+      );
+      const standardWidthInput = document.getElementById("standardWidthInput");
+      const standardHeightInput = document.getElementById(
+        "standardHeightInput"
+      );
       let items = [];
       let currentIndex = 0;
       let currentData = null;
@@ -273,6 +496,8 @@
       let fieldInputs = [];
       let fieldInputMap = {};
       let lastAutoNotes = "";
+      let lastAutoSize = "";
+      let includeToggles = {};
       let defaultJsonFolder = "C:\\\\Users\\\\outdo\\\\Downloads";
 
       function toStringValue(value) {
@@ -394,6 +619,743 @@
         if (input && input.value !== next) {
           input.value = next;
         }
+      }
+
+      function ensureIncludeToggle(input, toggleId, labelText) {
+        if (!input) return null;
+        const existing = document.getElementById(toggleId);
+        if (existing) return existing;
+        const field = input.closest(".field");
+        if (!field) return null;
+        const row = document.createElement("div");
+        row.className = "row";
+        const label = document.createElement("label");
+        label.className = "inline-check";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.id = toggleId;
+        checkbox.checked = true;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(` ${labelText}`));
+        row.appendChild(label);
+        field.appendChild(row);
+        return checkbox;
+      }
+
+      function initMeasurementToggles() {
+        includeToggles.size = ensureIncludeToggle(
+          sizeUsInput,
+          "sizeIncludeToggle",
+          "Include Size/Fit in measurements"
+        );
+        includeToggles.outsoleLength = ensureIncludeToggle(
+          outsoleLengthInput,
+          "outsoleLengthInclude",
+          "Include"
+        );
+        includeToggles.outsoleWidth = ensureIncludeToggle(
+          outsoleWidthInput,
+          "outsoleWidthInclude",
+          "Include"
+        );
+        includeToggles.insoleLength = ensureIncludeToggle(
+          insoleLengthInput,
+          "insoleLengthInclude",
+          "Include"
+        );
+        includeToggles.insoleWidth = ensureIncludeToggle(
+          insoleWidthInput,
+          "insoleWidthInclude",
+          "Include"
+        );
+        includeToggles.heelHeight = ensureIncludeToggle(
+          heelHeightInput,
+          "heelHeightInclude",
+          "Include"
+        );
+        includeToggles.platformHeight = ensureIncludeToggle(
+          platformHeightInput,
+          "platformHeightInclude",
+          "Include"
+        );
+        includeToggles.toeBoxHeight = ensureIncludeToggle(
+          toeBoxHeightInput,
+          "toeBoxHeightInclude",
+          "Include"
+        );
+        includeToggles.weight = ensureIncludeToggle(
+          weightValueInput,
+          "weightInclude",
+          "Include"
+        );
+        includeToggles.shaftHeight = ensureIncludeToggle(
+          shaftHeightInput,
+          "shaftHeightInclude",
+          "Include"
+        );
+        includeToggles.shaftCirc = ensureIncludeToggle(
+          shaftCircInput,
+          "shaftCircInclude",
+          "Include"
+        );
+        includeToggles.calfCirc = ensureIncludeToggle(
+          calfCircInput,
+          "calfCircInclude",
+          "Include"
+        );
+        includeToggles.garmentChest = ensureIncludeToggle(
+          garmentChestInput,
+          "garmentChestInclude",
+          "Include"
+        );
+        includeToggles.garmentLength = ensureIncludeToggle(
+          garmentLengthInput,
+          "garmentLengthInclude",
+          "Include"
+        );
+        includeToggles.garmentShoulder = ensureIncludeToggle(
+          garmentShoulderInput,
+          "garmentShoulderInclude",
+          "Include"
+        );
+        includeToggles.garmentSleeve = ensureIncludeToggle(
+          garmentSleeveInput,
+          "garmentSleeveInclude",
+          "Include"
+        );
+        includeToggles.garmentWaist = ensureIncludeToggle(
+          garmentWaistInput,
+          "garmentWaistInclude",
+          "Include"
+        );
+        includeToggles.garmentInseam = ensureIncludeToggle(
+          garmentInseamInput,
+          "garmentInseamInclude",
+          "Include"
+        );
+        includeToggles.garmentRise = ensureIncludeToggle(
+          garmentRiseInput,
+          "garmentRiseInclude",
+          "Include"
+        );
+        includeToggles.garmentHip = ensureIncludeToggle(
+          garmentHipInput,
+          "garmentHipInclude",
+          "Include"
+        );
+        includeToggles.standardLength = ensureIncludeToggle(
+          standardLengthInput,
+          "standardLengthInclude",
+          "Include"
+        );
+        includeToggles.standardWidth = ensureIncludeToggle(
+          standardWidthInput,
+          "standardWidthInclude",
+          "Include"
+        );
+        includeToggles.standardHeight = ensureIncludeToggle(
+          standardHeightInput,
+          "standardHeightInclude",
+          "Include"
+        );
+      }
+
+      function isIncluded(toggle) {
+        return !toggle || toggle.checked;
+      }
+
+      function parseNumber(value) {
+        const parsed = Number.parseFloat(String(value || ""));
+        return Number.isFinite(parsed) ? parsed : null;
+      }
+
+      function formatSizeValue(value, estimated) {
+        if (value === null) return "__";
+        const text = formatNumber(value, 1);
+        return estimated ? `~${text}` : text;
+      }
+
+      function getSizeOffsets(data) {
+        const intended = Array.isArray(data?.intended_for)
+          ? data.intended_for.map((item) => String(item).toLowerCase())
+          : [];
+        const isWomen = intended.includes("women");
+        if (isWomen) {
+          return { usToUk: -2, usToEu: 31 };
+        }
+        return { usToUk: -1, usToEu: 33 };
+      }
+
+      function convertSizeValues(raw, offsets) {
+        let { us, uk, eu } = raw;
+        let estimated = { us: false, uk: false, eu: false };
+        if (us !== null) {
+          if (uk === null) {
+            uk = us + offsets.usToUk;
+            estimated.uk = true;
+          }
+          if (eu === null) {
+            eu = us + offsets.usToEu;
+            estimated.eu = true;
+          }
+        } else if (uk !== null) {
+          us = uk - offsets.usToUk;
+          estimated.us = true;
+          if (eu === null) {
+            eu = us + offsets.usToEu;
+            estimated.eu = true;
+          }
+        } else if (eu !== null) {
+          us = eu - offsets.usToEu;
+          estimated.us = true;
+          uk = us + offsets.usToUk;
+          estimated.uk = true;
+        }
+        return { us, uk, eu, estimated };
+      }
+
+      function applySizeConversions(data) {
+        const raw = {
+          us: parseNumber(sizeUsInput?.value),
+          uk: parseNumber(sizeUkInput?.value),
+          eu: parseNumber(sizeEuInput?.value),
+        };
+        const offsets = getSizeOffsets(data);
+        const values = convertSizeValues(raw, offsets);
+        setInputValue(sizeUsInput, values.us);
+        setInputValue(sizeUkInput, values.uk);
+        setInputValue(sizeEuInput, values.eu);
+        return values;
+      }
+
+      function formatNumber(value, decimals) {
+        const factor = 10 ** decimals;
+        const rounded = Math.round(value * factor) / factor;
+        const fixed = rounded.toFixed(decimals);
+        return fixed.replace(/\.0+$/, "");
+      }
+
+      function formatInches(value) {
+        return `~${formatNumber(value, 1)} in`;
+      }
+
+      function formatCentimeters(value) {
+        return `${formatNumber(value * 2.54, 1)} cm`;
+      }
+
+      function formatPounds(value) {
+        return `~${formatNumber(value, 2)} lb`;
+      }
+
+      function formatKilograms(value) {
+        return `${formatNumber(value * 0.453592, 2)} kg`;
+      }
+
+      function addMeasurementLine(label, inches, lines, imperial, metric) {
+        if (inches === null) return;
+        const inText = formatInches(inches);
+        const cmText = formatCentimeters(inches);
+        lines.push(`${label}: ${inText} (${cmText})`);
+        imperial.push(`${label}: ${inText}`);
+        metric.push(`${label}: ${cmText}`);
+      }
+
+      function addWeightLine(label, pounds, lines, imperial, metric) {
+        if (pounds === null) return;
+        const lbText = formatPounds(pounds);
+        const kgText = formatKilograms(pounds);
+        lines.push(`${label}: ${lbText} (${kgText})`);
+        imperial.push(`${label}: ${lbText}`);
+        metric.push(`${label}: ${kgText}`);
+      }
+
+      function buildSizeTagFromInputs(data) {
+        const values = applySizeConversions(data);
+        const width = String(sizeWidthInput?.value || "").trim();
+        if (!values.us && !values.uk && !values.eu && !width) return "";
+        const usText = formatSizeValue(values.us, values.estimated?.us);
+        const ukText = formatSizeValue(values.uk, values.estimated?.uk);
+        const euText = formatSizeValue(values.eu, values.estimated?.eu);
+        const widthText = width || "__";
+        return `US ${usText} / UK ${ukText} / EU ${euText} (Width ${widthText})`;
+      }
+
+      function updateSizeOrFitFromHelper(data) {
+        if (!data) return;
+        const next = buildSizeTagFromInputs(data);
+        if (!next) return;
+        const current = String(data.size_or_fit || "").trim();
+        if (current && current !== lastAutoSize) return;
+        data.size_or_fit = next;
+        lastAutoSize = next;
+        const input = fieldInputMap.size_or_fit;
+        if (input && input.value !== next) {
+          input.value = next;
+        }
+      }
+
+      function setFieldValue(key, value) {
+        if (!currentData) return;
+        currentData[key] = value;
+        const input = fieldInputMap[key];
+        if (!input) return;
+        if (Array.isArray(value)) {
+          input.value = value.join("\n");
+        } else {
+          input.value = value ?? "";
+        }
+      }
+
+      function hasMeasurementInputs(values) {
+        return Object.values(values).some((value) => value !== null);
+      }
+
+      function detectMeasurementTemplate(data) {
+        const lines = Array.isArray(data?.measurements)
+          ? data.measurements.join("\n").toLowerCase()
+          : String(data?.measurements || "").toLowerCase();
+        if (lines.includes("outsole") || lines.includes("insole")) {
+          if (
+            lines.includes("shaft") ||
+            lines.includes("calf") ||
+            lines.includes("opening")
+          ) {
+            return "boot";
+          }
+          return "shoe";
+        }
+        if (
+          lines.includes("chest") ||
+          lines.includes("waist") ||
+          lines.includes("inseam") ||
+          lines.includes("sleeve")
+        ) {
+          return "garment";
+        }
+        if (
+          lines.includes("length") &&
+          lines.includes("width") &&
+          lines.includes("height")
+        ) {
+          return "standard";
+        }
+        return "shoe";
+      }
+
+      function getSelectedTemplate() {
+        if (!measurementTemplateSelect) return "shoe";
+        if (measurementTemplateSelect.value !== "auto") {
+          return measurementTemplateSelect.value;
+        }
+        return detectMeasurementTemplate(currentData);
+      }
+
+      function updateMeasurementsFromHelper() {
+        if (!autoMeasurementsToggle?.checked || !currentData) return;
+        const template = getSelectedTemplate();
+        const values = {
+          outsoleLength: parseNumber(outsoleLengthInput?.value),
+          outsoleWidth: parseNumber(outsoleWidthInput?.value),
+          insoleLength: parseNumber(insoleLengthInput?.value),
+          insoleWidth: parseNumber(insoleWidthInput?.value),
+          heelHeight: parseNumber(heelHeightInput?.value),
+          platformHeight: parseNumber(platformHeightInput?.value),
+          toeBoxHeight: parseNumber(toeBoxHeightInput?.value),
+          shaftHeight: parseNumber(shaftHeightInput?.value),
+          shaftCirc: parseNumber(shaftCircInput?.value),
+          calfCirc: parseNumber(calfCircInput?.value),
+          weightValue: parseNumber(weightValueInput?.value),
+          garmentChest: parseNumber(garmentChestInput?.value),
+          garmentLength: parseNumber(garmentLengthInput?.value),
+          garmentShoulder: parseNumber(garmentShoulderInput?.value),
+          garmentSleeve: parseNumber(garmentSleeveInput?.value),
+          garmentWaist: parseNumber(garmentWaistInput?.value),
+          garmentInseam: parseNumber(garmentInseamInput?.value),
+          garmentRise: parseNumber(garmentRiseInput?.value),
+          garmentHip: parseNumber(garmentHipInput?.value),
+          standardLength: parseNumber(standardLengthInput?.value),
+          standardWidth: parseNumber(standardWidthInput?.value),
+          standardHeight: parseNumber(standardHeightInput?.value),
+        };
+
+        if (!hasMeasurementInputs(values)) return;
+
+        const lines = [];
+        const imperial = [];
+        const metric = [];
+
+        const sizeTag = String(currentData.size_or_fit || "").trim();
+        if (sizeTag && isIncluded(includeToggles.size)) {
+          lines.push(`Size / Fit: ${sizeTag}`);
+        }
+
+        if (template === "shoe" || template === "boot") {
+          if (isIncluded(includeToggles.outsoleLength)) {
+            addMeasurementLine(
+              "Outsole length (heel-to-toe)",
+              values.outsoleLength,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.outsoleWidth)) {
+            addMeasurementLine(
+              "Outsole width (widest)",
+              values.outsoleWidth,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.insoleLength)) {
+            addMeasurementLine(
+              "Insole length (heel to toe)",
+              values.insoleLength,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.insoleWidth)) {
+            addMeasurementLine(
+              "Insole width (ball area)",
+              values.insoleWidth,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.heelHeight)) {
+            addMeasurementLine(
+              "Heel height",
+              values.heelHeight,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.platformHeight)) {
+            addMeasurementLine(
+              "Platform height (forefoot)",
+              values.platformHeight,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.toeBoxHeight)) {
+            addMeasurementLine(
+              "Toe box height",
+              values.toeBoxHeight,
+              lines,
+              imperial,
+              metric
+            );
+          }
+
+          if (template === "boot") {
+            if (isIncluded(includeToggles.shaftHeight)) {
+              addMeasurementLine(
+                "Shaft height (from outsole)",
+                values.shaftHeight,
+                lines,
+                imperial,
+                metric
+              );
+            }
+            if (isIncluded(includeToggles.shaftCirc)) {
+              addMeasurementLine(
+                "Shaft opening (circumference)",
+                values.shaftCirc,
+                lines,
+                imperial,
+                metric
+              );
+            }
+            if (isIncluded(includeToggles.calfCirc)) {
+              addMeasurementLine(
+                "Calf circumference (widest point)",
+                values.calfCirc,
+                lines,
+                imperial,
+                metric
+              );
+            }
+          }
+
+          if (
+            values.weightValue !== null &&
+            isIncluded(includeToggles.weight)
+          ) {
+            const weightLabel =
+              weightPerSelect?.value === "boot"
+                ? "Weight (per boot)"
+                : "Weight (pair)";
+            addWeightLine(
+              weightLabel,
+              values.weightValue,
+              lines,
+              imperial,
+              metric
+            );
+          }
+        }
+
+        if (template === "garment") {
+          if (isIncluded(includeToggles.garmentChest)) {
+            addMeasurementLine(
+              "Chest (pit to pit)",
+              values.garmentChest,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.garmentLength)) {
+            addMeasurementLine(
+              "Length (shoulder to hem)",
+              values.garmentLength,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.garmentShoulder)) {
+            addMeasurementLine(
+              "Shoulder width",
+              values.garmentShoulder,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.garmentSleeve)) {
+            addMeasurementLine(
+              "Sleeve length",
+              values.garmentSleeve,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.garmentWaist)) {
+            addMeasurementLine(
+              "Waist",
+              values.garmentWaist,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.garmentInseam)) {
+            addMeasurementLine(
+              "Inseam",
+              values.garmentInseam,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.garmentRise)) {
+            addMeasurementLine(
+              "Rise",
+              values.garmentRise,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.garmentHip)) {
+            addMeasurementLine(
+              "Hip",
+              values.garmentHip,
+              lines,
+              imperial,
+              metric
+            );
+          }
+        }
+
+        if (template === "standard") {
+          if (isIncluded(includeToggles.standardLength)) {
+            addMeasurementLine(
+              "Length",
+              values.standardLength,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.standardWidth)) {
+            addMeasurementLine(
+              "Width",
+              values.standardWidth,
+              lines,
+              imperial,
+              metric
+            );
+          }
+          if (isIncluded(includeToggles.standardHeight)) {
+            addMeasurementLine(
+              "Height",
+              values.standardHeight,
+              lines,
+              imperial,
+              metric
+            );
+          }
+        }
+
+        setFieldValue("measurements", lines);
+        setFieldValue("measurements_imperial", imperial);
+        setFieldValue("measurements_metric", metric);
+        updateListperfectlyDescription(currentData);
+      }
+
+      function toggleMeasurementFields() {
+        if (!measurementTemplateSelect) return;
+        const template =
+          measurementTemplateSelect.value === "auto"
+            ? detectMeasurementTemplate(currentData)
+            : measurementTemplateSelect.value;
+        if (shoeFields) {
+          shoeFields.style.display =
+            template === "shoe" || template === "boot" ? "block" : "none";
+        }
+        if (bootFields) {
+          bootFields.style.display = template === "boot" ? "block" : "none";
+        }
+        if (garmentFields) {
+          garmentFields.style.display =
+            template === "garment" ? "block" : "none";
+        }
+        if (standardFields) {
+          standardFields.style.display =
+            template === "standard" ? "block" : "none";
+        }
+      }
+
+      function extractInches(line) {
+        const match = String(line || "").match(/:\s*~?([\d.]+)\s*in\b/i);
+        return match ? Number.parseFloat(match[1]) : null;
+      }
+
+      function extractPounds(line) {
+        const match = String(line || "").match(/:\s*~?([\d.]+)\s*lb\b/i);
+        return match ? Number.parseFloat(match[1]) : null;
+      }
+
+      function setInputValue(input, value) {
+        if (!input || value === null || Number.isNaN(value)) return;
+        if (String(input.value || "").trim()) return;
+        input.value = value;
+      }
+
+      function populateMeasurementHelperFromData(data) {
+        if (!data) return;
+        const lines = Array.isArray(data.measurements)
+          ? data.measurements
+          : parseList(data.measurements);
+        if (!lines.length) return;
+
+        const lineMap = new Map();
+        lines.forEach((line) => {
+          const [label] = String(line).split(":");
+          if (!label) return;
+          lineMap.set(label.trim().toLowerCase(), line);
+        });
+
+        const setFromLabel = (label, input, parser) => {
+          const line = lineMap.get(label.toLowerCase());
+          if (!line) return;
+          const value = parser(line);
+          setInputValue(input, value);
+        };
+
+        setFromLabel(
+          "Outsole length (heel-to-toe)",
+          outsoleLengthInput,
+          extractInches
+        );
+        setFromLabel(
+          "Outsole width (widest)",
+          outsoleWidthInput,
+          extractInches
+        );
+        setFromLabel(
+          "Insole length (heel to toe)",
+          insoleLengthInput,
+          extractInches
+        );
+        setFromLabel(
+          "Insole width (ball area)",
+          insoleWidthInput,
+          extractInches
+        );
+        setFromLabel("Heel height", heelHeightInput, extractInches);
+        setFromLabel(
+          "Platform height (forefoot)",
+          platformHeightInput,
+          extractInches
+        );
+        setFromLabel("Toe box height", toeBoxHeightInput, extractInches);
+        setFromLabel(
+          "Shaft height (from outsole)",
+          shaftHeightInput,
+          extractInches
+        );
+        setFromLabel(
+          "Shaft opening (circumference)",
+          shaftCircInput,
+          extractInches
+        );
+        setFromLabel(
+          "Calf circumference (widest point)",
+          calfCircInput,
+          extractInches
+        );
+        setFromLabel("Chest (pit to pit)", garmentChestInput, extractInches);
+        setFromLabel(
+          "Length (shoulder to hem)",
+          garmentLengthInput,
+          extractInches
+        );
+        setFromLabel("Shoulder width", garmentShoulderInput, extractInches);
+        setFromLabel("Sleeve length", garmentSleeveInput, extractInches);
+        setFromLabel("Waist", garmentWaistInput, extractInches);
+        setFromLabel("Inseam", garmentInseamInput, extractInches);
+        setFromLabel("Rise", garmentRiseInput, extractInches);
+        setFromLabel("Hip", garmentHipInput, extractInches);
+        setFromLabel("Length", standardLengthInput, extractInches);
+        setFromLabel("Width", standardWidthInput, extractInches);
+        setFromLabel("Height", standardHeightInput, extractInches);
+
+        lines.forEach((line) => {
+          if (!line.toLowerCase().includes("weight")) return;
+          const pounds = extractPounds(line);
+          setInputValue(weightValueInput, pounds);
+          if (weightPerSelect) {
+            if (line.toLowerCase().includes("per boot")) {
+              weightPerSelect.value = "boot";
+            } else {
+              weightPerSelect.value = "pair";
+            }
+          }
+        });
+
+        const sizeText = String(data.size_or_fit || "");
+        if (sizeText) {
+          const usMatch = sizeText.match(/US\s*([0-9.]+)/i);
+          const ukMatch = sizeText.match(/UK\s*([0-9.]+)/i);
+          const euMatch = sizeText.match(/EU\s*([0-9.]+)/i);
+          const widthMatch = sizeText.match(/Width\s*([A-Za-z0-9]+)/i);
+          if (usMatch) setInputValue(sizeUsInput, usMatch[1]);
+          if (ukMatch) setInputValue(sizeUkInput, ukMatch[1]);
+          if (euMatch) setInputValue(sizeEuInput, euMatch[1]);
+          if (widthMatch) setInputValue(sizeWidthInput, widthMatch[1]);
+        }
+        updateSizeOrFitFromHelper(data);
       }
 
       function sanitizePart(value) {
@@ -544,6 +1506,16 @@
             }
             if (field.key === "platforms") {
               currentData.platforms = parsePlatforms(input.value);
+            }
+            if (
+              [
+                "measurements",
+                "measurements_imperial",
+                "measurements_metric",
+              ].includes(field.key) &&
+              autoMeasurementsToggle
+            ) {
+              autoMeasurementsToggle.checked = false;
             }
             if (
               [
@@ -702,6 +1674,68 @@
       }
 
       updateFieldEditability();
+      initMeasurementToggles();
+
+      function handleMeasurementInput() {
+        const template = getSelectedTemplate();
+        if (template === "shoe" || template === "boot") {
+          updateSizeOrFitFromHelper(currentData);
+        }
+        updateMeasurementsFromHelper();
+      }
+
+      const measurementInputs = [
+        sizeUsInput,
+        sizeUkInput,
+        sizeEuInput,
+        sizeWidthInput,
+        outsoleLengthInput,
+        outsoleWidthInput,
+        insoleLengthInput,
+        insoleWidthInput,
+        heelHeightInput,
+        platformHeightInput,
+        toeBoxHeightInput,
+        weightValueInput,
+        shaftHeightInput,
+        shaftCircInput,
+        calfCircInput,
+        garmentChestInput,
+        garmentLengthInput,
+        garmentShoulderInput,
+        garmentSleeveInput,
+        garmentWaistInput,
+        garmentInseamInput,
+        garmentRiseInput,
+        garmentHipInput,
+        standardLengthInput,
+        standardWidthInput,
+        standardHeightInput,
+      ];
+
+      measurementInputs.forEach((input) => {
+        if (!input) return;
+        input.addEventListener("input", handleMeasurementInput);
+      });
+
+      if (weightPerSelect) {
+        weightPerSelect.addEventListener("change", handleMeasurementInput);
+      }
+
+      if (measurementTemplateSelect) {
+        measurementTemplateSelect.addEventListener("change", () => {
+          toggleMeasurementFields();
+          handleMeasurementInput();
+        });
+      }
+
+      if (autoMeasurementsToggle) {
+        autoMeasurementsToggle.addEventListener("change", () => {
+          if (autoMeasurementsToggle.checked) {
+            updateMeasurementsFromHelper();
+          }
+        });
+      }
 
       jsonBrowseBtn.addEventListener("click", () => {
         jsonPicker.click();
@@ -834,11 +1868,14 @@
         if (!items.length) return;
         currentData = items[currentIndex].data;
         lpPanel.style.display = "block";
+        measurementsHelperPanel.style.display = "block";
         platformPanel.style.display = "block";
         additionalPanel.style.display = "block";
         updateSkuPanel(currentData);
         renderFields(currentData);
         updateFieldEditability();
+        toggleMeasurementFields();
+        populateMeasurementHelperFromData(currentData);
         downloadBtn.disabled = false;
         updateStatus();
       }
@@ -876,6 +1913,7 @@
         }
         if (!items.length) {
           lpPanel.style.display = "none";
+          measurementsHelperPanel.style.display = "none";
           platformPanel.style.display = "none";
           additionalPanel.style.display = "none";
           skuPanel.style.display = "none";

@@ -1,0 +1,15 @@
+Measurements template — Garments
+
+Format (combined line):
+Label: ~X in (Y cm)
+
+Use only what you can estimate; omit unknowns.
+
+- Chest (pit to pit): ~__ in (__ cm)
+- Length (shoulder to hem): ~__ in (__ cm)
+- Shoulder width: ~__ in (__ cm)
+- Sleeve length: ~__ in (__ cm)
+- Waist: ~__ in (__ cm)
+- Inseam: ~__ in (__ cm)
+- Rise: ~__ in (__ cm)
+- Hip: ~__ in (__ cm)

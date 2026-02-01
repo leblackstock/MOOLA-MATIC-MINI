@@ -7,9 +7,11 @@ Run mode
 - Trigger: user message begins with "/run-moola" or open `commands/run-moola.md`.
 - Default output: Identify + Value unless the user explicitly says "List" or "Listing".
 - Listing output: follow `Original/MOOLA-MATIC LIST.txt` and `Original/MOOLA-MATIC JSON SCHEMA.txt`.
+- Measurement estimates must be generated in the initial JSON (not in the UI).
 - Listing JSON: create the JSON file and respond with:
   JSON file created.
 - ListPerfectly priority: fill all fields used by `playwright-assistant/scripts/selectors.json` first.
+- After a List run, load the generated JSON file in the Playwright UI to review/edit and download.
 
 Edit mode
 
@@ -29,3 +31,7 @@ Templates
 - `templates/list-json-template.json`
 - `templates/list-json-confirmation.txt`
 - `templates/listperfectly-selectors-priority.txt`
+- `templates/measurements/measurements-shoes.txt`
+- `templates/measurements/measurements-boots.txt`
+- `templates/measurements/measurements-garments.txt`
+- `templates/measurements/measurements-standard-lwh.txt`
