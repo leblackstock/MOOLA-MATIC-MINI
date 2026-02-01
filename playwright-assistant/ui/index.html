@@ -139,6 +139,12 @@
         font-size: 12px;
         color: #b29adf;
       }
+      .section-title {
+        margin: 14px 0 6px;
+        font-size: 14px;
+        color: var(--violet-200);
+        font-weight: 600;
+      }
       .inline-check {
         display: inline-flex;
         align-items: center;
@@ -401,9 +407,16 @@
       <details id="platformPanel" class="panel" style="display: none" open>
         <summary><h2>Platform specifics</h2></summary>
         <div class="note" style="margin-top: 6px">
-          Platform recommendations and Types block outputs.
+          Platform-specific reasons and types grouped by platform.
         </div>
-        <div id="platformFields"></div>
+        <div class="section-title">Ebay</div>
+        <div id="ebayPlatformFields"></div>
+        <div class="section-title">Depop</div>
+        <div id="depopPlatformFields"></div>
+        <div class="section-title">Misc Types (Occasions/Styles)</div>
+        <div id="typesMiscFields"></div>
+        <div class="section-title">Other Platforms</div>
+        <div id="otherPlatformFields"></div>
       </details>
 
       <details id="additionalPanel" class="panel" style="display: none" open>
@@ -425,7 +438,16 @@
       const platformPanel = document.getElementById("platformPanel");
       const additionalPanel = document.getElementById("additionalPanel");
       const lpFieldsContainer = document.getElementById("lpFields");
-      const platformFieldsContainer = document.getElementById("platformFields");
+      const ebayPlatformFieldsContainer =
+        document.getElementById("ebayPlatformFields");
+      const depopPlatformFieldsContainer = document.getElementById(
+        "depopPlatformFields"
+      );
+      const typesMiscFieldsContainer =
+        document.getElementById("typesMiscFields");
+      const otherPlatformFieldsContainer = document.getElementById(
+        "otherPlatformFields"
+      );
       const additionalFieldsContainer =
         document.getElementById("additionalFields");
       const status = document.getElementById("status");
@@ -542,6 +564,105 @@
             reason: line.slice(idx + 1).trim(),
           };
         });
+      }
+
+      function getTypesParts(data) {
+        const text = String(data?.types_block || "");
+        const depopMatch = text.match(
+          /^(?:Depop Boots Type|Depop Types):\s*(.+)$/im
+        );
+        const ebayMatch = text.match(
+          /^(?:Ebay Boots Type|Ebay Types):\s*(.+)$/im
+        );
+        const occasionsMatch = text.match(/^Occasions:\s*(.+)$/im);
+        const stylesMatch = text.match(/^Styles:\s*(.+)$/im);
+        const depop = depopMatch ? depopMatch[1].trim() : "";
+        const ebay = ebayMatch ? ebayMatch[1].trim() : "";
+        const occasions = occasionsMatch ? occasionsMatch[1].trim() : "";
+        const styles = stylesMatch ? stylesMatch[1].trim() : "";
+        const lines = text
+          .split(/\\n/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+        const misc = lines.filter((line) => {
+          const lower = line.toLowerCase();
+          if (lower.startsWith("depop boots type:")) return false;
+          if (lower.startsWith("depop types:")) return false;
+          if (lower.startsWith("ebay boots type:")) return false;
+          if (lower.startsWith("ebay types:")) return false;
+          if (lower.startsWith("occasions:")) return false;
+          if (lower.startsWith("styles:")) return false;
+          return true;
+        });
+        return { depop, ebay, occasions, styles, misc };
+      }
+
+      function buildTypesBlock(parts) {
+        const lines = [];
+        if (parts.depop) {
+          lines.push(`Depop Boots Type: ${parts.depop}`);
+        }
+        if (parts.ebay) {
+          lines.push(`Ebay Boots Type: ${parts.ebay}`);
+        }
+        if (parts.occasions) {
+          lines.push(`Occasions: ${parts.occasions}`);
+        }
+        if (parts.styles) {
+          lines.push(`Styles: ${parts.styles}`);
+        }
+        if (parts.misc?.length) {
+          lines.push(...parts.misc);
+        }
+        return lines.join("\\n");
+      }
+
+      function setTypesPart(data, part, value) {
+        if (!data) return;
+        const parts = getTypesParts(data);
+        if (part === "depop") parts.depop = String(value || "").trim();
+        if (part === "ebay") parts.ebay = String(value || "").trim();
+        if (part === "occasions") parts.occasions = String(value || "").trim();
+        if (part === "styles") parts.styles = String(value || "").trim();
+        if (part === "misc") {
+          parts.misc = String(value || "")
+            .split(/\\n/)
+            .map((line) => line.trim())
+            .filter(Boolean);
+        }
+        data.types_block = buildTypesBlock(parts);
+      }
+
+      function getPlatformReason(data, platform) {
+        const list = Array.isArray(data?.platforms) ? data.platforms : [];
+        const match = list.find(
+          (item) =>
+            String(item?.platform || "").toLowerCase() ===
+            platform.toLowerCase()
+        );
+        return match?.reason || "";
+      }
+
+      function setPlatformReason(data, platform, reason) {
+        if (!data) return;
+        const trimmed = String(reason || "").trim();
+        const list = Array.isArray(data.platforms) ? data.platforms : [];
+        const idx = list.findIndex(
+          (item) =>
+            String(item?.platform || "").toLowerCase() ===
+            platform.toLowerCase()
+        );
+        if (!trimmed) {
+          if (idx >= 0) list.splice(idx, 1);
+          data.platforms = list;
+          return;
+        }
+        if (idx >= 0) {
+          list[idx].reason = trimmed;
+        } else {
+          list.push({ platform, reason: trimmed });
+        }
+        data.platforms = list;
       }
 
       function buildListperfectlyDescription(data) {
@@ -1465,7 +1586,11 @@
         const input = field.multiline
           ? document.createElement("textarea")
           : document.createElement("input");
-        const rawValue = data ? data[field.key] : "";
+        const rawValue = field.getValue
+          ? field.getValue(data)
+          : data
+          ? data[field.key]
+          : "";
         const displayValue = field.format
           ? field.format(rawValue)
           : toStringValue(rawValue);
@@ -1500,7 +1625,11 @@
             const parsedValue = field.parse
               ? field.parse(input.value)
               : input.value;
-            currentData[field.key] = parsedValue;
+            if (field.setValue) {
+              field.setValue(currentData, parsedValue);
+            } else {
+              currentData[field.key] = parsedValue;
+            }
             if (field.key === "tags_line") {
               currentData.tags = parseList(input.value);
             }
@@ -1542,7 +1671,10 @@
 
       function renderFields(data) {
         lpFieldsContainer.innerHTML = "";
-        platformFieldsContainer.innerHTML = "";
+        ebayPlatformFieldsContainer.innerHTML = "";
+        depopPlatformFieldsContainer.innerHTML = "";
+        typesMiscFieldsContainer.innerHTML = "";
+        otherPlatformFieldsContainer.innerHTML = "";
         additionalFieldsContainer.innerHTML = "";
         fieldInputs = [];
         fieldInputMap = {};
@@ -1621,15 +1753,119 @@
           { label: "Purchase Location", key: "purchase_location" },
         ];
 
-        const platformFields = [
+        const ebayPlatformFields = [
           {
-            label: "Platforms",
-            key: "platforms",
+            label: "Ebay Reason",
             multiline: true,
-            format: (value) => toStringValue(value),
-            parse: (value) => parsePlatforms(value),
+            getValue: (data) => getPlatformReason(data, "eBay"),
+            setValue: (data, value) => setPlatformReason(data, "eBay", value),
           },
-          { label: "Types block", key: "types_block", multiline: true },
+          {
+            label: "Ebay Types",
+            multiline: true,
+            getValue: (data) => getTypesParts(data).ebay,
+            setValue: (data, value) => setTypesPart(data, "ebay", value),
+          },
+        ];
+
+        const depopPlatformFields = [
+          {
+            label: "Depop Reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Depop"),
+            setValue: (data, value) => setPlatformReason(data, "Depop", value),
+          },
+          {
+            label: "Depop Types",
+            multiline: true,
+            getValue: (data) => getTypesParts(data).depop,
+            setValue: (data, value) => setTypesPart(data, "depop", value),
+          },
+        ];
+
+        const miscTypesFields = [
+          {
+            label: "Occasions",
+            multiline: true,
+            getValue: (data) => getTypesParts(data).occasions,
+            setValue: (data, value) => setTypesPart(data, "occasions", value),
+          },
+          {
+            label: "Styles",
+            multiline: true,
+            getValue: (data) => getTypesParts(data).styles,
+            setValue: (data, value) => setTypesPart(data, "styles", value),
+          },
+        ];
+
+        const otherPlatformFields = [
+          {
+            label: "Etsy reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Etsy"),
+            setValue: (data, value) => setPlatformReason(data, "Etsy", value),
+          },
+          {
+            label: "Facebook Marketplace reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Facebook Marketplace"),
+            setValue: (data, value) =>
+              setPlatformReason(data, "Facebook Marketplace", value),
+          },
+          {
+            label: "Mercari reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Mercari"),
+            setValue: (data, value) =>
+              setPlatformReason(data, "Mercari", value),
+          },
+          {
+            label: "Poshmark reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Poshmark"),
+            setValue: (data, value) =>
+              setPlatformReason(data, "Poshmark", value),
+          },
+          {
+            label: "Grailed reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Grailed"),
+            setValue: (data, value) =>
+              setPlatformReason(data, "Grailed", value),
+          },
+          {
+            label: "Depop reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Depop"),
+            setValue: (data, value) => setPlatformReason(data, "Depop", value),
+          },
+          {
+            label: "Shopify reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Shopify"),
+            setValue: (data, value) =>
+              setPlatformReason(data, "Shopify", value),
+          },
+          {
+            label: "Vestiaire Collective reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Vestiaire Collective"),
+            setValue: (data, value) =>
+              setPlatformReason(data, "Vestiaire Collective", value),
+          },
+          {
+            label: "Vinted reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Vinted"),
+            setValue: (data, value) => setPlatformReason(data, "Vinted", value),
+          },
+          {
+            label: "Whatnot reason",
+            multiline: true,
+            getValue: (data) => getPlatformReason(data, "Whatnot"),
+            setValue: (data, value) =>
+              setPlatformReason(data, "Whatnot", value),
+          },
         ];
 
         const additionalFields = [
@@ -1657,8 +1893,17 @@
         listperfectlyFields.forEach((field) =>
           addField(field, data, lpFieldsContainer)
         );
-        platformFields.forEach((field) =>
-          addField(field, data, platformFieldsContainer)
+        ebayPlatformFields.forEach((field) =>
+          addField(field, data, ebayPlatformFieldsContainer)
+        );
+        depopPlatformFields.forEach((field) =>
+          addField(field, data, depopPlatformFieldsContainer)
+        );
+        miscTypesFields.forEach((field) =>
+          addField(field, data, typesMiscFieldsContainer)
+        );
+        otherPlatformFields.forEach((field) =>
+          addField(field, data, otherPlatformFieldsContainer)
         );
         additionalFields.forEach((field) =>
           addField(field, data, additionalFieldsContainer)

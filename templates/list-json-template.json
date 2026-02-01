@@ -48,7 +48,7 @@
       "reason": "<reason_2>"
     }
   ],
-  "types_block": "Depop Boots Type: <depop_boots_types>\nEbay Boots Type: <ebay_boots_type>\nOccasions: <occasions>\nStyles: <styles>",
+  "types_block": "Depop Boots Type: <depop_boots_type>\nEbay Boots Type: <ebay_boots_type>\nOccasions: <occasion_1>, <occasion_2>, <occasion_3>\nStyles: <style_1>, <style_2>, <style_3>",
   "listing_body": "<listing_body_lines>",
   "question": "None"
 }
