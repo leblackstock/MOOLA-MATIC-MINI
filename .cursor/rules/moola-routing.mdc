@@ -1,0 +1,11 @@
+---
+description: Moola-Matic routing and mode triggers
+alwaysApply: true
+---
+
+# Moola-Matic routing
+- Treat messages starting with "/run-moola" as Run mode.
+- Treat messages starting with "/edit-moola" as Edit mode.
+- Run mode: execute Moola-Matic; default to Identify+Value unless the user explicitly says List/Listing.
+- Edit mode: improve rules/templates/schema/workflow docs; do not output listings.
+- `Original/*.txt` are reference-only; do not modify them.

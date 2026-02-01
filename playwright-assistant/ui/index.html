@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -18,6 +18,7 @@
         --ink-100: #f4f0ff;
         --ink-200: #d9cff6;
       }
+
       html,
       body {
         min-height: 100%;
@@ -25,7 +26,12 @@
       body {
         margin: 0;
         color: var(--ink-100);
-        background: radial-gradient(circle at top, #22113f 0%, #120a22 45%, #0b0814 100%);
+        background: radial-gradient(
+          circle at top,
+          #22113f 0%,
+          #120a22 45%,
+          #0b0814 100%
+        );
         background-repeat: no-repeat;
         background-attachment: fixed;
       }
@@ -138,67 +144,112 @@
       <h1>Moola Playwright Helper</h1>
       <p>Load your listing JSON, then copy fields into your listing form.</p>
 
-    <div class="panel">
-      <div class="row">
-        <input type="file" id="fileInput" accept=".json" multiple />
-        <button id="downloadBtn" disabled>Download JSON</button>
-        <button id="prevBtn" disabled>Prev</button>
-        <button id="nextBtn" disabled>Next</button>
-      </div>
-      <div class="note" style="margin-top: 10px;">
-        Edit mode is always on. Edits update the JSON used for auto‑fill and download.
-      </div>
-      <div class="status" id="status">No file loaded.</div>
-      <div class="note">
-        This page never shows raw JSON. It only displays copy-ready fields.
-      </div>
-    </div>
-
-    <div class="panel" id="autofillPanel">
-      <h2>Auto‑fill helper</h2>
-      <div class="field">
-        <label>Project folder path</label>
-        <input id="projectPathInput" type="text" placeholder="C:\\Users\\outdo\\Documents\\MOOLA-MATIC MINI" />
-      </div>
-      <div class="field">
-        <label>JSON file path</label>
-        <input id="jsonPathInput" type="text" placeholder="C:\\Users\\outdo\\Downloads\\listing.json" />
-      </div>
-      <div class="row">
-        <input id="jsonPicker" type="file" accept=".json" style="display:none;" />
-        <button id="jsonBrowseBtn">Browse JSON</button>
-      </div>
-      <div class="row">
-        <button id="copyCmdBtn">Copy autofill command</button>
-        <button id="downloadBatBtn">Download run-autofill.bat</button>
-      </div>
-      <div class="note" id="autofillNote">
-        Browsers can’t run Playwright directly. Use the copied command or the .bat file.
-      </div>
-      <div class="note" style="margin-top: 8px;">
-        Need PowerShell? Press the Windows key, type "PowerShell", and open Windows PowerShell.
-      </div>
-    </div>
-
-    <div id="skuPanel" class="panel" style="display: none;">
-      <div class="field">
-        <label>SKU</label>
+      <div class="panel">
         <div class="row">
-          <input id="skuInput" type="text" placeholder="Enter SKU" />
-          <button id="skuOkBtn">OK</button>
-          <button id="skuChangeBtn">Change</button>
+          <input type="file" id="fileInput" accept=".json" multiple />
+          <button id="downloadBtn" disabled>Download JSON</button>
+          <button id="prevBtn" disabled>Prev</button>
+          <button id="nextBtn" disabled>Next</button>
         </div>
-        <div class="note" id="skuHint"></div>
+        <div class="note" style="margin-top: 10px">
+          Edit mode is always on. Edits update the JSON used for auto‑fill and
+          download.
+        </div>
+        <div class="status" id="status">No file loaded.</div>
+        <div class="note">
+          This page never shows raw JSON. It only displays copy-ready fields.
+        </div>
       </div>
-    </div>
 
-      <div id="fields" class="panel" style="display: none;"></div>
+      <div class="panel" id="autofillPanel">
+        <h2>Auto‑fill helper</h2>
+        <div class="field">
+          <label>Project folder path</label>
+          <input
+            id="projectPathInput"
+            type="text"
+            placeholder="C:\\Users\\outdo\\Documents\\MOOLA-MATIC MINI"
+          />
+        </div>
+        <div class="field">
+          <label>JSON file path</label>
+          <input
+            id="jsonPathInput"
+            type="text"
+            placeholder="C:\\Users\\outdo\\Downloads\\listing.json"
+          />
+        </div>
+        <div class="row">
+          <input
+            id="jsonPicker"
+            type="file"
+            accept=".json"
+            style="display: none"
+          />
+          <button id="jsonBrowseBtn">Browse JSON</button>
+        </div>
+        <div class="row">
+          <button id="copyCmdBtn">Copy autofill command</button>
+          <button id="downloadBatBtn">Download run-autofill.bat</button>
+        </div>
+        <div class="note" id="autofillNote">
+          Browsers can’t run Playwright directly. Use the copied command or the
+          .bat file.
+        </div>
+        <div class="note" style="margin-top: 8px">
+          Need PowerShell? Press the Windows key, type "PowerShell", and open
+          Windows PowerShell.
+        </div>
+      </div>
+
+      <div id="skuPanel" class="panel" style="display: none">
+        <div class="field">
+          <label>SKU</label>
+          <div class="row">
+            <input id="skuInput" type="text" placeholder="Enter SKU" />
+            <button id="skuOkBtn">OK</button>
+            <button id="skuChangeBtn">Change</button>
+          </div>
+          <div class="note" id="skuHint"></div>
+        </div>
+      </div>
+
+      <div id="lpPanel" class="panel" style="display: none">
+        <h2>ListPerfectly selectors (auto-fill priority)</h2>
+        <div class="note" style="margin-top: 6px">
+          Includes combined fields like intended_for, tags_line, condition
+          notes, and measurements. Package measurements are L x W x H (in).
+        </div>
+        <div id="lpFields"></div>
+      </div>
+
+      <div id="platformPanel" class="panel" style="display: none">
+        <h2>Platform specifics</h2>
+        <div class="note" style="margin-top: 6px">
+          Platform recommendations and Types block outputs.
+        </div>
+        <div id="platformFields"></div>
+      </div>
+
+      <div id="additionalPanel" class="panel" style="display: none">
+        <h2>Additional information</h2>
+        <div class="note" style="margin-top: 6px">
+          Listing content and other non-selector fields.
+        </div>
+        <div id="additionalFields"></div>
+      </div>
     </div>
 
     <script>
       const fileInput = document.getElementById("fileInput");
       const downloadBtn = document.getElementById("downloadBtn");
-      const fieldsContainer = document.getElementById("fields");
+      const lpPanel = document.getElementById("lpPanel");
+      const platformPanel = document.getElementById("platformPanel");
+      const additionalPanel = document.getElementById("additionalPanel");
+      const lpFieldsContainer = document.getElementById("lpFields");
+      const platformFieldsContainer = document.getElementById("platformFields");
+      const additionalFieldsContainer =
+        document.getElementById("additionalFields");
       const status = document.getElementById("status");
       const prevBtn = document.getElementById("prevBtn");
       const nextBtn = document.getElementById("nextBtn");
@@ -220,6 +271,8 @@
       let skuConfirmed = false;
       let editMode = true;
       let fieldInputs = [];
+      let fieldInputMap = {};
+      let lastAutoNotes = "";
       let defaultJsonFolder = "C:\\\\Users\\\\outdo\\\\Downloads";
 
       function toStringValue(value) {
@@ -261,9 +314,86 @@
           }
           return {
             platform: line.slice(0, idx).trim(),
-            reason: line.slice(idx + 1).trim()
+            reason: line.slice(idx + 1).trim(),
           };
         });
+      }
+
+      function buildListperfectlyDescription(data) {
+        const parts = [];
+        const hook = String(data?.hook || "").trim();
+        if (hook) parts.push(hook);
+
+        const description = String(data?.description || "").trim();
+        if (description) parts.push(description);
+
+        const includedItems = Array.isArray(data?.included_items)
+          ? data.included_items
+          : parseList(data?.included_items);
+        const cleanIncluded = includedItems
+          .map((item) => String(item || "").trim())
+          .filter(Boolean);
+        if (cleanIncluded.length) {
+          parts.push("You will receive the following item(s):");
+          parts.push(cleanIncluded.map((item) => `- ${item}`).join("\n"));
+        }
+
+        const measurements = Array.isArray(data?.measurements)
+          ? data.measurements
+          : parseList(data?.measurements);
+        const cleanMeasurements = measurements
+          .map((item) => String(item || "").trim())
+          .filter(Boolean);
+        if (cleanMeasurements.length) {
+          parts.push("Measurements are as follows:");
+          parts.push(cleanMeasurements.map((item) => `- ${item}`).join("\n"));
+        }
+
+        const cta = String(data?.cta || "").trim();
+        if (cta) parts.push(cta);
+
+        return parts.join("\n\n").trim();
+      }
+
+      function updateListperfectlyDescription(data) {
+        if (!data) return;
+        const next = buildListperfectlyDescription(data);
+        data.listperfectly_description = next;
+        const input = fieldInputMap.listperfectly_description;
+        if (input && input.value !== next) {
+          input.value = next;
+        }
+      }
+
+      function buildSellerNotes(data, existingNotes) {
+        const base =
+          data?.purchase_date && data?.purchase_location
+            ? `${data.purchase_date} Purchased from ${data.purchase_location}`
+            : "";
+        const lines = String(existingNotes || "")
+          .split(/\n/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+        const extras = lines.filter(
+          (line) => line !== base && line !== lastAutoNotes
+        );
+        if (!base) return extras.join("\n");
+        return [base, ...extras].join("\n").trim();
+      }
+
+      function updateSellerNotes(data) {
+        if (!data) return;
+        const next = buildSellerNotes(data, data.notes);
+        const base =
+          data?.purchase_date && data?.purchase_location
+            ? `${data.purchase_date} Purchased from ${data.purchase_location}`
+            : "";
+        lastAutoNotes = base;
+        data.notes = next;
+        const input = fieldInputMap.notes;
+        if (input && input.value !== next) {
+          input.value = next;
+        }
       }
 
       function sanitizePart(value) {
@@ -277,7 +407,9 @@
 
       function buildFilename(data) {
         const sku = data?.sku ? sanitizePart(String(data.sku)) : "";
-        const title = data?.title ? sanitizePart(String(data.title)) : "listing";
+        const title = data?.title
+          ? sanitizePart(String(data.title))
+          : "listing";
         const now = new Date();
         const yyyy = String(now.getFullYear());
         const mm = String(now.getMonth() + 1).padStart(2, "0");
@@ -320,7 +452,8 @@
         if (skuConfirmed) {
           skuHint.textContent = `SKU confirmed: ${skuInput.value}.`;
         } else if (existingSku) {
-          skuHint.textContent = "SKU loaded from file. Click OK to confirm or Change to edit.";
+          skuHint.textContent =
+            "SKU loaded from file. Click OK to confirm or Change to edit.";
         } else if (suggested) {
           skuHint.textContent = `Suggested next SKU: ${suggested}`;
         } else {
@@ -356,7 +489,7 @@
       skuOkBtn.addEventListener("click", confirmSku);
       skuChangeBtn.addEventListener("click", changeSku);
 
-      function addField(field, data) {
+      function addField(field, data, container) {
         const fieldEl = document.createElement("div");
         fieldEl.className = "field";
 
@@ -367,11 +500,21 @@
         const row = document.createElement("div");
         row.className = "row";
 
-        const input = field.multiline ? document.createElement("textarea") : document.createElement("input");
+        const input = field.multiline
+          ? document.createElement("textarea")
+          : document.createElement("input");
         const rawValue = data ? data[field.key] : "";
-        const displayValue = field.format ? field.format(rawValue) : toStringValue(rawValue);
+        const displayValue = field.format
+          ? field.format(rawValue)
+          : toStringValue(rawValue);
         input.value = displayValue;
-        input.readOnly = !editMode;
+        input.readOnly = Boolean(field.readOnly) || !editMode;
+        if (
+          field.key === "listperfectly_description" &&
+          input.tagName === "TEXTAREA"
+        ) {
+          input.style.minHeight = "200px";
+        }
         row.appendChild(input);
 
         const button = document.createElement("button");
@@ -389,9 +532,12 @@
         row.appendChild(button);
 
         if (field.key) {
+          fieldInputMap[field.key] = input;
           input.addEventListener("input", () => {
             if (!currentData) return;
-            const parsedValue = field.parse ? field.parse(input.value) : input.value;
+            const parsedValue = field.parse
+              ? field.parse(input.value)
+              : input.value;
             currentData[field.key] = parsedValue;
             if (field.key === "tags_line") {
               currentData.tags = parseList(input.value);
@@ -399,89 +545,154 @@
             if (field.key === "platforms") {
               currentData.platforms = parsePlatforms(input.value);
             }
+            if (
+              [
+                "hook",
+                "description",
+                "included_items",
+                "measurements",
+                "cta",
+              ].includes(field.key)
+            ) {
+              updateListperfectlyDescription(currentData);
+            }
+            if (["purchase_date", "purchase_location"].includes(field.key)) {
+              updateSellerNotes(currentData);
+            }
             items[currentIndex].data = currentData;
           });
         }
 
         fieldEl.appendChild(row);
-        fieldsContainer.appendChild(fieldEl);
+        container.appendChild(fieldEl);
         fieldInputs.push(input);
       }
 
       function renderFields(data) {
-        fieldsContainer.innerHTML = "";
+        lpFieldsContainer.innerHTML = "";
+        platformFieldsContainer.innerHTML = "";
+        additionalFieldsContainer.innerHTML = "";
         fieldInputs = [];
-        const fields = [
+        fieldInputMap = {};
+        const listperfectlyFields = [
           { label: "SKU", key: "sku" },
-          { label: "Quantity", key: "quantity" },
-          { label: "COGS", key: "cogs" },
-          { label: "MSRP", key: "msrp" },
-          { label: "UPC", key: "upc" },
-          { label: "Brand / Maker", key: "brand" },
-          { label: "Color Shade", key: "color" },
-          { label: "Material", key: "material" },
-          { label: "Size or Fit", key: "size_or_fit" },
-          { label: "Style / Features", key: "style_features" },
-          { label: "Condition Status", key: "condition_status" },
-          {
-            label: "Intended For",
-            key: "intended_for",
-            multiline: true,
-            format: (value) => (Array.isArray(value) ? value.join(", ") : toStringValue(value)),
-            parse: (value) => parseList(value)
-          },
-          { label: "Shipping Weight (lb)", key: "shipping_weight_lb" },
-          { label: "Shipping Weight (oz)", key: "shipping_weight_oz" },
-          { label: "Package Length", key: "package_length" },
-          { label: "Package Width", key: "package_width" },
-          { label: "Package Height", key: "package_height" },
-          { label: "Shipping ZIP", key: "shipping_zip" },
-          { label: "Purchase Date", key: "purchase_date" },
-          { label: "Purchase Location", key: "purchase_location" },
-          { label: "Notes", key: "notes", multiline: true },
-          { label: "Short Description (ListPerfectly)", key: "listperfectly_description", multiline: true },
           { label: "Title", key: "title" },
-          { label: "Listing body", key: "listing_body", multiline: true },
+          {
+            label: "Short Description (ListPerfectly)",
+            key: "listperfectly_description",
+            multiline: true,
+            readOnly: true,
+          },
+          { label: "Hook", key: "hook" },
+          { label: "Description", key: "description", multiline: true },
+          {
+            label: "Included Items",
+            key: "included_items",
+            multiline: true,
+            format: (value) => toStringValue(value),
+            parse: (value) => parseList(value),
+          },
           {
             label: "Measurements (Combined)",
             key: "measurements",
             multiline: true,
             format: (value) => toStringValue(value),
-            parse: (value) => parseList(value)
+            parse: (value) => parseList(value),
           },
           {
             label: "Measurements (Imperial)",
             key: "measurements_imperial",
             multiline: true,
             format: (value) => toStringValue(value),
-            parse: (value) => parseList(value)
+            parse: (value) => parseList(value),
           },
           {
             label: "Measurements (Metric)",
             key: "measurements_metric",
             multiline: true,
             format: (value) => toStringValue(value),
-            parse: (value) => parseList(value)
+            parse: (value) => parseList(value),
           },
-          { label: "Buyer pays shipping price", key: "buyer_pays_shipping_price" },
-          { label: "Free shipping price", key: "free_shipping_price" },
-          { label: "Shipping cost estimate", key: "shipping_cost_estimate" },
+          { label: "CTA", key: "cta" },
+          { label: "Brand / Maker", key: "brand" },
+          { label: "Color Shade", key: "color" },
+          { label: "Material", key: "material" },
+          { label: "Style / Features", key: "style_features" },
+          { label: "Size or Fit", key: "size_or_fit" },
           { label: "Tags line", key: "tags_line" },
-          { label: "Condition", key: "condition", multiline: true },
+          { label: "Condition Status", key: "condition_status" },
+          { label: "Condition Notes", key: "condition", multiline: true },
+          {
+            label: "Buyer pays shipping price",
+            key: "buyer_pays_shipping_price",
+          },
+          { label: "COGS", key: "cogs" },
+          { label: "MSRP", key: "msrp" },
+          { label: "UPC", key: "upc" },
+          { label: "Quantity", key: "quantity" },
+          {
+            label: "Intended For",
+            key: "intended_for",
+            multiline: true,
+            format: (value) =>
+              Array.isArray(value) ? value.join(", ") : toStringValue(value),
+            parse: (value) => parseList(value),
+          },
+          { label: "Shipping Weight (lb)", key: "shipping_weight_lb" },
+          { label: "Shipping Weight (oz)", key: "shipping_weight_oz" },
+          { label: "Package Length (in)", key: "package_length" },
+          { label: "Package Width (in)", key: "package_width" },
+          { label: "Package Height (in)", key: "package_height" },
+          { label: "Shipping ZIP", key: "shipping_zip" },
+          { label: "Seller Notes", key: "notes", multiline: true },
+          { label: "Purchase Date", key: "purchase_date" },
+          { label: "Purchase Location", key: "purchase_location" },
+        ];
+
+        const platformFields = [
           {
             label: "Platforms",
             key: "platforms",
             multiline: true,
             format: (value) => toStringValue(value),
-            parse: (value) => parsePlatforms(value)
+            parse: (value) => parsePlatforms(value),
           },
           { label: "Types block", key: "types_block", multiline: true },
-          { label: "CTA", key: "cta" },
-          { label: "Pricing sentence", key: "pricing_sentence", multiline: true },
-          { label: "Shipping estimate sentence", key: "shipping_estimate_sentence", multiline: true },
-          { label: "Time-to-sell sentence", key: "time_to_sell_sentence", multiline: true }
         ];
-        fields.forEach((field) => addField(field, data));
+
+        const additionalFields = [
+          { label: "Listing body", key: "listing_body", multiline: true },
+          {
+            label: "Pricing sentence",
+            key: "pricing_sentence",
+            multiline: true,
+          },
+          { label: "Free shipping price", key: "free_shipping_price" },
+          {
+            label: "Shipping estimate sentence",
+            key: "shipping_estimate_sentence",
+            multiline: true,
+          },
+          { label: "Shipping cost estimate", key: "shipping_cost_estimate" },
+          {
+            label: "Time-to-sell sentence",
+            key: "time_to_sell_sentence",
+            multiline: true,
+          },
+          { label: "Question", key: "question" },
+        ];
+
+        listperfectlyFields.forEach((field) =>
+          addField(field, data, lpFieldsContainer)
+        );
+        platformFields.forEach((field) =>
+          addField(field, data, platformFieldsContainer)
+        );
+        additionalFields.forEach((field) =>
+          addField(field, data, additionalFieldsContainer)
+        );
+        updateListperfectlyDescription(data);
+        updateSellerNotes(data);
       }
 
       function updateFieldEditability() {
@@ -510,8 +721,7 @@
         } else {
           jsonPathInput.value = file.name;
         }
-        autofillNote.textContent =
-          `Selected ${file.name}. Path was auto-filled; edit if needed.`;
+        autofillNote.textContent = `Selected ${file.name}. Path was auto-filled; edit if needed.`;
         saveAutofillInputs();
       });
 
@@ -519,14 +729,19 @@
         const savedProject = window.localStorage.getItem("moola_project_path");
         if (savedProject) {
           if (savedProject.includes("Moola-Matic")) {
-            projectPathInput.value = "C:\\\\Users\\\\outdo\\\\Documents\\\\MOOLA-MATIC MINI";
-            window.localStorage.setItem("moola_project_path", projectPathInput.value);
+            projectPathInput.value =
+              "C:\\\\Users\\\\outdo\\\\Documents\\\\MOOLA-MATIC MINI";
+            window.localStorage.setItem(
+              "moola_project_path",
+              projectPathInput.value
+            );
           } else {
             projectPathInput.value = savedProject;
           }
         }
         if (!projectPathInput.value) {
-          projectPathInput.value = "C:\\\\Users\\\\outdo\\\\Documents\\\\MOOLA-MATIC MINI";
+          projectPathInput.value =
+            "C:\\\\Users\\\\outdo\\\\Documents\\\\MOOLA-MATIC MINI";
         }
         jsonPathInput.value = "C:\\\\Users\\\\outdo\\\\Downloads";
         const current = jsonPathInput.value.trim();
@@ -541,7 +756,10 @@
 
       function saveAutofillInputs() {
         if (projectPathInput.value) {
-          window.localStorage.setItem("moola_project_path", projectPathInput.value);
+          window.localStorage.setItem(
+            "moola_project_path",
+            projectPathInput.value
+          );
         }
         if (jsonPathInput.value) {
           window.localStorage.setItem("moola_json_path", jsonPathInput.value);
@@ -562,14 +780,16 @@
         saveAutofillInputs();
         const cmd = buildAutofillCommand();
         if (!cmd) {
-          autofillNote.textContent = "Enter the project path and JSON file path first.";
+          autofillNote.textContent =
+            "Enter the project path and JSON file path first.";
           return;
         }
         try {
           await navigator.clipboard.writeText(cmd);
           autofillNote.textContent = "Autofill command copied.";
         } catch (err) {
-          autofillNote.textContent = "Could not copy. You can still download the .bat file.";
+          autofillNote.textContent =
+            "Could not copy. You can still download the .bat file.";
         }
       });
 
@@ -577,7 +797,8 @@
         saveAutofillInputs();
         const cmd = buildAutofillCommand();
         if (!cmd) {
-          autofillNote.textContent = "Enter the project path and JSON file path first.";
+          autofillNote.textContent =
+            "Enter the project path and JSON file path first.";
           return;
         }
         const content = `@echo off\r\n${cmd}\r\npause\r\n`;
@@ -590,7 +811,8 @@
         link.click();
         link.remove();
         URL.revokeObjectURL(url);
-        autofillNote.textContent = "run-autofill.bat downloaded. Double-click it to run.";
+        autofillNote.textContent =
+          "run-autofill.bat downloaded. Double-click it to run.";
       });
 
       function updateStatus() {
@@ -601,7 +823,9 @@
           return;
         }
         const current = items[currentIndex];
-        status.textContent = `Loaded ${items.length} file(s). Viewing ${currentIndex + 1} of ${items.length}: ${current.name}`;
+        status.textContent = `Loaded ${items.length} file(s). Viewing ${
+          currentIndex + 1
+        } of ${items.length}: ${current.name}`;
         prevBtn.disabled = currentIndex === 0;
         nextBtn.disabled = currentIndex === items.length - 1;
       }
@@ -609,7 +833,9 @@
       function loadCurrent() {
         if (!items.length) return;
         currentData = items[currentIndex].data;
-        fieldsContainer.style.display = "block";
+        lpPanel.style.display = "block";
+        platformPanel.style.display = "block";
+        additionalPanel.style.display = "block";
         updateSkuPanel(currentData);
         renderFields(currentData);
         updateFieldEditability();
@@ -649,7 +875,9 @@
           }
         }
         if (!items.length) {
-          fieldsContainer.style.display = "none";
+          lpPanel.style.display = "none";
+          platformPanel.style.display = "none";
+          additionalPanel.style.display = "none";
           skuPanel.style.display = "none";
           downloadBtn.disabled = true;
           updateStatus();
@@ -664,9 +892,10 @@
 
       downloadBtn.addEventListener("click", () => {
         if (!currentData) return;
+        updateListperfectlyDescription(currentData);
         const filename = buildFilename(currentData);
         const blob = new Blob([JSON.stringify(currentData, null, 2)], {
-          type: "application/json"
+          type: "application/json",
         });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");

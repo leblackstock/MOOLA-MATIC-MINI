@@ -1,0 +1,33 @@
+ListPerfectly selector priority (fill these first)
+
+Source: playwright-assistant/scripts/selectors.json
+
+Required JSON keys for auto-fill:
+- title
+- listperfectly_description
+- brand
+- color
+- material
+- style_features
+- size_or_fit
+- tags_line
+- condition_status
+- condition
+- buyer_pays_shipping_price
+- cogs
+- msrp
+- sku
+- upc
+- quantity
+- intended_for
+- shipping_weight_lb
+- shipping_weight_oz
+- package_length
+- package_width
+- package_height
+- shipping_zip
+- notes
+
+Rules:
+- If unknown, use empty strings/arrays (do not omit keys).
+- Keep intended_for as an array of allowed values.

@@ -1,0 +1,11 @@
+---
+description: Edit mode for improving Moola-Matic
+globs: commands/edit-moola.md
+alwaysApply: false
+---
+
+# Edit mode
+- Focus on improving rules, templates, schemas, and workflow docs.
+- Keep `Original/*.txt` as reference-only; do not modify them.
+- Prefer edits in `.cursor/rules/`, `AGENTS.md`, and `commands/`.
+- Do not output listings in Edit mode.

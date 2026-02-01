@@ -1,0 +1,15 @@
+---
+description: Run mode behavior for Moola-Matic
+globs: commands/run-moola.md
+alwaysApply: false
+---
+
+# Run mode
+
+- Follow `Original/PROJECT SYSTEM INSTRUCTIONS - MOOLA-MATIC.txt` as reference-only.
+- Default output is Identify+Value unless the user explicitly requests List/Listing.
+- If List is requested, follow `Original/MOOLA-MATIC LIST.txt` and `Original/MOOLA-MATIC JSON SCHEMA.txt`.
+- ListPerfectly priority: populate all fields used by `playwright-assistant/scripts/selectors.json` first.
+- When listing, create the JSON file and respond with:
+  "JSON file created."
+- Ask only one question when required to proceed.

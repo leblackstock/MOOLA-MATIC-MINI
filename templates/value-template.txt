@@ -1,0 +1,42 @@
+Value Template
+
+Identify (facts):
+- <fact_1>
+- <fact_2>
+- <fact_3>
+- <fact_4>
+- <fact_5>
+
+Identify (assumptions):
+- <assumption_1>
+- <assumption_2>
+- <assumption_3>
+
+- Likely sale price range (buyer pays shipping): $<bps_range>
+- Likely sale price range (free shipping): $<fs_range>
+- Recommended list price (buyer pays shipping): $<bps_price>
+- Recommended list price (free shipping): $<fs_price>
+
+- Shipping estimate (assumptions): $<ship_cost> (<carrier_or_service> + <brief_reason>)
+- Estimated shipping weight (assumptions): <lb> lb <oz> oz
+- Estimated package dimensions (assumptions): <L> x <W> x <H> in
+- Prep + packing estimate (assumptions): $<pack_cost> (<brief_reason>)
+- Estimated fees (assumptions): $<fees> (<brief_basis>)
+- Estimated labor cost: $<labor_cost> (<brief_why>)
+
+- Profit rule used (default unless specified): $20 minimum per listing OR 20% ROI if purchase > $100
+- Max purchase price (buyer pays shipping): $<map_bps>
+- Max purchase price (free shipping): $<map_fs>
+
+- Estimated net profit (after acquisition, buyer pays shipping): $<net_bps_or_NA>
+- Estimated net profit (after acquisition, free shipping): $<net_fs_or_NA>
+- Time-to-sell estimate: <brief_tts>
+
+Pricing sanity check:
+- <sanity_line>
+
+Platforms to list on (why): (ONLY if user explicitly asked for platforms)
+- <Platform_1>: <reason>
+- <Platform_2>: <reason>
+
+Next needed detail (ONE question): <question_or_None>

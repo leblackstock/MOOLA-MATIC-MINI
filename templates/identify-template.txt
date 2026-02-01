@@ -1,0 +1,20 @@
+Identify Template
+
+What I see / know (facts):
+- <fact_1>
+- <fact_2>
+- <fact_3>
+- <fact_4>
+- <fact_5>
+
+Best guess (assumptions):
+- <assumption_1>
+- <assumption_2>
+- <assumption_3>
+
+Platforms to list on (why):
+- <Platform_1>: <reason>
+- <Platform_2>: <reason>
+- <Platform_3>: <reason>
+
+Next needed detail (ONE question): <question_or_None>

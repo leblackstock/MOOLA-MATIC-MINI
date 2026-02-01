@@ -1,0 +1,102 @@
+MOOLA-MATIC JSON SCHEMA.txt
+
+QUICK REFERENCE
+- LIST mode only; include JSON by default unless user says "no JSON".
+- Do NOT display raw JSON unless user explicitly asks to see it.
+- Create JSON file and output a single download line.
+- Use empty strings or empty arrays instead of guessing.
+- Keep field types exact (arrays stay arrays, strings stay strings).
+
+NOTES / COMMON MISTAKES
+- Do NOT print the JSON in chat; only output the JSON download line.
+- Do NOT add extra keys beyond the schema list.
+- Arrays must be arrays (never empty strings). Use [] for empty lists.
+- "quantity" must be the string "1", not a number.
+- "condition_status" must be exactly "New" or "Pre-Owned" if known.
+- "intended_for" must be an array of allowed values (even if only one).
+- "platforms" must be an array of {"platform":"...","reason":"..."} objects.
+- "shipping_zip" defaults to "30236" if not provided.
+- "notes" must be exactly "<purchase_date> Purchased from <purchase_location>" or blank.
+- Do NOT use labels like "Condition:" or "Platforms:" in any sentence fields.
+- Do NOT include platform lines inside "listing_body" or "listperfectly_description".
+
+JSON OUTPUT (LIST MODE ONLY)
+- Create the JSON file (if the project supports file creation).
+- Output a single plain-text download line only (must be clickable):
+  Download the JSON: <YYYYMMDD-HHMM>_<Title>.json
+- Filename rules:
+  Use date/time first, then Title, separated by underscores. Do NOT include SKU.
+  Date/time format uses local time: YYYYMMDD-HHMM.
+  Replace spaces with dashes, remove commas/quotes, and collapse multiple dashes.
+
+JSON FILE CONTENT (EXACT)
+- The JSON file must be a single JSON object with these keys (always include all keys):
+  title, hook, description, included_items, measurements, measurements_imperial, measurements_metric, tags_line, tags, condition, cta,
+  pricing_sentence, free_shipping_price, buyer_pays_shipping_price, shipping_estimate_sentence,
+  shipping_cost_estimate, time_to_sell_sentence, platforms, types_block, listing_body,
+  listperfectly_description, question,
+  sku, quantity, cogs, upc, brand, color, material, size_or_fit, style_features, msrp,
+  condition_status, intended_for, shipping_weight_lb, shipping_weight_oz,
+  package_length, package_width, package_height, shipping_zip,
+  purchase_date, purchase_location, notes
+
+FIELD TYPES (STRICT)
+- Strings: title, hook, description, tags_line, condition, cta, pricing_sentence, shipping_estimate_sentence, time_to_sell_sentence,
+  types_block, listing_body, listperfectly_description, question, sku, quantity, cogs, upc, brand, color, material, size_or_fit,
+  style_features, msrp, condition_status, shipping_weight_lb, shipping_weight_oz, package_length, package_width, package_height,
+  shipping_zip, purchase_date, purchase_location, notes, shipping_cost_estimate, free_shipping_price, buyer_pays_shipping_price.
+- Arrays of strings: included_items, measurements, measurements_imperial, measurements_metric, tags, intended_for.
+- Arrays of objects: platforms (each object has "platform" and "reason" strings).
+
+FIELD RULES
+- title = Title line.
+- hook = One-line hook.
+- description = Description paragraph(s) only (no condition details).
+- included_items = array of bullet items from step 4; [] if none.
+- measurements = array of bullet items from step 5 (each bullet includes imperial + metric); [] if none.
+- measurements_imperial = array of imperial-only bullet items from step 5; [] if none.
+- measurements_metric = array of metric-only bullet items from step 5; [] if none.
+- Keep the same ordering across all three measurement arrays.
+- tags_line = comma-separated tags line from step 6.
+- tags = tags_line split on commas and trimmed.
+- condition = Condition paragraph.
+- cta = CTA sentence.
+- pricing_sentence = sentence from step 9 and MUST include:
+  Free shipping: $X.XX | Buyer pays shipping: $Y.XX
+- free_shipping_price / buyer_pays_shipping_price = values extracted from step 9.
+- shipping_estimate_sentence = sentence from step 10.
+- shipping_cost_estimate = estimated shipping dollar amount (string, e.g., "18.00").
+- time_to_sell_sentence = sentence from step 11.
+- platforms = array of objects like {"platform":"eBay","reason":"..."} from step 12.
+- types_block = Types block text from step 13 (preserve line breaks).
+- listing_body = steps 2-11 combined in order with the same line breaks/bullets as the listing output:
+  - No title line
+  - No labels (e.g., "Condition:", "Included:", "Platforms:", "Price:")
+  - No platform lines
+- listperfectly_description = steps 2-5 and step 8 combined in order with the same line breaks/bullets:
+  - No condition line
+  - No platform lines
+- question = final question sentence or "None".
+- sku = SKU value if provided; otherwise empty.
+- quantity = "1".
+- cogs = acquisition cost if provided; otherwise empty.
+- upc = user-provided UPC only; otherwise empty.
+- brand = Brand/Maker if known; otherwise empty.
+- color = Color Shade if known; otherwise empty.
+- material = Material/Ingredient Composition if known; otherwise empty.
+- size_or_fit = Size or Fit if known; otherwise empty.
+- style_features = Style/Features if known; otherwise empty.
+- msrp = estimated MSRP; if cannot be estimated, use buyer-pays-shipping price.
+- condition_status = "New" or "Pre-Owned" if known; otherwise empty.
+- intended_for = array of intended-for values if known; otherwise []. Use ONLY these exact options:
+  Unisex, Men, Women, Unisex Kids, Girls, Boys, Babies, Maternity, Pets, Cats, Dogs, None.
+- shipping_weight_lb = estimated shipping weight in lb if known; otherwise empty.
+- shipping_weight_oz = estimated shipping weight in oz if known; otherwise empty.
+- package_length = estimated package length if known; otherwise empty.
+- package_width = estimated package width if known; otherwise empty.
+- package_height = estimated package height if known; otherwise empty.
+- shipping_zip = "30236".
+- purchase_date = purchase date if provided; otherwise empty.
+- purchase_location = purchase location if provided; otherwise empty.
+- notes = exactly "<purchase_date> Purchased from <purchase_location>" (otherwise blank).
+- Use empty strings or empty arrays instead of guessing missing data. Do not use null unless explicitly stated.
