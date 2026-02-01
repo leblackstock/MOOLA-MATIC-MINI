@@ -12,6 +12,8 @@ Run mode
   JSON file created.
 - ListPerfectly priority: fill all fields used by `playwright-assistant/scripts/selectors.json` first.
 - After a List run, load the generated JSON file in the Playwright UI to review/edit and download.
+- Creativity levels (LIST mode): Hook = High, Description = Medium, CTA = Medium (all factual).
+- CTA style: use a sentence similar to “Photos show condition and measurements; ask if you need a specific angle or detail confirmed.”
 
 Edit mode
 

@@ -13,4 +13,9 @@ alwaysApply: false
 - When listing, include estimated measurements in the initial JSON output.
 - When listing, create the JSON file and respond with:
   "JSON file created."
+- Creativity levels (LIST mode):
+  - Hook: High (marketing flair allowed, still factual)
+  - Description: Medium (lightly persuasive, mostly factual)
+  - CTA: Medium (friendly prompt, no urgency claims)
+  - CTA style: use a sentence similar to “Photos show condition and measurements; ask if you need a specific angle or detail confirmed.”
 - Ask only one question when required to proceed.

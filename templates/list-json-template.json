@@ -8,7 +8,7 @@
   "measurements": ["<measurement_1_imperial_and_metric>"],
   "measurements_imperial": ["<measurement_1_imperial_only>"],
   "measurements_metric": ["<measurement_1_metric_only>"],
-  "cta": "<cta_sentence>",
+  "cta": "Photos show condition and measurements; ask if you need a specific angle or detail confirmed.",
   "brand": "<brand_or_blank>",
   "color": "<color_or_blank>",
   "material": "<material_or_blank>",
