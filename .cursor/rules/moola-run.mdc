@@ -12,13 +12,21 @@ alwaysApply: false
 - ListPerfectly priority: populate all fields used by `playwright-assistant/scripts/selectors.json` first.
 - When listing, include estimated measurements in the initial JSON output.
 - When listing, `included_items` must include one descriptor with the item. Prefer gender when known (e.g., "Men's Boots (pair)"). If gender is not applicable or unknown, use a category descriptor with quantity (e.g., "Decor (1 piece)", "Wall Art (2 pieces)").
+- When listing, set `pre_owned_condition` to Like New/Good/Fair/Poor/None. Use None when `condition_status` is not Pre-Owned.
+- When listing, set `shipping_cost_estimate` to the estimated Priority Mail shipping price.
+- When listing, set `fees_or_other_costs` to total costs excluding purchase price; include average eBay platform fees, payment processing fees, and labor.
+- When listing, populate the fee breakdown keys: `platform_fee_estimate`, `payment_processing_fee_estimate`, and `labor_cost_estimate`.
+- Fee defaults: platform fee 13% of sale price; payment processing $0.30.
+- Labor defaults: 20 minutes at $20/hr if item is clean and photo-ready; add time for cleaning/repair/refurbishment.
+- When listing, populate profit estimates: `max_profit_price` and `max_profit_estimate` (full price, buyer pays shipping) and `min_profit_price` and `min_profit_estimate` (near-guaranteed quick sale, buyer pays shipping). Also add time-to-sell estimates for each: `max_profit_time_to_sell` and `min_profit_time_to_sell`. Use: profit = sale price - platform fee - payment processing - labor - COGS (exclude shipping when buyer pays shipping).
 - When listing and a box size is mentioned or implied, warn if any size breakpoint would be exceeded (1 cu ft, length > 22", length > 30", or 2 cu ft).
 - When listing and pricing is checked, choose the cheapest Priority option (flat rate vs regular). Use the matching box dimensions from `templates/shipping/usps-priority-boxes.txt` and populate `package_length`, `package_width`, and `package_height` in the JSON. Estimate and populate `shipping_weight_lb` and `shipping_weight_oz`.
 - When listing, create the JSON file and respond with:
   "JSON file created."
 - Creativity levels (LIST mode):
-  - Hook: High (marketing flair allowed, still factual)
-  - Description: Medium (lightly persuasive, mostly factual)
-  - CTA: Medium (friendly prompt, no urgency claims)
-  - CTA style: use a sentence similar to “Photos show condition and measurements; ask if you need a specific angle or detail confirmed.”
+  - Hook: High (marketing flair allowed, still factual; offer to solve a problem). Keep it distinct from the description.
+  - Description: High (engaging, vivid, still factual). Do not repeat the hook; add new details and benefits.
+  - Description: include the most searched keywords naturally in sentences.
+  - CTA: High (friendly, energetic prompt, include light urgency)
+  - CTA style: use a sentence similar to “Photos show condition and measurements; ask if you need a specific angle or detail confirmed—grab them before they’re gone.”
 - Ask only one question when required to proceed.

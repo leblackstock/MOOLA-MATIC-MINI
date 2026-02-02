@@ -18,31 +18,200 @@
     }
   },
   "fields": [
-    { "name": "Listing Title", "selector": "textarea[name='input_133']", "value": "title", "action": "fill" },
-    { "name": "Short description only", "text": "Short description only", "exact": true, "action": "click" },
-    { "name": "Short Description", "selector": "textarea[name='input_505']", "value": "listperfectly_description", "action": "fill", "noTypingDelay": true },
-    { "name": "Brand / Maker / Label / Artist", "selector": "textarea[name='input_206']", "value": "brand", "action": "fill" },
-    { "name": "Color Shade", "selector": "#editMainContainer > div:nth-child(3) > div._editModalBody_1wdzs_41 > div._shortDescriptionContainer_1ekko_1 > div > div._rightSide_1ekko_127 > div:nth-child(2) > div:nth-child(2) > div > tags > span", "value": "color", "action": "type_each_tag", "force": true, "skipScroll": true, "noTypingDelay": true, "refocusEachTag": true },
-    { "name": "Material / Ingredient Composition", "selector": "textarea[name='input_82']", "value": "material", "action": "fill" },
-    { "name": "Style / Features", "selector": "textarea[name='input_205']", "value": "style_features", "action": "fill" },
-    { "name": "Size or Fit", "selector": "input[name='input_213']", "value": "size_or_fit", "action": "fill" },
-    { "name": "Keywords or Tags", "selector": "#editMainContainer > div:nth-child(3) > div._editModalBody_1wdzs_41 > div:nth-child(9) > div:nth-child(4) > div > div > div > div._leftContainer_kux1c_222 > div:nth-child(2) > div tags > span", "value": "tags_line", "action": "type_each_tag", "force": true, "skipScroll": true, "noTypingDelay": true, "refocusEachTag": true },
-    { "name": "Condition Status", "action": "click_each_text", "value": "condition_status", "exact": false, "normalizeComparison": true, "scope": "div._conditionMenu_yqtyt_38 div._menuItems_yqtyt_65" },
-    { "name": "Condition Notes", "selector": "textarea[name='input_17']", "value": "condition", "action": "fill", "noTypingDelay": true },
-    { "name": "Price", "selector": "input[name='input_22']", "value": "buyer_pays_shipping_price", "action": "fill" },
-    { "name": "COGS", "selector": "input[name='input_847']", "value": "cogs", "action": "fill" },
-    { "name": "MSRP", "selector": "input[name='input_104']", "value": "msrp", "action": "fill" },
-    { "name": "SKU", "selector": "input[name='input_1']", "value": "sku", "action": "fill", "autoSku": true },
-    { "name": "UPC", "selector": "input[name='input_704']", "value": "upc", "action": "fill" },
-    { "name": "Quantity", "selector": "input[name='input_851']", "value": "quantity", "action": "fill" },
-    { "name": "Intended For Options", "action": "click_each_text", "value": "intended_for", "exact": true, "scope": "div._intendedMenu_1pwff_1 div._menuItems_1pwff_44" },
-    { "name": "Shipping Weight lb / kg", "selector": "input[name='input_2']", "value": "shipping_weight_lb", "action": "fill" },
-    { "name": "Shipping Weight oz / g", "selector": "input[name='input_3']", "value": "shipping_weight_oz", "action": "fill" },
-    { "name": "Shipping Package Length", "selector": "input[name='input_531']", "value": "package_length", "action": "fill" },
-    { "name": "Shipping Package Width", "selector": "input[name='input_532']", "value": "package_width", "action": "fill" },
-    { "name": "Shipping Package Height", "selector": "input[name='input_533']", "value": "package_height", "action": "fill" },
-    { "name": "Shipping Zip or City Code", "selector": "input[name='input_837']", "value": "shipping_zip", "action": "fill" },
-    { "name": "Seller Notes", "selector": "textarea[name='input_726']", "value": "notes", "action": "fill", "noTypingDelay": true }
+    {
+      "name": "Listing Title",
+      "selector": "textarea[name='input_133']",
+      "value": "title",
+      "action": "fill"
+    },
+    {
+      "name": "Short Description",
+      "selector": "textarea[name='input_505']",
+      "value": "listperfectly_description",
+      "action": "fill",
+      "noTypingDelay": true
+    },
+    {
+      "name": "Brand / Maker / Label / Artist",
+      "selector": "textarea[name='input_206']",
+      "value": "brand",
+      "action": "fill"
+    },
+    {
+      "name": "Color Shade",
+      "text": "Color Shade",
+      "selector": "xpath=//div[normalize-space()='Color Shade' and contains(@class,'_title_1ekko_53')]/following::div[contains(@class,'tags-input')][1]//span[contains(@class,'tagify__input')]",
+      "value": "color",
+      "action": "fill",
+      "joinWithCommaValue": true,
+      "pressEnter": true,
+      "postFillDelayMs": 300,
+      "noTypingDelay": true
+    },
+    {
+      "name": "Material / Ingredient Composition",
+      "selector": "textarea[name='input_82']",
+      "value": "material",
+      "action": "fill"
+    },
+    {
+      "name": "Style / Features",
+      "selector": "textarea[name='input_205']",
+      "value": "style_features",
+      "action": "fill"
+    },
+    {
+      "name": "Size or Fit",
+      "selector": "input[name='input_213']",
+      "value": "size_or_fit",
+      "action": "fill"
+    },
+    {
+      "name": "Short description only",
+      "text": "Short description only",
+      "exact": true,
+      "action": "click"
+    },
+    {
+      "name": "Intended For Options",
+      "action": "click_each_text",
+      "value": "intended_for",
+      "exact": true,
+      "scope": "div._intendedMenu_1pwff_1 div._menuItems_1pwff_44"
+    },
+    {
+      "name": "Condition Status",
+      "action": "click_each_text",
+      "value": "condition_status",
+      "exact": false,
+      "normalizeComparison": true,
+      "scope": "div._conditionMenu_yqtyt_38 div._menuItems_yqtyt_65"
+    },
+    {
+      "name": "Pre-Owned Condition",
+      "action": "click_each_text",
+      "value": "pre_owned_condition",
+      "exact": false,
+      "normalizeComparison": true,
+      "scope": "div._intendedMenu_yqtyt_1 div._menuItems_yqtyt_65"
+    },
+    {
+      "name": "Condition Notes",
+      "selector": "textarea[name='input_17']",
+      "value": "condition",
+      "action": "fill",
+      "noTypingDelay": true
+    },
+    {
+      "name": "Keywords or Tags",
+      "text": "Keywords or Tags",
+      "selector": "xpath=//div[contains(@class,'_leftContainer_kux1c_222')]//p[contains(@class,'_heading_kux1c_184') and contains(normalize-space(.),'Keywords or Tags')]/following::div[contains(@class,'tags-input')][1]//span[contains(@class,'tagify__input')]",
+      "value": "tags_line",
+      "action": "fill",
+      "joinWithCommaValue": true,
+      "pressEnter": true,
+      "postFillDelayMs": 300,
+      "noTypingDelay": true
+    },
+    {
+      "name": "Price",
+      "selector": "input[name='input_22']",
+      "value": "buyer_pays_shipping_price",
+      "action": "fill"
+    },
+    {
+      "name": "COGS",
+      "selector": "input[name='input_847']",
+      "value": "cogs",
+      "action": "fill"
+    },
+    {
+      "name": "MSRP",
+      "selector": "input[name='input_104']",
+      "value": "msrp",
+      "action": "fill"
+    },
+    {
+      "name": "SKU",
+      "selector": "input[name='input_1']",
+      "value": "sku",
+      "action": "fill",
+      "autoSku": true
+    },
+    {
+      "name": "UPC",
+      "selector": "input[name='input_704']",
+      "value": "upc",
+      "action": "fill"
+    },
+    {
+      "name": "Quantity",
+      "selector": "input[name='input_851']",
+      "value": "quantity",
+      "action": "fill"
+    },
+    {
+      "name": "Shipping Weight lb / kg",
+      "selector": "input[name='input_2']",
+      "value": "shipping_weight_lb",
+      "action": "fill"
+    },
+    {
+      "name": "Shipping Weight oz / g",
+      "selector": "input[name='input_3']",
+      "value": "shipping_weight_oz",
+      "action": "fill"
+    },
+    {
+      "name": "Shipping Package Length",
+      "selector": "input[name='input_531']",
+      "value": "package_length",
+      "action": "fill"
+    },
+    {
+      "name": "Shipping Package Width",
+      "selector": "input[name='input_532']",
+      "value": "package_width",
+      "action": "fill"
+    },
+    {
+      "name": "Shipping Package Height",
+      "selector": "input[name='input_533']",
+      "value": "package_height",
+      "action": "fill"
+    },
+    {
+      "name": "Shipping Zip or City Code",
+      "selector": "input[name='input_837']",
+      "value": "shipping_zip",
+      "action": "fill"
+    },
+    {
+      "name": "Costs accordion",
+      "selector": "xpath=//div[contains(@class,'_acordionHeader_8aga2_2')][.//span[normalize-space()='Inventory and Sales']]",
+      "action": "click",
+      "force": true,
+      "clickElementCenter": true
+    },
+    {
+      "name": "Shipping",
+      "selector": "input[name='input_852']",
+      "value": "shipping_cost_estimate",
+      "action": "fill"
+    },
+    {
+      "name": "Fees or Other Costs",
+      "selector": "input[name='input_844']",
+      "value": "fees_or_other_costs",
+      "action": "fill"
+    },
+    {
+      "name": "Seller Notes",
+      "selector": "textarea[name='input_726']",
+      "value": "notes",
+      "action": "fill",
+      "noTypingDelay": true
+    }
   ],
   "draft": {
     "selector": "div._markListing_bandq_43 label._checkBoxContainer_bandq_78",

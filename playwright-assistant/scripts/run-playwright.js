@@ -10,12 +10,32 @@ function randomBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function getPasteShortcut() {
+  return process.platform === "darwin" ? "Meta+V" : "Control+V";
+}
+
 function getArgValue(flag, fallback) {
   const idx = process.argv.indexOf(flag);
   if (idx !== -1 && process.argv[idx + 1]) {
     return process.argv[idx + 1];
   }
   return fallback;
+}
+
+function buildCommaSeparatedValue(raw) {
+  if (raw === null || raw === undefined) return "";
+  if (Array.isArray(raw)) {
+    return raw
+      .map((item) => String(item).trim())
+      .filter(Boolean)
+      .join(", ");
+  }
+  const text = String(raw);
+  return text
+    .split(/[,\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(", ");
 }
 
 function toStringValue(value) {
@@ -26,7 +46,9 @@ function toStringValue(value) {
         if (item && typeof item === "object") {
           const platform = item.platform || "";
           const reason = item.reason || "";
-          return platform && reason ? `${platform}: ${reason}` : platform || reason;
+          return platform && reason
+            ? `${platform}: ${reason}`
+            : platform || reason;
         }
         return String(item);
       })
@@ -128,7 +150,8 @@ function getLocator(page, field) {
   const exact = field.exact === true;
   if (field.selector) return page.locator(field.selector);
   if (field.label) return page.getByLabel(field.label, { exact });
-  if (field.placeholder) return page.getByPlaceholder(field.placeholder, { exact });
+  if (field.placeholder)
+    return page.getByPlaceholder(field.placeholder, { exact });
   if (field.text) return page.getByText(field.text, { exact });
   return null;
 }
@@ -142,10 +165,113 @@ async function scrollIfNeeded(locator, field) {
   }
 }
 
+async function getTagInputLocator(locator) {
+  try {
+    const inputLocator = locator.locator(
+      "input, textarea, [contenteditable], [role='textbox'], .tagify__input"
+    );
+    if (await inputLocator.count()) {
+      return inputLocator.first();
+    }
+    const isEditable = await locator
+      .first()
+      .evaluate(
+        (el) =>
+          el.isContentEditable ||
+          el.getAttribute("role") === "textbox" ||
+          el.hasAttribute("contenteditable")
+      )
+      .catch(() => false);
+    if (isEditable) {
+      return locator.first();
+    }
+  } catch (err) {
+    // Fall back to the original locator if nested inputs are unavailable.
+  }
+  return locator;
+}
+
+async function focusLocator(locator, field) {
+  let focused = false;
+  if (field?.focusByEval) {
+    try {
+      await locator.first().evaluate((el) => el.focus());
+      focused = true;
+    } catch (err) {
+      // Ignore focus failures and fall through to click.
+    }
+  }
+  if (field?.clickAfterFocus || !focused) {
+    try {
+      if (field?.clickPosition) {
+        await locator.first().click({
+          force: field.force === true,
+          position: field.clickPosition,
+        });
+      } else if (field?.force) {
+        await locator.first().click({ force: true });
+      } else {
+        await locator.first().click();
+      }
+      focused = true;
+    } catch (err) {
+      // Ignore click failures; caller can decide on fallback.
+    }
+  }
+  return focused;
+}
+
+async function isCheckboxChecked(page, field) {
+  try {
+    if (field?.checkedSelector) {
+      const checkedLocator = page.locator(field.checkedSelector);
+      if (await checkedLocator.count()) {
+        return await checkedLocator.first().isChecked();
+      }
+    }
+    const container = getLocator(page, field);
+    if (!container || (await container.count()) === 0) return false;
+    const checkbox = container.locator("input[type='checkbox']");
+    if (await checkbox.count()) {
+      return await checkbox.first().isChecked();
+    }
+  } catch (err) {
+    // If we fail to detect checked state, fall back to clicking.
+  }
+  return false;
+}
+
+async function pasteText(page, text) {
+  try {
+    await page.evaluate(async (value) => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(value);
+        return;
+      }
+      const textarea = document.createElement("textarea");
+      textarea.value = value;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }, text);
+    await page.keyboard.press(getPasteShortcut());
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 async function fillField(page, field, data, options) {
   const selector = field.selector;
   const action = field.action || "fill";
   let value = getValue(data, field.value);
+  if (field.joinWithCommaValue) {
+    const raw = getRawValue(data, field.value);
+    value = buildCommaSeparatedValue(raw);
+  }
   if (field.autoSku) {
     value = getAutoSkuValue(data, options.skuOptions);
   }
@@ -170,7 +296,7 @@ async function fillField(page, field, data, options) {
       values = [String(raw).trim()];
     } else if (raw) {
       values = String(raw)
-        .split(/[,\\n]/)
+        .split(/[,\n]/)
         .map((item) => item.trim())
         .filter(Boolean);
     }
@@ -215,34 +341,116 @@ async function fillField(page, field, data, options) {
     const tags = Array.isArray(raw)
       ? raw
       : String(raw || "")
-          .split(/[,\\n]/)
+          .split(/[,\n]/)
           .map((item) => item.trim())
           .filter(Boolean);
-    const locator = getLocator(page, field);
+    let locator = getLocator(page, field);
+    if ((!locator || (await locator.count()) === 0) && field.text) {
+      const exact = field.exact === true;
+      const textLocator = page.getByText(field.text, { exact });
+      const tagsLocator = textLocator.locator("xpath=following::tags[1]");
+      if (await tagsLocator.count()) {
+        locator = tagsLocator;
+      }
+    }
     if (!locator || (await locator.count()) === 0) {
       console.log(`Skipping ${field.name || selector}: target not found`);
       return;
     }
-    await scrollIfNeeded(locator, field);
-    if (field.force) {
-      await locator.first().click({ force: true });
-    } else {
-      await locator.first().click();
+    const targetLocator = await getTagInputLocator(locator);
+    await scrollIfNeeded(targetLocator, field);
+    const focused = await focusLocator(targetLocator, field);
+    if (!focused && locator !== targetLocator) {
+      await focusLocator(locator, field);
+    }
+    const delayBase =
+      typeof field.typingDelayMs === "number"
+        ? field.typingDelayMs
+        : options.typingDelayMs;
+    const delay = field.noTypingDelay || !delayBase ? 0 : delayBase;
+    const postTypeDelayMs =
+      typeof field.postTypeDelayMs === "number" ? field.postTypeDelayMs : 80;
+    const useKeyboard =
+      field.useKeyboard === true ||
+      field.useInsertText === true ||
+      field.usePaste === true;
+    if (field.clearBeforeType) {
+      if (useKeyboard) {
+        await page.keyboard.press("Control+A");
+        await page.keyboard.press("Backspace");
+      } else {
+        await targetLocator.first().fill("");
+      }
+    }
+    if (field.joinWithComma) {
+      if (!tags.length) return;
+      const joinedTags = tags.join(", ");
+      if (field.useInsertText) {
+        await page.keyboard.insertText(joinedTags);
+      } else if (field.usePaste) {
+        const pasted = await pasteText(page, joinedTags);
+        if (!pasted) {
+          await page.keyboard.insertText(joinedTags);
+        }
+      } else if (field.useKeyboard) {
+        await page.keyboard.type(joinedTags, delay ? { delay } : undefined);
+      } else {
+        await targetLocator
+          .first()
+          .type(joinedTags, delay ? { delay } : undefined);
+      }
+      if (postTypeDelayMs > 0) {
+        await page.waitForTimeout(postTypeDelayMs);
+      }
+      if (useKeyboard) {
+        await page.keyboard.press("Enter");
+      } else {
+        await targetLocator.first().press("Enter");
+      }
+      return;
     }
     for (const tag of tags) {
       if (field.refocusEachTag) {
-        await locator.first().click({ force: field.force === true });
+        await focusLocator(targetLocator, field);
       }
-      const delay =
-        field.noTypingDelay || !options.typingDelayMs ? 0 : options.typingDelayMs;
-      await locator.first().type(tag, delay ? { delay } : undefined);
-      await locator.first().press("Enter");
+      if (field.useInsertText) {
+        await page.keyboard.insertText(tag);
+      } else if (field.usePaste) {
+        const pasted = await pasteText(page, tag);
+        if (!pasted) {
+          await page.keyboard.insertText(tag);
+        }
+      } else if (field.useKeyboard) {
+        await page.keyboard.type(tag, delay ? { delay } : undefined);
+      } else {
+        await targetLocator.first().type(tag, delay ? { delay } : undefined);
+      }
+      if (postTypeDelayMs > 0) {
+        await page.waitForTimeout(postTypeDelayMs);
+      }
+      if (useKeyboard) {
+        await page.keyboard.press("Enter");
+      } else {
+        await targetLocator.first().press("Enter");
+      }
     }
     return;
   }
-  const locator = getLocator(page, field);
+  let locator = getLocator(page, field);
+  if ((!locator || (await locator.count()) === 0) && field.useTagInput) {
+    if (field.text) {
+      const exact = field.exact === true;
+      const textLocator = page.getByText(field.text, { exact });
+      const tagsLocator = textLocator.locator("xpath=following::tags[1]");
+      if (await tagsLocator.count()) {
+        locator = tagsLocator;
+      }
+    }
+  }
   if (!locator) {
-    console.log(`Skipping ${field.name || selector}: no selector/label/placeholder/text`);
+    console.log(
+      `Skipping ${field.name || selector}: no selector/label/placeholder/text`
+    );
     return;
   }
   const count = await locator.count();
@@ -250,60 +458,81 @@ async function fillField(page, field, data, options) {
     console.log(`Skipping ${field.name || selector}: target not found`);
     return;
   }
+  const targetLocator = field.useTagInput
+    ? await getTagInputLocator(locator)
+    : locator;
   if (action === "click") {
-    await scrollIfNeeded(locator, field);
+    await scrollIfNeeded(targetLocator, field);
     if (field.clickElementCenter) {
-      const box = await locator.first().boundingBox();
+      const box = await targetLocator.first().boundingBox();
       if (box) {
         await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
       } else {
-        await locator.first().click({ force: field.force === true });
+        await targetLocator.first().click({ force: field.force === true });
       }
     } else {
-      await locator.first().click({ force: field.force === true });
+      await targetLocator.first().click({ force: field.force === true });
     }
     return;
   }
   if (action === "check") {
-    await scrollIfNeeded(locator, field);
-    await locator.first().check({ force: field.force === true });
+    await scrollIfNeeded(targetLocator, field);
+    await targetLocator.first().check({ force: field.force === true });
     return;
   }
   if (action === "select") {
-    await scrollIfNeeded(locator, field);
-    await locator.first().selectOption(value);
+    await scrollIfNeeded(targetLocator, field);
+    await targetLocator.first().selectOption(value);
     return;
   }
   if (action === "type") {
-    await scrollIfNeeded(locator, field);
+    await scrollIfNeeded(targetLocator, field);
     const delay = options.typingDelayMs
       ? randomBetween(
           Math.max(0, options.typingDelayMs - 40),
           options.typingDelayMs + 60
         )
       : 0;
-    await locator.first().type(value, delay ? { delay } : undefined);
+    await targetLocator.first().type(value, delay ? { delay } : undefined);
     if (field.pressEnter) {
-      await locator.first().press("Enter");
+      if (
+        typeof field.postFillDelayMs === "number" &&
+        field.postFillDelayMs > 0
+      ) {
+        await page.waitForTimeout(field.postFillDelayMs);
+      }
+      await targetLocator.first().press("Enter");
     }
     return;
   }
   if (options.typingDelayMs && !field.noTypingDelay) {
-    await scrollIfNeeded(locator, field);
-    await locator.first().fill("");
+    await scrollIfNeeded(targetLocator, field);
+    await targetLocator.first().fill("");
     const delay = randomBetween(
       Math.max(0, options.typingDelayMs - 40),
       options.typingDelayMs + 60
     );
-    await locator.first().type(value, { delay });
+    await targetLocator.first().type(value, { delay });
     if (field.pressEnter) {
-      await locator.first().press("Enter");
+      if (
+        typeof field.postFillDelayMs === "number" &&
+        field.postFillDelayMs > 0
+      ) {
+        await page.waitForTimeout(field.postFillDelayMs);
+      }
+      await targetLocator.first().press("Enter");
     }
   } else {
-    await scrollIfNeeded(locator, field);
-    await locator.first().fill(value);
+    await scrollIfNeeded(targetLocator, field);
+    await targetLocator.first().fill(value);
     if (field.pressEnter) {
-      await locator.first().press("Enter");
+      if (
+        typeof field.postFillDelayMs === "number" &&
+        field.postFillDelayMs > 0
+      ) {
+        await page.waitForTimeout(field.postFillDelayMs);
+      }
+      await targetLocator.first().press("Enter");
     }
   }
 }
@@ -344,8 +573,9 @@ async function main() {
   const typingDelayMs =
     Number(typingDelayArg || options.typingDelayMs || (safe ? 90 : 0)) || 0;
   const betweenFieldsDelayMs =
-    Number(betweenDelayArg || options.betweenFieldsDelayMs || (safe ? 300 : 0)) ||
-    0;
+    Number(
+      betweenDelayArg || options.betweenFieldsDelayMs || (safe ? 300 : 0)
+    ) || 0;
   const skuOptions = options.sku || {};
   const userDataDir = userDataDirArg || options.userDataDir || "";
   const finalHeadless = headless ? true : !headed && !safe;
@@ -362,19 +592,33 @@ async function main() {
   if (userDataDir) {
     context = await chromium.launchPersistentContext(userDataDir, {
       headless: finalHeadless,
-      slowMo: slowMoMs || undefined
+      slowMo: slowMoMs || undefined,
     });
     page = context.pages()[0] || (await context.newPage());
   } else {
     browser = await chromium.launch({
       headless: finalHeadless,
-      slowMo: slowMoMs || undefined
+      slowMo: slowMoMs || undefined,
     });
     context = await browser.newContext();
     page = await context.newPage();
   }
 
-  await page.goto(selectors.url, { waitUntil: options.waitUntil || "domcontentloaded" });
+  const needsClipboard = selectors.fields?.some((field) => field.usePaste);
+  if (needsClipboard) {
+    try {
+      const origin = new URL(selectors.url).origin;
+      await context.grantPermissions(["clipboard-read", "clipboard-write"], {
+        origin,
+      });
+    } catch (err) {
+      console.log("Warning: could not grant clipboard permissions.");
+    }
+  }
+
+  await page.goto(selectors.url, {
+    waitUntil: options.waitUntil || "domcontentloaded",
+  });
 
   if (options.pauseForManualStart) {
     await waitForEnter(
@@ -383,7 +627,7 @@ async function main() {
   }
   if (options.waitForSelector) {
     await page.waitForSelector(options.waitForSelector, {
-      timeout: options.waitForSelectorTimeoutMs || 120000
+      timeout: options.waitForSelectorTimeoutMs || 120000,
     });
   }
   if (options.pauseBeforeFillMs) {
@@ -402,7 +646,13 @@ async function main() {
   }
 
   if (options.clickDraft && draft) {
-    await fillField(page, draft, data, { typingDelayMs, skuOptions });
+    const skipDraft =
+      draft.skipIfChecked !== false && (await isCheckboxChecked(page, draft));
+    if (skipDraft) {
+      console.log("Draft already checked. Skipping.");
+    } else {
+      await fillField(page, draft, data, { typingDelayMs, skuOptions });
+    }
   }
   if (options.clickSaveProgress && saveProgress) {
     await fillField(page, saveProgress, data, { typingDelayMs, skuOptions });
@@ -425,7 +675,9 @@ async function main() {
   }
 
   if (options.pauseForReview) {
-    await waitForEnter("Review the page, then press Enter to close the browser...");
+    await waitForEnter(
+      "Review the page, then press Enter to close the browser..."
+    );
   }
 
   if (headed && !options.pauseForReview) {

@@ -173,6 +173,11 @@
     <div class="wrap">
       <h1>Moola Playwright Helper</h1>
       <p>Load your listing JSON, then copy fields into your listing form.</p>
+      <div class="row" style="margin: 8px 0 14px">
+        <button id="expandAllBtn" type="button">Expand all</button>
+        <button id="collapseAllBtn" type="button">Collapse all</button>
+        <button id="clearAllBtn" type="button">Clear All</button>
+      </div>
 
       <details class="panel" open>
         <summary><h2>JSON Loader</h2></summary>
@@ -434,6 +439,9 @@
       const fileInput = document.getElementById("fileInput");
       const downloadBtn = document.getElementById("downloadBtn");
       const previewBtn = document.getElementById("previewBtn");
+      const expandAllBtn = document.getElementById("expandAllBtn");
+      const collapseAllBtn = document.getElementById("collapseAllBtn");
+      const clearAllBtn = document.getElementById("clearAllBtn");
       const lpPanel = document.getElementById("lpPanel");
       const measurementsHelperPanel = document.getElementById(
         "measurementsHelperPanel"
@@ -526,6 +534,7 @@
       let lastAutoSize = "";
       let includeToggles = {};
       let defaultJsonFolder = "C:\\\\Users\\\\outdo\\\\Downloads";
+      const sessionStorageKey = "moola_session_data";
 
       function toStringValue(value) {
         if (value === null || value === undefined) return "";
@@ -1464,6 +1473,7 @@
         setFieldValue("measurements_imperial", imperial);
         setFieldValue("measurements_metric", metric);
         updateListperfectlyDescription(currentData);
+        saveSession();
       }
 
       function toggleMeasurementFields() {
@@ -1646,6 +1656,69 @@
         }
       }
 
+      function saveSession() {
+        if (!currentData) return;
+        try {
+          window.localStorage.setItem(
+            sessionStorageKey,
+            JSON.stringify(currentData)
+          );
+        } catch (err) {
+          // Ignore storage errors.
+        }
+      }
+
+      function clearSession() {
+        window.localStorage.removeItem(sessionStorageKey);
+      }
+
+      function resetToEmpty() {
+        items = [];
+        currentIndex = 0;
+        currentData = null;
+        skuConfirmed = false;
+        fieldInputs = [];
+        fieldInputMap = {};
+        lpPanel.style.display = "none";
+        measurementsHelperPanel.style.display = "none";
+        platformPanel.style.display = "none";
+        additionalPanel.style.display = "none";
+        skuPanel.style.display = "none";
+        lpFieldsContainer.innerHTML = "";
+        ebayPlatformFieldsContainer.innerHTML = "";
+        depopPlatformFieldsContainer.innerHTML = "";
+        typesMiscFieldsContainer.innerHTML = "";
+        otherPlatformFieldsContainer.innerHTML = "";
+        additionalFieldsContainer.innerHTML = "";
+        downloadBtn.disabled = true;
+        if (previewBtn) previewBtn.disabled = true;
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        if (fileInput) fileInput.value = "";
+        updateStatus();
+      }
+
+      function loadSession() {
+        const raw = window.localStorage.getItem(sessionStorageKey);
+        if (!raw) return false;
+        try {
+          const data = JSON.parse(raw);
+          items = [
+            {
+              name: "Recovered session",
+              data,
+              skuConfirmed: Boolean(data?.sku),
+            },
+          ];
+          currentIndex = 0;
+          skuPanel.style.display = "block";
+          loadCurrent();
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+
       function escapeHtml(value) {
         return String(value || "")
           .replace(/&/g, "&amp;")
@@ -1704,13 +1777,41 @@
         addSection("Description", readPreviewValue("description"));
         addSection("Included Items", readPreviewValue("included_items"));
         addSection("Measurements", readPreviewValue("measurements"));
-        addSection("Condition", readPreviewValue("condition"));
+        addSection("Condition", [
+          `Condition status: ${readPreviewValue("condition_status")}`,
+          `Pre-Owned condition: ${readPreviewValue("pre_owned_condition")}`,
+          readPreviewValue("condition"),
+        ]);
+        addSection("Pricing", readPreviewValue("pricing_sentence"));
+        const maxProfitTime = readPreviewValue("max_profit_time_to_sell");
+        const minProfitTime = readPreviewValue("min_profit_time_to_sell");
+        const profitLines = [
+          `Max profit price: ${readPreviewValue("max_profit_price")}`,
+          `Max profit estimate: ${readPreviewValue("max_profit_estimate")}`,
+          `Max profit time to sell: ${maxProfitTime}`,
+          `Min profit price: ${readPreviewValue("min_profit_price")}`,
+          `Min profit estimate: ${readPreviewValue("min_profit_estimate")}`,
+          `Min profit time to sell: ${minProfitTime}`,
+        ];
+        if (!maxProfitTime && !minProfitTime) {
+          profitLines.push(
+            `Time To Sell: ${readPreviewValue("time_to_sell_sentence")}`
+          );
+        }
+        addSection("Profit Estimates", profitLines);
         addSection(
           "Shipping Estimate",
           readPreviewValue("shipping_estimate_sentence")
         );
-        addSection("Pricing", readPreviewValue("pricing_sentence"));
-        addSection("Time To Sell", readPreviewValue("time_to_sell_sentence"));
+        addSection("Fees Breakdown", [
+          `Platform fees: ${readPreviewValue("platform_fee_estimate")}`,
+          `Payment processing: ${readPreviewValue(
+            "payment_processing_fee_estimate"
+          )}`,
+          `Labor: ${readPreviewValue("labor_cost_estimate")}`,
+          `Fees or Other Costs: ${readPreviewValue("fees_or_other_costs")}`,
+        ]);
+
         addSection(
           "Platforms",
           formatPlatformsPreview(readPreviewValue("platforms"))
@@ -1738,37 +1839,39 @@
         color-scheme: dark;
       }
       body {
-        font-family: "Segoe UI", Arial, sans-serif;
+        font-family: "Segoe UI", "Inter", Arial, sans-serif;
         margin: 24px;
         color: #f4edff;
         background: radial-gradient(circle at top, #2a104a 0%, #0f081b 55%, #0b0614 100%);
+        font-size: 16px;
+        line-height: 1.6;
+        letter-spacing: 0.2px;
       }
       h1 {
         margin-bottom: 12px;
-        font-size: 26px;
+        font-size: 28px;
         color: #f7e9ff;
       }
       h2 {
         margin: 0 0 10px;
-        font-size: 16px;
-        color: #cdb3ff;
+        font-size: 17px;
+        color: #d7c3ff;
       }
       section {
-        margin-bottom: 16px;
-        padding: 14px 16px;
-        background: #1b102c;
-        border: 1px solid #39215a;
-        border-radius: 10px;
-        box-shadow: 0 10px 24px rgba(5, 2, 10, 0.35);
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #2b1a44;
+      }
+      section:last-of-type {
+        border-bottom: none;
       }
       pre {
         white-space: pre-wrap;
         margin: 0;
         color: #f2eaff;
-        background: #12091d;
-        padding: 10px 12px;
-        border-radius: 8px;
-        border: 1px solid #2f1a4a;
+        background: transparent;
+        padding: 0;
+        border: none;
       }
       p {
         color: #e6dbff;
@@ -1828,6 +1931,7 @@
         skuInput.readOnly = true;
         skuHint.textContent = `SKU set to ${value}.`;
         renderFields(currentData);
+        saveSession();
       }
 
       function changeSku() {
@@ -1928,6 +2032,7 @@
               updateSellerNotes(currentData);
             }
             items[currentIndex].data = currentData;
+            saveSession();
           });
         }
 
@@ -1992,6 +2097,10 @@
           { label: "Size or Fit", key: "size_or_fit" },
           { label: "Tags line", key: "tags_line" },
           { label: "Condition Status", key: "condition_status" },
+          {
+            label: "Pre-Owned Condition (Like New/Good/Fair/Poor/None)",
+            key: "pre_owned_condition",
+          },
           { label: "Condition Notes", key: "condition", multiline: true },
           {
             label: "Buyer pays shipping price",
@@ -2149,6 +2258,19 @@
             multiline: true,
           },
           { label: "Shipping cost estimate", key: "shipping_cost_estimate" },
+          { label: "Platform fee estimate", key: "platform_fee_estimate" },
+          {
+            label: "Payment processing fee estimate",
+            key: "payment_processing_fee_estimate",
+          },
+          { label: "Labor cost estimate", key: "labor_cost_estimate" },
+          { label: "Fees or Other Costs", key: "fees_or_other_costs" },
+          { label: "Max profit price", key: "max_profit_price" },
+          { label: "Max profit estimate", key: "max_profit_estimate" },
+          { label: "Max profit time to sell", key: "max_profit_time_to_sell" },
+          { label: "Min profit price", key: "min_profit_price" },
+          { label: "Min profit estimate", key: "min_profit_estimate" },
+          { label: "Min profit time to sell", key: "min_profit_time_to_sell" },
           {
             label: "Time-to-sell sentence",
             key: "time_to_sell_sentence",
@@ -2398,6 +2520,7 @@
         downloadBtn.disabled = false;
         if (previewBtn) previewBtn.disabled = false;
         updateStatus();
+        saveSession();
       }
 
       prevBtn.addEventListener("click", () => {
@@ -2421,6 +2544,7 @@
       fileInput.addEventListener("change", async (event) => {
         const files = Array.from(event.target.files || []);
         if (!files.length) return;
+        clearSession();
         items = [];
         for (const file of files) {
           try {
@@ -2432,14 +2556,7 @@
           }
         }
         if (!items.length) {
-          lpPanel.style.display = "none";
-          measurementsHelperPanel.style.display = "none";
-          platformPanel.style.display = "none";
-          additionalPanel.style.display = "none";
-          skuPanel.style.display = "none";
-          downloadBtn.disabled = true;
-          if (previewBtn) previewBtn.disabled = true;
-          updateStatus();
+          resetToEmpty();
           return;
         }
         currentIndex = 0;
@@ -2448,6 +2565,7 @@
       });
 
       loadSavedAutofillInputs();
+      loadSession();
 
       downloadBtn.addEventListener("click", () => {
         if (!currentData) return;
@@ -2476,6 +2594,29 @@
           if (!win) return;
           win.document.write(html);
           win.document.close();
+        });
+      }
+
+      if (expandAllBtn) {
+        expandAllBtn.addEventListener("click", () => {
+          document.querySelectorAll("details.panel").forEach((panel) => {
+            panel.open = true;
+          });
+        });
+      }
+
+      if (collapseAllBtn) {
+        collapseAllBtn.addEventListener("click", () => {
+          document.querySelectorAll("details.panel").forEach((panel) => {
+            panel.open = false;
+          });
+        });
+      }
+
+      if (clearAllBtn) {
+        clearAllBtn.addEventListener("click", () => {
+          clearSession();
+          resetToEmpty();
         });
       }
     </script>

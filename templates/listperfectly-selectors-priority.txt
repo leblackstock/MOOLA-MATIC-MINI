@@ -12,6 +12,7 @@ Required JSON keys for auto-fill:
 - size_or_fit
 - tags_line
 - condition_status
+- pre_owned_condition
 - condition
 - buyer_pays_shipping_price
 - cogs
@@ -26,6 +27,8 @@ Required JSON keys for auto-fill:
 - package_width
 - package_height
 - shipping_zip
+- shipping_cost_estimate
+- fees_or_other_costs
 - notes
 
 Rules:
