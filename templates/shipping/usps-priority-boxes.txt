@@ -1,0 +1,31 @@
+USPS PRIORITY MAIL (NON-FLAT-RATE) BOXES
+Last updated: 2026-02-01
+Sources: USPS store box specs; USPS Notice 123 (flat rate dimensions)
+
+PRICING
+Use the eBay shipping calculator for current rates:
+https://www.ebay.com/shp/calc/rates
+Note: After using the calculator, record whether Flat Rate or regular Priority Mail is cheaper for the same item.
+
+STANDARD USPS PRIORITY MAIL BOXES (NON-FLAT-RATE)
+Name | Model | Outside (L x W x H) | Inside (L x W x H)
+Priority Mail Small Box | Box 1096L | 9-7/16 x 6-7/16 x 2-3/16 | 9-1/4 x 6-1/4 x 2
+Priority Mail Medium Box Option 1 (side-load) | Box 1092 | 13-11/16 x 12 x 2-7/8 | 13-3/8 x 11-7/8 x 2-3/4
+Priority Mail Medium Box Option 2 (side-load) | Box 1097 | 13-7/16 x 11-5/8 x 2-1/2 | 13-1/8 x 11-1/2 x 2-3/8
+Priority Mail Side-Loading Large Box | Box 1095 | 15 x 12 x 3-1/8 | 14-7/8 x 11-7/8 x 3
+Priority Mail Medium Cube-Shaped Box | Box 4 | 7-1/4 x 7-1/4 x 6-1/2 | 7 x 7 x 6
+Priority Mail Medium Box (top-load) | Box 7 | 12-1/4 x 12 x 8-1/2 | 12 x 11-3/4 x 8
+Priority Mail Shoe Box | Shoe Box | 14-7/8 x 5-1/4 x 7-3/8 | 14-3/8 x 5-1/8 x 7-1/4
+
+USPS PRIORITY MAIL FLAT RATE BOXES
+Name | Model | Outside (L x W x H) | Inside (L x W x H)
+Small Flat Rate Box | Flat Rate Box | 8-11/16 x 5-7/16 x 1-3/4 | 8-5/8 x 5-3/8 x 1-5/8
+Medium Flat Rate Box (top-load) | Flat Rate Box | 11-1/4 x 8-3/4 x 6 | 11 x 8-1/2 x 5-1/2
+Medium Flat Rate Box (side-load) | Flat Rate Box | 14 x 12 x 3-1/2 | 13-5/8 x 11-7/8 x 3-3/8
+Large Flat Rate Box | Flat Rate Box | 12 x 12-1/4 x 6 | 11-3/4 x 12 x 5-1/2
+
+SIZE BREAKPOINT NOTES (PRIORITY MAIL)
+- If package exceeds 1 cubic foot (1,728 cubic inches), USPS charges the greater of actual or dimensional weight.
+- If length > 22" and <= 30", an oversize surcharge may apply.
+- If length > 30", an oversize surcharge may apply.
+- If package exceeds 2 cubic feet (3,456 cubic inches), an additional oversize surcharge may apply.

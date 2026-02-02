@@ -11,6 +11,9 @@ alwaysApply: false
 - If List is requested, follow `Original/MOOLA-MATIC LIST.txt` and `Original/MOOLA-MATIC JSON SCHEMA.txt`.
 - ListPerfectly priority: populate all fields used by `playwright-assistant/scripts/selectors.json` first.
 - When listing, include estimated measurements in the initial JSON output.
+- When listing, `included_items` must include one descriptor with the item. Prefer gender when known (e.g., "Men's Boots (pair)"). If gender is not applicable or unknown, use a category descriptor with quantity (e.g., "Decor (1 piece)", "Wall Art (2 pieces)").
+- When listing and a box size is mentioned or implied, warn if any size breakpoint would be exceeded (1 cu ft, length > 22", length > 30", or 2 cu ft).
+- When listing and pricing is checked, choose the cheapest Priority option (flat rate vs regular). Use the matching box dimensions from `templates/shipping/usps-priority-boxes.txt` and populate `package_length`, `package_width`, and `package_height` in the JSON. Estimate and populate `shipping_weight_lb` and `shipping_weight_oz`.
 - When listing, create the JSON file and respond with:
   "JSON file created."
 - Creativity levels (LIST mode):

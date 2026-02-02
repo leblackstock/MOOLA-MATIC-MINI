@@ -179,6 +179,7 @@
         <div class="row">
           <input type="file" id="fileInput" accept=".json" multiple />
           <button id="downloadBtn" disabled>Download JSON</button>
+          <button id="previewBtn" disabled>Preview Listing</button>
           <button id="prevBtn" disabled>Prev</button>
           <button id="nextBtn" disabled>Next</button>
         </div>
@@ -269,12 +270,10 @@
           Enter inches; cm is auto-calculated. Auto-generated values use "~".
         </div>
         <div class="field">
-          <label>Auto-generate measurements</label>
+          <label>Measurements verified</label>
           <div class="row">
-            <input id="autoMeasurementsToggle" type="checkbox" checked />
-            <span class="note"
-              >Turns off if you edit measurement arrays manually.</span
-            >
+            <input id="measurementsVerifiedToggle" type="checkbox" />
+            <button id="saveVerifiedBtn" type="button">Save verified</button>
           </div>
         </div>
         <div class="field">
@@ -297,8 +296,11 @@
               <input
                 id="sizeWidthInput"
                 type="text"
-                placeholder="Width (D, EE)"
+                placeholder="Width (Reg/Wide/Extra Wide/XXWide/Narrow)"
               />
+            </div>
+            <div class="note">
+              Width note: Reg, Wide, Extra Wide, XXWide, Narrow. Default to Reg.
             </div>
           </div>
           <div class="field">
@@ -431,6 +433,7 @@
     <script>
       const fileInput = document.getElementById("fileInput");
       const downloadBtn = document.getElementById("downloadBtn");
+      const previewBtn = document.getElementById("previewBtn");
       const lpPanel = document.getElementById("lpPanel");
       const measurementsHelperPanel = document.getElementById(
         "measurementsHelperPanel"
@@ -465,9 +468,11 @@
       const skuOkBtn = document.getElementById("skuOkBtn");
       const skuChangeBtn = document.getElementById("skuChangeBtn");
       const skuHint = document.getElementById("skuHint");
-      const autoMeasurementsToggle = document.getElementById(
-        "autoMeasurementsToggle"
+      const autoMeasurementsToggle = null;
+      const measurementsVerifiedToggle = document.getElementById(
+        "measurementsVerifiedToggle"
       );
+      const saveVerifiedBtn = document.getElementById("saveVerifiedBtn");
       const measurementTemplateSelect = document.getElementById(
         "measurementTemplateSelect"
       );
@@ -545,6 +550,13 @@
       function parseList(value) {
         return String(value || "")
           .split(/[,\\n]/)
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+
+      function parseLines(value) {
+        return String(value || "")
+          .split(/\\n/)
           .map((item) => item.trim())
           .filter(Boolean);
       }
@@ -675,7 +687,7 @@
 
         const includedItems = Array.isArray(data?.included_items)
           ? data.included_items
-          : parseList(data?.included_items);
+          : parseLines(data?.included_items);
         const cleanIncluded = includedItems
           .map((item) => String(item || "").trim())
           .filter(Boolean);
@@ -890,9 +902,10 @@
         return Number.isFinite(parsed) ? parsed : null;
       }
 
-      function formatSizeValue(value, estimated) {
-        if (value === null) return "__";
+      function formatSizeValue(value, estimated, verified) {
+        if (value === null) return null;
         const text = formatNumber(value, 1);
+        if (verified) return text;
         return estimated ? `~${text}` : text;
       }
 
@@ -949,6 +962,47 @@
         return values;
       }
 
+      function normalizeWidthLabel(value) {
+        const raw = String(value || "").trim();
+        if (!raw) return "";
+        const lower = raw.toLowerCase();
+        if (lower === "reg" || lower === "regular" || lower === "m") {
+          return "Reg";
+        }
+        if (lower.includes("narrow")) return "Narrow";
+        if (
+          lower.includes("xx") ||
+          lower.includes("4e") ||
+          lower.includes("eeee")
+        ) {
+          return "XXWide";
+        }
+        if (lower.includes("extra")) return "Extra Wide";
+        if (lower.includes("wide") || lower === "w") return "Wide";
+        const compact = lower.replace(/[^a-z0-9]/g, "");
+        if (compact === "d") return "Reg";
+        if (compact === "b" || compact === "c") return "Narrow";
+        if (compact === "e" || compact === "ee" || compact === "2e") {
+          return "Wide";
+        }
+        if (compact === "eee" || compact === "3e") return "Extra Wide";
+        if (compact === "4e" || compact === "eeee") return "XXWide";
+        return raw;
+      }
+
+      function formatWidthText(raw) {
+        const cleaned = String(raw || "").trim();
+        const label = normalizeWidthLabel(cleaned);
+        if (!label) return "Reg";
+        if (!cleaned) return label;
+        const compact = cleaned.replace(/[^a-z0-9]/gi, "");
+        const isCodeOnly = /^[a-z0-9]+$/i.test(compact) && compact.length <= 3;
+        if (isCodeOnly && label !== cleaned) {
+          return `${cleaned} (${label})`;
+        }
+        return label;
+      }
+
       function formatNumber(value, decimals) {
         const factor = 10 ** decimals;
         const rounded = Math.round(value * factor) / factor;
@@ -956,34 +1010,43 @@
         return fixed.replace(/\.0+$/, "");
       }
 
-      function formatInches(value) {
-        return `~${formatNumber(value, 1)} in`;
+      function formatInches(value, verified) {
+        const text = `${formatNumber(value, 1)} in`;
+        return verified ? text : `~${text}`;
       }
 
       function formatCentimeters(value) {
         return `${formatNumber(value * 2.54, 1)} cm`;
       }
 
-      function formatPounds(value) {
-        return `~${formatNumber(value, 2)} lb`;
+      function formatPounds(value, verified) {
+        const text = `${formatNumber(value, 2)} lb`;
+        return verified ? text : `~${text}`;
       }
 
       function formatKilograms(value) {
         return `${formatNumber(value * 0.453592, 2)} kg`;
       }
 
-      function addMeasurementLine(label, inches, lines, imperial, metric) {
+      function addMeasurementLine(
+        label,
+        inches,
+        lines,
+        imperial,
+        metric,
+        verified
+      ) {
         if (inches === null) return;
-        const inText = formatInches(inches);
+        const inText = formatInches(inches, verified);
         const cmText = formatCentimeters(inches);
         lines.push(`${label}: ${inText} (${cmText})`);
         imperial.push(`${label}: ${inText}`);
         metric.push(`${label}: ${cmText}`);
       }
 
-      function addWeightLine(label, pounds, lines, imperial, metric) {
+      function addWeightLine(label, pounds, lines, imperial, metric, verified) {
         if (pounds === null) return;
-        const lbText = formatPounds(pounds);
+        const lbText = formatPounds(pounds, verified);
         const kgText = formatKilograms(pounds);
         lines.push(`${label}: ${lbText} (${kgText})`);
         imperial.push(`${label}: ${lbText}`);
@@ -993,20 +1056,66 @@
       function buildSizeTagFromInputs(data) {
         const values = applySizeConversions(data);
         const width = String(sizeWidthInput?.value || "").trim();
-        if (!values.us && !values.uk && !values.eu && !width) return "";
-        const usText = formatSizeValue(values.us, values.estimated?.us);
-        const ukText = formatSizeValue(values.uk, values.estimated?.uk);
-        const euText = formatSizeValue(values.eu, values.estimated?.eu);
-        const widthText = width || "__";
-        return `US ${usText} / UK ${ukText} / EU ${euText} (Width ${widthText})`;
+        if (values.us === null && values.uk === null && values.eu === null) {
+          return "";
+        }
+        const verified = measurementsVerifiedToggle?.checked;
+        const usText = formatSizeValue(
+          values.us,
+          values.estimated?.us,
+          verified
+        );
+        const ukText = formatSizeValue(
+          values.uk,
+          values.estimated?.uk,
+          verified
+        );
+        const euText = formatSizeValue(
+          values.eu,
+          values.estimated?.eu,
+          verified
+        );
+        const parts = [];
+        if (usText !== null) parts.push(`US ${usText}`);
+        if (ukText !== null) parts.push(`UK ${ukText}`);
+        if (euText !== null) parts.push(`EU ${euText}`);
+        const widthText = formatWidthText(width);
+        return `${parts.join(" / ")} (Width ${widthText})`;
       }
 
       function updateSizeOrFitFromHelper(data) {
         if (!data) return;
         const next = buildSizeTagFromInputs(data);
-        if (!next) return;
         const current = String(data.size_or_fit || "").trim();
-        if (current && current !== lastAutoSize) return;
+        const hasPlaceholder = current.includes("__");
+        const currentWidthMatch = current.match(/Width\s*([^)]+)/i);
+        const currentWidthRaw = currentWidthMatch
+          ? currentWidthMatch[1].trim()
+          : "";
+        const currentWidthFormatted = currentWidthRaw
+          ? formatWidthText(currentWidthRaw)
+          : "";
+        const widthNeedsNormalize =
+          currentWidthRaw && currentWidthFormatted !== currentWidthRaw;
+        if (!next) {
+          if (hasPlaceholder) {
+            data.size_or_fit = "";
+            lastAutoSize = "";
+            const input = fieldInputMap.size_or_fit;
+            if (input && input.value) {
+              input.value = "";
+            }
+          }
+          return;
+        }
+        if (
+          current &&
+          current !== lastAutoSize &&
+          !hasPlaceholder &&
+          !widthNeedsNormalize
+        ) {
+          return;
+        }
         data.size_or_fit = next;
         lastAutoSize = next;
         const input = fieldInputMap.size_or_fit;
@@ -1072,7 +1181,7 @@
       }
 
       function updateMeasurementsFromHelper() {
-        if (!autoMeasurementsToggle?.checked || !currentData) return;
+        if (!currentData) return;
         const template = getSelectedTemplate();
         const values = {
           outsoleLength: parseNumber(outsoleLengthInput?.value),
@@ -1104,6 +1213,7 @@
         const lines = [];
         const imperial = [];
         const metric = [];
+        const verified = measurementsVerifiedToggle?.checked;
 
         const sizeTag = String(currentData.size_or_fit || "").trim();
         if (sizeTag && isIncluded(includeToggles.size)) {
@@ -1117,7 +1227,8 @@
               values.outsoleLength,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.outsoleWidth)) {
@@ -1126,7 +1237,8 @@
               values.outsoleWidth,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.insoleLength)) {
@@ -1135,7 +1247,8 @@
               values.insoleLength,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.insoleWidth)) {
@@ -1144,7 +1257,8 @@
               values.insoleWidth,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.heelHeight)) {
@@ -1153,7 +1267,8 @@
               values.heelHeight,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.platformHeight)) {
@@ -1162,7 +1277,8 @@
               values.platformHeight,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.toeBoxHeight)) {
@@ -1171,7 +1287,8 @@
               values.toeBoxHeight,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
 
@@ -1182,7 +1299,8 @@
                 values.shaftHeight,
                 lines,
                 imperial,
-                metric
+                metric,
+                verified
               );
             }
             if (isIncluded(includeToggles.shaftCirc)) {
@@ -1191,7 +1309,8 @@
                 values.shaftCirc,
                 lines,
                 imperial,
-                metric
+                metric,
+                verified
               );
             }
             if (isIncluded(includeToggles.calfCirc)) {
@@ -1200,7 +1319,8 @@
                 values.calfCirc,
                 lines,
                 imperial,
-                metric
+                metric,
+                verified
               );
             }
           }
@@ -1218,7 +1338,8 @@
               values.weightValue,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
         }
@@ -1230,7 +1351,8 @@
               values.garmentChest,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.garmentLength)) {
@@ -1239,7 +1361,8 @@
               values.garmentLength,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.garmentShoulder)) {
@@ -1248,7 +1371,8 @@
               values.garmentShoulder,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.garmentSleeve)) {
@@ -1257,7 +1381,8 @@
               values.garmentSleeve,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.garmentWaist)) {
@@ -1266,7 +1391,8 @@
               values.garmentWaist,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.garmentInseam)) {
@@ -1275,7 +1401,8 @@
               values.garmentInseam,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.garmentRise)) {
@@ -1284,7 +1411,8 @@
               values.garmentRise,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.garmentHip)) {
@@ -1293,7 +1421,8 @@
               values.garmentHip,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
         }
@@ -1305,7 +1434,8 @@
               values.standardLength,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.standardWidth)) {
@@ -1314,7 +1444,8 @@
               values.standardWidth,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
           if (isIncluded(includeToggles.standardHeight)) {
@@ -1323,7 +1454,8 @@
               values.standardHeight,
               lines,
               imperial,
-              metric
+              metric,
+              verified
             );
           }
         }
@@ -1514,6 +1646,142 @@
         }
       }
 
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function toLines(value) {
+        if (!value) return [];
+        if (Array.isArray(value)) {
+          return value.map((item) => String(item).trim()).filter(Boolean);
+        }
+        return String(value)
+          .split(/\n/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+      }
+
+      function buildPreviewHtml(data) {
+        const title = String(data?.title || "Listing Preview").trim();
+        const sections = [];
+
+        const readPreviewValue = (key) => {
+          const input = fieldInputMap?.[key];
+          if (input) return input.value;
+          return data ? data[key] : "";
+        };
+
+        const addSection = (label, content) => {
+          const lines = toLines(content);
+          if (!lines.length) return;
+          sections.push({
+            label,
+            html: `<pre>${escapeHtml(lines.join("\n"))}</pre>`,
+          });
+        };
+
+        const formatPlatformsPreview = (value) => {
+          if (Array.isArray(value)) {
+            return value
+              .map((item) => {
+                const platform = String(item?.platform || "").trim();
+                const reason = String(item?.reason || "").trim();
+                return platform && reason
+                  ? `${platform}: ${reason}`
+                  : platform || reason;
+              })
+              .filter(Boolean);
+          }
+          return toLines(value);
+        };
+
+        addSection("Hook", readPreviewValue("hook"));
+        addSection("Description", readPreviewValue("description"));
+        addSection("Included Items", readPreviewValue("included_items"));
+        addSection("Measurements", readPreviewValue("measurements"));
+        addSection("Condition", readPreviewValue("condition"));
+        addSection(
+          "Shipping Estimate",
+          readPreviewValue("shipping_estimate_sentence")
+        );
+        addSection("Pricing", readPreviewValue("pricing_sentence"));
+        addSection("Time To Sell", readPreviewValue("time_to_sell_sentence"));
+        addSection(
+          "Platforms",
+          formatPlatformsPreview(readPreviewValue("platforms"))
+        );
+        addSection("Types", readPreviewValue("types_block"));
+        addSection("Seller Notes", readPreviewValue("notes"));
+
+        const sectionsHtml = sections
+          .map(
+            (section) => `
+          <section>
+            <h2>${escapeHtml(section.label)}</h2>
+            ${section.html}
+          </section>`
+          )
+          .join("");
+
+        return `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>${escapeHtml(title || "Listing Preview")}</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 24px;
+        color: #f4edff;
+        background: radial-gradient(circle at top, #2a104a 0%, #0f081b 55%, #0b0614 100%);
+      }
+      h1 {
+        margin-bottom: 12px;
+        font-size: 26px;
+        color: #f7e9ff;
+      }
+      h2 {
+        margin: 0 0 10px;
+        font-size: 16px;
+        color: #cdb3ff;
+      }
+      section {
+        margin-bottom: 16px;
+        padding: 14px 16px;
+        background: #1b102c;
+        border: 1px solid #39215a;
+        border-radius: 10px;
+        box-shadow: 0 10px 24px rgba(5, 2, 10, 0.35);
+      }
+      pre {
+        white-space: pre-wrap;
+        margin: 0;
+        color: #f2eaff;
+        background: #12091d;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #2f1a4a;
+      }
+      p {
+        color: #e6dbff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>${escapeHtml(title || "Listing Preview")}</h1>
+    ${sectionsHtml || "<p>No preview content available.</p>"}
+  </body>
+</html>`;
+      }
+
       function suggestNextSku() {
         const last = getLastSku();
         const lastNum = Number.parseInt(last, 10);
@@ -1641,10 +1909,9 @@
                 "measurements",
                 "measurements_imperial",
                 "measurements_metric",
-              ].includes(field.key) &&
-              autoMeasurementsToggle
+              ].includes(field.key)
             ) {
-              autoMeasurementsToggle.checked = false;
+              return;
             }
             if (
               [
@@ -1694,7 +1961,7 @@
             key: "included_items",
             multiline: true,
             format: (value) => toStringValue(value),
-            parse: (value) => parseList(value),
+            parse: (value) => parseLines(value),
           },
           {
             label: "Measurements (Combined)",
@@ -1974,11 +2241,18 @@
         });
       }
 
-      if (autoMeasurementsToggle) {
-        autoMeasurementsToggle.addEventListener("change", () => {
-          if (autoMeasurementsToggle.checked) {
-            updateMeasurementsFromHelper();
+      if (measurementsVerifiedToggle) {
+        measurementsVerifiedToggle.addEventListener("change", () => {
+          updateMeasurementsFromHelper();
+        });
+      }
+
+      if (saveVerifiedBtn) {
+        saveVerifiedBtn.addEventListener("click", () => {
+          if (measurementsVerifiedToggle) {
+            measurementsVerifiedToggle.checked = true;
           }
+          handleMeasurementInput();
         });
       }
 
@@ -2122,6 +2396,7 @@
         toggleMeasurementFields();
         populateMeasurementHelperFromData(currentData);
         downloadBtn.disabled = false;
+        if (previewBtn) previewBtn.disabled = false;
         updateStatus();
       }
 
@@ -2163,6 +2438,7 @@
           additionalPanel.style.display = "none";
           skuPanel.style.display = "none";
           downloadBtn.disabled = true;
+          if (previewBtn) previewBtn.disabled = true;
           updateStatus();
           return;
         }
@@ -2191,6 +2467,17 @@
         jsonPathInput.value = `C:\\\\Users\\\\outdo\\\\Downloads\\\\${filename}`;
         saveAutofillInputs();
       });
+
+      if (previewBtn) {
+        previewBtn.addEventListener("click", () => {
+          if (!currentData) return;
+          const html = buildPreviewHtml(currentData);
+          const win = window.open("", "_blank");
+          if (!win) return;
+          win.document.write(html);
+          win.document.close();
+        });
+      }
     </script>
   </body>
 </html>
