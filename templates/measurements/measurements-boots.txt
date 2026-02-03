@@ -6,16 +6,19 @@ Label: ~X in (Y cm)
 Use only what you can estimate; omit unknowns.
 
 Size tag format (if provided):
-US __ / UK __ / EU __ (Width __)
+US __ / UK __ / EU __ / Width __
 
+Required (core):
 - Outsole length (heel-to-toe): ~__ in (__ cm)
 - Outsole width (widest): ~__ in (__ cm)
 - Insole length (heel to toe): ~__ in (__ cm)
 - Insole width (ball area): ~__ in (__ cm)
 - Heel height: ~__ in (__ cm)
-- Platform height (forefoot): ~__ in (__ cm)
-- Toe box height: ~__ in (__ cm)
 - Shaft height (from outsole): ~__ in (__ cm)
 - Shaft opening (circumference): ~__ in (__ cm)
-- Calf circumference (widest point): ~__ in (__ cm)
 - Weight (pair): ~__ lb (__ kg)
+
+Optional (if known):
+- Platform height (forefoot): ~__ in (__ cm)
+- Toe box height: ~__ in (__ cm)
+- Calf circumference (widest point): ~__ in (__ cm)

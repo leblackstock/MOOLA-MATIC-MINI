@@ -14,6 +14,8 @@ description: Execute MOOLA-MATIC Run mode for identify/value by default and list
   - Include estimated measurements in the initial JSON.
   - Populate fields used by ListPerfectly selectors first.
   - Create the JSON file and respond with `JSON file created.`
+  - If `era_status` is Vintage or Antique, include Etsy in `platforms` with a clear reason.
+  - If `era_status` is Vintage or Antique, include Vinted in `platforms` with a clear reason.
 
 ## References
 

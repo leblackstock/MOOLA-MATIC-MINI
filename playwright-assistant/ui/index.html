@@ -185,9 +185,16 @@
           <input type="file" id="fileInput" accept=".json" multiple />
           <button id="downloadBtn" disabled>Download JSON</button>
           <button id="previewBtn" disabled>Preview Listing</button>
+          <button id="mergeBtn" disabled>Update/Merge JSON</button>
           <button id="prevBtn" disabled>Prev</button>
           <button id="nextBtn" disabled>Next</button>
         </div>
+        <input
+          id="mergePicker"
+          type="file"
+          accept=".json"
+          style="display: none"
+        />
         <div class="note" style="margin-top: 10px">
           Edit mode is always on. Edits update the JSON used for auto‑fill and
           download.
@@ -439,6 +446,7 @@
       const fileInput = document.getElementById("fileInput");
       const downloadBtn = document.getElementById("downloadBtn");
       const previewBtn = document.getElementById("previewBtn");
+      const mergeBtn = document.getElementById("mergeBtn");
       const expandAllBtn = document.getElementById("expandAllBtn");
       const collapseAllBtn = document.getElementById("collapseAllBtn");
       const clearAllBtn = document.getElementById("clearAllBtn");
@@ -467,6 +475,7 @@
       const projectPathInput = document.getElementById("projectPathInput");
       const jsonPathInput = document.getElementById("jsonPathInput");
       const jsonPicker = document.getElementById("jsonPicker");
+      const mergePicker = document.getElementById("mergePicker");
       const jsonBrowseBtn = document.getElementById("jsonBrowseBtn");
       const copyCmdBtn = document.getElementById("copyCmdBtn");
       const downloadBatBtn = document.getElementById("downloadBatBtn");
@@ -533,6 +542,8 @@
       let lastAutoNotes = "";
       let lastAutoSize = "";
       let includeToggles = {};
+      let measurementTogglePairs = [];
+      let includeDefaultsApplied = false;
       let defaultJsonFolder = "C:\\\\Users\\\\outdo\\\\Downloads";
       const sessionStorageKey = "moola_session_data";
 
@@ -561,6 +572,115 @@
           .split(/[,\n]/)
           .map((item) => item.trim())
           .filter(Boolean);
+      }
+
+      function normalizeKey(value) {
+        return String(value || "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "");
+      }
+
+      function isBlankString(value) {
+        return !String(value || "").trim();
+      }
+
+      function isBlankArray(value) {
+        if (!Array.isArray(value)) return true;
+        if (!value.length) return true;
+        return value.every((item) => !String(item || "").trim());
+      }
+
+      function getMatchScore(base, incoming) {
+        const pairs = [
+          { key: "sku", weight: 2 },
+          { key: "title", weight: 2 },
+          { key: "brand", weight: 1 },
+          { key: "size_or_fit", weight: 1 },
+          { key: "upc", weight: 1 },
+        ];
+        let score = 0;
+        pairs.forEach(({ key, weight }) => {
+          const a = normalizeKey(base?.[key]);
+          const b = normalizeKey(incoming?.[key]);
+          if (a && b && a === b) score += weight;
+        });
+        return score;
+      }
+
+      function isLikelySameItem(base, incoming) {
+        if (!base || !incoming) return false;
+        const skuMatch =
+          normalizeKey(base.sku) &&
+          normalizeKey(base.sku) === normalizeKey(incoming.sku);
+        const titleMatch =
+          normalizeKey(base.title) &&
+          normalizeKey(base.title) === normalizeKey(incoming.title);
+        const brandMatch =
+          normalizeKey(base.brand) &&
+          normalizeKey(base.brand) === normalizeKey(incoming.brand);
+        const score = getMatchScore(base, incoming);
+        if (skuMatch) return true;
+        if (titleMatch && brandMatch) return true;
+        return score >= 3;
+      }
+
+      function mergeMissingFields(base, incoming) {
+        if (!base || !incoming) return false;
+        let changed = false;
+        Object.keys(incoming).forEach((key) => {
+          const incomingValue = incoming[key];
+          if (key === "platforms") {
+            if (!Array.isArray(incomingValue) || !incomingValue.length) return;
+            if (!Array.isArray(base.platforms) || !base.platforms.length) {
+              base.platforms = incomingValue;
+              changed = true;
+              return;
+            }
+            const existing = new Set(
+              base.platforms
+                .map((item) => normalizeKey(item?.platform))
+                .filter(Boolean)
+            );
+            incomingValue.forEach((item) => {
+              const name = normalizeKey(item?.platform);
+              if (!name || existing.has(name)) return;
+              base.platforms.push(item);
+              existing.add(name);
+              changed = true;
+            });
+            return;
+          }
+          if (Array.isArray(incomingValue)) {
+            if (isBlankArray(base[key]) && !isBlankArray(incomingValue)) {
+              base[key] = incomingValue;
+              changed = true;
+            }
+            return;
+          }
+          if (incomingValue && typeof incomingValue === "object") {
+            return;
+          }
+          if (isBlankString(base[key]) && !isBlankString(incomingValue)) {
+            base[key] = incomingValue;
+            changed = true;
+          }
+        });
+
+        if (
+          isBlankString(base.tags_line) &&
+          !isBlankString(incoming.tags_line)
+        ) {
+          base.tags_line = incoming.tags_line;
+          if (isBlankArray(base.tags)) {
+            base.tags = parseList(incoming.tags_line);
+          }
+          changed = true;
+        }
+        if (isBlankArray(base.tags) && !isBlankArray(incoming.tags)) {
+          base.tags = incoming.tags;
+          changed = true;
+        }
+        return changed;
       }
 
       function capitalizeWords(text) {
@@ -815,12 +935,44 @@
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.id = toggleId;
-        checkbox.checked = true;
+        checkbox.checked = Boolean(String(input.value || "").trim());
+        checkbox.addEventListener("change", () => {
+          checkbox.dataset.manual = "true";
+        });
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(` ${labelText}`));
         row.appendChild(label);
         field.appendChild(row);
+        measurementTogglePairs.push({ toggle: checkbox, input });
         return checkbox;
+      }
+
+      function applyIncludeDefaultsFromInputs() {
+        if (includeDefaultsApplied) return;
+        measurementTogglePairs.forEach(({ toggle, input }) => {
+          if (!toggle || !input) return;
+          toggle.checked = Boolean(String(input.value || "").trim());
+          toggle.dataset.manual = "false";
+        });
+        includeDefaultsApplied = true;
+      }
+
+      function updateIncludeToggleForInput(input) {
+        if (!input) return;
+        const pair = measurementTogglePairs.find(
+          (item) => item.input === input
+        );
+        if (!pair || !pair.toggle) return;
+        const hasValue = Boolean(String(input.value || "").trim());
+        if (!hasValue) {
+          pair.toggle.checked = false;
+          pair.toggle.dataset.manual = "false";
+          return;
+        }
+        if (pair.toggle.dataset.manual === "true" && !pair.toggle.checked) {
+          return;
+        }
+        pair.toggle.checked = true;
       }
 
       function initMeasurementToggles() {
@@ -1738,6 +1890,7 @@
         additionalFieldsContainer.innerHTML = "";
         downloadBtn.disabled = true;
         if (previewBtn) previewBtn.disabled = true;
+        if (mergeBtn) mergeBtn.disabled = true;
         prevBtn.disabled = true;
         nextBtn.disabled = true;
         if (fileInput) fileInput.value = "";
@@ -2487,7 +2640,10 @@
 
       measurementInputs.forEach((input) => {
         if (!input) return;
-        input.addEventListener("input", handleMeasurementInput);
+        input.addEventListener("input", () => {
+          updateIncludeToggleForInput(input);
+          handleMeasurementInput();
+        });
       });
 
       if (weightPerSelect) {
@@ -2519,6 +2675,49 @@
       jsonBrowseBtn.addEventListener("click", () => {
         jsonPicker.click();
       });
+
+      if (mergeBtn) {
+        mergeBtn.addEventListener("click", () => {
+          if (!currentData) return;
+          if (mergePicker) mergePicker.click();
+        });
+      }
+
+      if (mergePicker) {
+        mergePicker.addEventListener("change", async () => {
+          if (!currentData) return;
+          const file = mergePicker.files && mergePicker.files[0];
+          if (!file) return;
+          try {
+            const text = await file.text();
+            const incoming = JSON.parse(text);
+            if (!isLikelySameItem(currentData, incoming)) {
+              status.textContent =
+                "Merge skipped: selected file does not appear to match this listing.";
+              return;
+            }
+            const changed = mergeMissingFields(currentData, incoming);
+            if (!changed) {
+              status.textContent = `Merge complete. No missing fields found in ${file.name}.`;
+            } else {
+              status.textContent = `Merged missing fields from ${file.name}.`;
+            }
+            items[currentIndex].data = currentData;
+            renderFields(currentData);
+            normalizeMsrp(currentData);
+            updateListperfectlyDescription(currentData);
+            updateSellerNotes(currentData);
+            toggleMeasurementFields();
+            populateMeasurementHelperFromData(currentData);
+            applyIncludeDefaultsFromInputs();
+            updateFieldEditability();
+            saveSession();
+            mergePicker.value = "";
+          } catch (err) {
+            status.textContent = `Could not parse JSON: ${file.name}`;
+          }
+        });
+      }
 
       jsonPicker.addEventListener("change", () => {
         const file = jsonPicker.files && jsonPicker.files[0];
@@ -2663,6 +2862,7 @@
 
       function loadCurrent() {
         if (!items.length) return;
+        includeDefaultsApplied = false;
         currentData = items[currentIndex].data;
         lpPanel.style.display = "block";
         measurementsHelperPanel.style.display = "block";
@@ -2674,8 +2874,10 @@
         updateFieldEditability();
         toggleMeasurementFields();
         populateMeasurementHelperFromData(currentData);
+        applyIncludeDefaultsFromInputs();
         downloadBtn.disabled = false;
         if (previewBtn) previewBtn.disabled = false;
+        if (mergeBtn) mergeBtn.disabled = false;
         updateStatus();
         saveSession();
       }

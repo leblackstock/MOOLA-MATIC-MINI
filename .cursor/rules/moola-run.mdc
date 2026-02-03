@@ -11,6 +11,7 @@ alwaysApply: false
 - If List is requested, follow `Original/MOOLA-MATIC LIST.txt` and `Original/MOOLA-MATIC JSON SCHEMA.txt`.
 - ListPerfectly priority: populate all fields used by `playwright-assistant/scripts/selectors.json` first.
 - When listing, include estimated measurements in the initial JSON output.
+- When listing, include estimated measurements in the listing output when the LIST rules allow it (use "~" and both units).
 - When listing, `included_items` must include one descriptor with the item. Prefer gender when known (e.g., "Men's Boots (pair)"). If gender is not applicable or unknown, use a category descriptor with quantity (e.g., "Decor (1 piece)", "Wall Art (2 pieces)").
 - When listing, set `pre_owned_condition` to Like New/Good/Fair/Poor/None. Use None when `condition_status` is not Pre-Owned.
 - When listing, estimate `era_status` as Vintage (20+ years), Antique (100+ years), Modern, or Unknown, and include a short `era_notes` basis when possible.
@@ -20,6 +21,7 @@ alwaysApply: false
 - When listing, use `era_status` and `style_tags` to guide comps: look for comparable sold items that explicitly include those keywords, and base pricing on those comps rather than applying an automatic premium.
 - When listing and exact comps are not available, provide a best-guess price based on the closest modern comps plus adjustments for condition, brand tier, size scarcity, material quality, and relevant `style_tags` demand. Keep the estimate realistic and note that it is a best-guess in the pricing rationale (without adding new JSON keys).
 - When listing, if `era_status` is Vintage or Antique, include Etsy in `platforms` with an honest reason (e.g., "Vintage-focused marketplace; good for retro/heritage styles when keywords like vintage/90s apply.").
+- When listing, if `era_status` is Vintage or Antique, include Vinted in `platforms` with an honest reason (e.g., "Vintage-friendly marketplace; good for retro/heritage styles at accessible price points.").
 - When listing, ensure `msrp` is not lower than `buyer_pays_shipping_price`. If it would be lower or unknown, set `msrp` to the buyer-pays-shipping price.
 - When listing, decide whether to include `offer_recommendation`. Include it for most mid-range items when a reasonable offer strategy would help; omit it for rare/collector/luxury items or when margins are too thin. If included, base it on pricing (e.g., min offer around ~85% of `min_profit_price`, auto-accept above ~90% of `max_profit_price`) and output as a single sentence like: "Offer recommendation: Set min offer to $50, auto accept above $60."
 - When listing, populate `country_of_origin` when known; otherwise leave it blank.
