@@ -14,6 +14,10 @@
   "material": "<material_or_blank>",
   "style_features": "<style_features_or_blank>",
   "size_or_fit": "<size_or_fit_or_blank>",
+  "country_of_origin": "<country_of_origin_or_blank>",
+  "era_status": "<Vintage_or_Antique_or_Modern_or_Unknown>",
+  "era_notes": "<era_notes_or_blank>",
+  "style_tags": ["<style_tag_1>", "<style_tag_2>"],
   "tags_line": "<tag_1>, <tag_2>, <tag_3>",
   "condition_status": "<New_or_Pre-Owned>",
   "pre_owned_condition": "<Like_New_or_Good_or_Fair_or_Poor_or_None>",
@@ -48,6 +52,7 @@
   "min_profit_price": "<min_profit_price>",
   "min_profit_estimate": "<min_profit_estimate>",
   "min_profit_time_to_sell": "<min_profit_time_to_sell>",
+  "offer_recommendation": "<offer_recommendation_or_blank>",
   "time_to_sell_sentence": "<time_to_sell_sentence>",
   "platforms": [
     {

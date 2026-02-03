@@ -86,6 +86,16 @@ function getRawValue(obj, keyPath) {
   return current;
 }
 
+function extractUsSize(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const usMatch = text.match(/US\s*([0-9.]+)/i);
+  if (usMatch) return usMatch[1];
+  const numericMatch = text.match(/([0-9]+(?:\.[0-9]+)?)/);
+  if (numericMatch) return numericMatch[1];
+  return text;
+}
+
 function normalizeText(value) {
   return String(value || "")
     .toLowerCase()
@@ -268,6 +278,9 @@ async function fillField(page, field, data, options) {
   const selector = field.selector;
   const action = field.action || "fill";
   let value = getValue(data, field.value);
+  if (field.valueTransform === "us_size_only") {
+    value = extractUsSize(value);
+  }
   if (field.joinWithCommaValue) {
     const raw = getRawValue(data, field.value);
     value = buildCommaSeparatedValue(raw);
@@ -554,6 +567,19 @@ async function main() {
 
   if (!fs.existsSync(jsonPath)) {
     console.error(`JSON file not found: ${jsonPath}`);
+    process.exit(1);
+  }
+  try {
+    const jsonStat = fs.statSync(jsonPath);
+    if (jsonStat.isDirectory()) {
+      console.error(`JSON path is a folder: ${jsonPath}`);
+      console.error(
+        "Please download the JSON from the UI and pass the full .json file path."
+      );
+      process.exit(1);
+    }
+  } catch (err) {
+    console.error(`Could not read JSON path: ${jsonPath}`);
     process.exit(1);
   }
   if (!fs.existsSync(selectorsPath)) {

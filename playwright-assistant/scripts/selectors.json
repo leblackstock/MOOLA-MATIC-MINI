@@ -64,6 +64,7 @@
       "name": "Size or Fit",
       "selector": "input[name='input_213']",
       "value": "size_or_fit",
+      "valueTransform": "us_size_only",
       "action": "fill"
     },
     {

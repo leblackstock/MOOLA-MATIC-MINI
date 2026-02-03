@@ -1,6 +1,7 @@
-Run Mode (copy/paste to start a run)
+Run Mode (copy/paste to start a run; tells Cursor to use Run mode)
 
 /run-moola
+Enter Run mode for MOOLA-MATIC.
 Run MOOLA-MATIC on the attached item(s). Default to Identify+Value unless I say "List".
 If I say "List", create the JSON file and respond with:
 JSON file created.

@@ -558,9 +558,24 @@
 
       function parseList(value) {
         return String(value || "")
-          .split(/[,\\n]/)
+          .split(/[,\n]/)
           .map((item) => item.trim())
           .filter(Boolean);
+      }
+
+      function capitalizeWords(text) {
+        return String(text || "")
+          .toLowerCase()
+          .split(/\s+/)
+          .map((word) => (word ? word[0].toUpperCase() + word.slice(1) : ""))
+          .join(" ")
+          .trim();
+      }
+
+      function normalizeColorTags(value) {
+        const tags = parseList(value);
+        if (!tags.length) return "";
+        return tags.map((tag) => capitalizeWords(tag)).join(", ");
       }
 
       function parseLines(value) {
@@ -701,8 +716,11 @@
           .map((item) => String(item || "").trim())
           .filter(Boolean);
         if (cleanIncluded.length) {
-          parts.push("You will receive the following item(s):");
-          parts.push(cleanIncluded.map((item) => `- ${item}`).join("\n"));
+          parts.push(
+            `You will receive the following item(s):\n${cleanIncluded
+              .map((item) => `- ${item}`)
+              .join("\n")}`
+          );
         }
 
         const measurements = Array.isArray(data?.measurements)
@@ -712,8 +730,11 @@
           .map((item) => String(item || "").trim())
           .filter(Boolean);
         if (cleanMeasurements.length) {
-          parts.push("Measurements are as follows:");
-          parts.push(cleanMeasurements.map((item) => `- ${item}`).join("\n"));
+          parts.push(
+            `Measurements:\n${cleanMeasurements
+              .map((item) => `- ${item}`)
+              .join("\n")}`
+          );
         }
 
         const cta = String(data?.cta || "").trim();
@@ -729,6 +750,7 @@
         const input = fieldInputMap.listperfectly_description;
         if (input && input.value !== next) {
           input.value = next;
+          updateCharCounter("listperfectly_description");
         }
       }
 
@@ -760,6 +782,23 @@
         const input = fieldInputMap.notes;
         if (input && input.value !== next) {
           input.value = next;
+        }
+      }
+
+      function normalizeMsrp(data) {
+        if (!data) return;
+        const priceRaw = String(data.buyer_pays_shipping_price || "").trim();
+        const msrpRaw = String(data.msrp || "").trim();
+        const price = parseMoney(priceRaw);
+        const msrp = parseMoney(msrpRaw);
+        if (price === null) return;
+        if (msrp === null || msrp < price) {
+          const next = priceRaw || price.toFixed(2);
+          data.msrp = next;
+          const input = fieldInputMap.msrp;
+          if (input && input.value !== next) {
+            input.value = next;
+          }
         }
       }
 
@@ -908,6 +947,12 @@
 
       function parseNumber(value) {
         const parsed = Number.parseFloat(String(value || ""));
+        return Number.isFinite(parsed) ? parsed : null;
+      }
+
+      function parseMoney(value) {
+        const cleaned = String(value || "").replace(/[^0-9.]/g, "");
+        const parsed = Number.parseFloat(cleaned);
         return Number.isFinite(parsed) ? parsed : null;
       }
 
@@ -1089,7 +1134,7 @@
         if (ukText !== null) parts.push(`UK ${ukText}`);
         if (euText !== null) parts.push(`EU ${euText}`);
         const widthText = formatWidthText(width);
-        return `${parts.join(" / ")} (Width ${widthText})`;
+        return `${parts.join(" / ")} / Width ${widthText}`;
       }
 
       function updateSizeOrFitFromHelper(data) {
@@ -1143,6 +1188,7 @@
         } else {
           input.value = value ?? "";
         }
+        updateCharCounter(key);
       }
 
       function hasMeasurementInputs(values) {
@@ -1773,10 +1819,54 @@
           return toLines(value);
         };
 
+        const buildPlatformsPreviewBlock = () => {
+          const rawPlatforms = readPreviewValue("platforms");
+          const platforms = Array.isArray(rawPlatforms)
+            ? rawPlatforms
+            : parsePlatforms(rawPlatforms);
+          const typesParts = getTypesParts({
+            types_block: readPreviewValue("types_block"),
+          });
+          const lines = [];
+          platforms.forEach((item) => {
+            const platform = String(item?.platform || "").trim();
+            const reason = String(item?.reason || "").trim();
+            if (!platform && !reason) return;
+            lines.push(platform || "Platform");
+            if (reason) lines.push(`- Reason: ${reason}`);
+            const lower = platform.toLowerCase();
+            if (lower === "ebay" && typesParts.ebay) {
+              lines.push(`- Types: ${typesParts.ebay}`);
+            }
+            if (lower === "depop" && typesParts.depop) {
+              lines.push(`- Types: ${typesParts.depop}`);
+            }
+            if (lower === "depop" && typesParts.occasions) {
+              lines.push(`- Occasions: ${typesParts.occasions}`);
+            }
+            if (lower === "depop" && typesParts.styles) {
+              lines.push(`- Styles: ${typesParts.styles}`);
+            }
+            lines.push("");
+          });
+          while (lines.length && lines[lines.length - 1] === "") {
+            lines.pop();
+          }
+          return lines;
+        };
+
         addSection("Hook", readPreviewValue("hook"));
         addSection("Description", readPreviewValue("description"));
         addSection("Included Items", readPreviewValue("included_items"));
+        addSection("Material", readPreviewValue("material"));
+        addSection("Country of Origin", readPreviewValue("country_of_origin"));
         addSection("Measurements", readPreviewValue("measurements"));
+        const tagsLine = readPreviewValue("tags_line");
+        const styleTags = readPreviewValue("style_tags");
+        const tagsSection = [];
+        if (tagsLine) tagsSection.push(`Tags: ${tagsLine}`);
+        if (styleTags) tagsSection.push(`Style tags: ${styleTags}`);
+        addSection("Tags / Keywords", tagsSection);
         addSection("Condition", [
           `Condition status: ${readPreviewValue("condition_status")}`,
           `Pre-Owned condition: ${readPreviewValue("pre_owned_condition")}`,
@@ -1793,6 +1883,10 @@
           `Min profit estimate: ${readPreviewValue("min_profit_estimate")}`,
           `Min profit time to sell: ${minProfitTime}`,
         ];
+        const offerRecommendation = readPreviewValue("offer_recommendation");
+        if (offerRecommendation) {
+          profitLines.push(offerRecommendation);
+        }
         if (!maxProfitTime && !minProfitTime) {
           profitLines.push(
             `Time To Sell: ${readPreviewValue("time_to_sell_sentence")}`
@@ -1812,11 +1906,15 @@
           `Fees or Other Costs: ${readPreviewValue("fees_or_other_costs")}`,
         ]);
 
-        addSection(
-          "Platforms",
-          formatPlatformsPreview(readPreviewValue("platforms"))
-        );
-        addSection("Types", readPreviewValue("types_block"));
+        addSection("Platforms", buildPlatformsPreviewBlock());
+        const miscTypes = [];
+        const typesParts = getTypesParts({
+          types_block: readPreviewValue("types_block"),
+        });
+        if (typesParts.misc?.length) {
+          miscTypes.push(...typesParts.misc);
+        }
+        addSection("Misc", miscTypes);
         addSection("Seller Notes", readPreviewValue("notes"));
 
         const sectionsHtml = sections
@@ -2028,17 +2126,42 @@
             ) {
               updateListperfectlyDescription(currentData);
             }
+            if (["buyer_pays_shipping_price", "msrp"].includes(field.key)) {
+              normalizeMsrp(currentData);
+            }
             if (["purchase_date", "purchase_location"].includes(field.key)) {
               updateSellerNotes(currentData);
             }
             items[currentIndex].data = currentData;
             saveSession();
+            updateCharCounter(field.key);
           });
         }
 
         fieldEl.appendChild(row);
+        if (field.key && field.countChars) {
+          const counter = document.createElement("div");
+          counter.className = "note";
+          counter.id = `counter-${field.key}`;
+          if (field.maxChars) {
+            counter.setAttribute("data-max", String(field.maxChars));
+          }
+          const maxLabel = field.maxChars ? ` / ${field.maxChars}` : "";
+          counter.textContent = `Characters: ${input.value.length}${maxLabel}`;
+          fieldEl.appendChild(counter);
+        }
         container.appendChild(fieldEl);
         fieldInputs.push(input);
+      }
+
+      function updateCharCounter(key) {
+        if (!key) return;
+        const counter = document.getElementById(`counter-${key}`);
+        const input = fieldInputMap[key];
+        if (!counter || !input) return;
+        const max = counter.getAttribute("data-max");
+        const maxLabel = max ? ` / ${max}` : "";
+        counter.textContent = `Characters: ${input.value.length}${maxLabel}`;
       }
 
       function renderFields(data) {
@@ -2052,12 +2175,13 @@
         fieldInputMap = {};
         const listperfectlyFields = [
           { label: "SKU", key: "sku" },
-          { label: "Title", key: "title" },
+          { label: "Title", key: "title", countChars: true, maxChars: 80 },
           {
             label: "Short Description (ListPerfectly)",
             key: "listperfectly_description",
             multiline: true,
             readOnly: true,
+            countChars: true,
           },
           { label: "Hook", key: "hook" },
           { label: "Description", key: "description", multiline: true },
@@ -2091,11 +2215,24 @@
           },
           { label: "CTA", key: "cta" },
           { label: "Brand / Maker", key: "brand" },
-          { label: "Color Shade", key: "color" },
+          {
+            label: "Color Shade",
+            key: "color",
+            format: (value) => normalizeColorTags(value),
+            parse: (value) => normalizeColorTags(value),
+          },
           { label: "Material", key: "material" },
+          { label: "Country of Origin", key: "country_of_origin" },
           { label: "Style / Features", key: "style_features" },
           { label: "Size or Fit", key: "size_or_fit" },
           { label: "Tags line", key: "tags_line" },
+          {
+            label: "Style Tags (boho, mid century modern, etc.)",
+            key: "style_tags",
+            format: (value) =>
+              Array.isArray(value) ? value.join(", ") : toStringValue(value),
+            parse: (value) => parseList(value),
+          },
           { label: "Condition Status", key: "condition_status" },
           {
             label: "Pre-Owned Condition (Like New/Good/Fair/Poor/None)",
@@ -2271,6 +2408,7 @@
           { label: "Min profit price", key: "min_profit_price" },
           { label: "Min profit estimate", key: "min_profit_estimate" },
           { label: "Min profit time to sell", key: "min_profit_time_to_sell" },
+          { label: "Offer recommendation", key: "offer_recommendation" },
           {
             label: "Time-to-sell sentence",
             key: "time_to_sell_sentence",
@@ -2451,8 +2589,25 @@
         return `node \"${scriptPath}\" --safe --json \"${jsonPath}\" --selectors \"${selectorsPath}\" --user-data-dir \"${userDataDir}\"`;
       }
 
+      function isJsonFilePath(value) {
+        return String(value || "")
+          .trim()
+          .toLowerCase()
+          .endsWith(".json");
+      }
+
+      function ensureJsonPathIsFile() {
+        const jsonPath = jsonPathInput.value.trim();
+        if (!jsonPath) return false;
+        if (isJsonFilePath(jsonPath)) return true;
+        autofillNote.textContent =
+          "Download the JSON first, then paste the full .json file path.";
+        return false;
+      }
+
       copyCmdBtn.addEventListener("click", async () => {
         saveAutofillInputs();
+        if (!ensureJsonPathIsFile()) return;
         const cmd = buildAutofillCommand();
         if (!cmd) {
           autofillNote.textContent =
@@ -2470,6 +2625,7 @@
 
       downloadBatBtn.addEventListener("click", () => {
         saveAutofillInputs();
+        if (!ensureJsonPathIsFile()) return;
         const cmd = buildAutofillCommand();
         if (!cmd) {
           autofillNote.textContent =
@@ -2514,6 +2670,7 @@
         additionalPanel.style.display = "block";
         updateSkuPanel(currentData);
         renderFields(currentData);
+        normalizeMsrp(currentData);
         updateFieldEditability();
         toggleMeasurementFields();
         populateMeasurementHelperFromData(currentData);
@@ -2569,6 +2726,7 @@
 
       downloadBtn.addEventListener("click", () => {
         if (!currentData) return;
+        normalizeMsrp(currentData);
         updateListperfectlyDescription(currentData);
         const filename = buildFilename(currentData);
         const blob = new Blob([JSON.stringify(currentData, null, 2)], {
