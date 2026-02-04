@@ -25,7 +25,16 @@ alwaysApply: false
 - When listing, ensure `msrp` is not lower than `buyer_pays_shipping_price`. If it would be lower or unknown, set `msrp` to the buyer-pays-shipping price.
 - When listing, decide whether to include `offer_recommendation`. Include it for most mid-range items when a reasonable offer strategy would help; omit it for rare/collector/luxury items or when margins are too thin. If included, base it on pricing (e.g., min offer around ~85% of `min_profit_price`, auto-accept above ~90% of `max_profit_price`) and output as a single sentence like: "Offer recommendation: Set min offer to $50, auto accept above $60."
 - When listing, populate `country_of_origin` when known; otherwise leave it blank.
+- When listing, set `comps_day_range` based on expected sales speed: fast sellers (trend/high demand) use shorter windows like 30–60 days; slow sellers (niche, rare sizes, higher price) use 180–365 days.
 - When listing, set `shipping_cost_estimate` to the estimated Priority Mail shipping price.
+- Platforms & Types (LIST mode):
+  - `platforms` array: include ALL supported platforms with a short, honest reason only (no types/occasions/styles text here).
+    - Supported platforms: eBay, Etsy, Poshmark, Mercari, Depop, Grailed, Facebook Marketplace, Shopify, Vestiaire Collective, Vinted, Whatnot.
+    - Each platform reason must start with Yes/No/Maybe, e.g., "Yes: Largest audience for ...", "No: Not the right buyer base", "Maybe: Worth testing if ...".
+  - `types_block`: follow `Original/MOOLA-MATIC TYPES.txt` EXACT format for the item type.
+    - Shoes/boots must include Depop Types + eBay Types + Occasions + Styles.
+    - Occasions/Styles are Depop-focused and should appear only inside `types_block` (no duplicate “misc” lines elsewhere).
+    - Do not add extra lines beyond the required format.
 - When listing, set `fees_or_other_costs` to total costs excluding purchase price; include average eBay platform fees, payment processing fees, and labor.
 - When listing, populate the fee breakdown keys: `platform_fee_estimate`, `payment_processing_fee_estimate`, and `labor_cost_estimate`.
 - Fee defaults: platform fee 13% of sale price; payment processing $0.30.

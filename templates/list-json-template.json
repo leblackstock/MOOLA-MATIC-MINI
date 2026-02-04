@@ -53,6 +53,7 @@
   "min_profit_estimate": "<min_profit_estimate>",
   "min_profit_time_to_sell": "<min_profit_time_to_sell>",
   "offer_recommendation": "<offer_recommendation_or_blank>",
+  "comps_day_range": "<comps_day_range_or_blank>",
   "time_to_sell_sentence": "<time_to_sell_sentence>",
   "platforms": [
     {

@@ -45,7 +45,7 @@
   "era_status": "Vintage",
   "era_notes": "Late 1970s to early 1980s based on Medina model verification.",
   "style_tags": ["vintage", "preppy", "golf"],
-  "tags_line": "vintage, dexter medina, golf shoes, wingtip brogues, oxfords, loafers, black leather, kiltie fringe, metal spikes, made in usa, mens 11.5d",
+  "tags_line": "vintage, dexter medina, golf shoes, wingtip brogues, oxfords, black leather, kiltie fringe, metal spikes, made in usa, mens 11.5d",
   "condition_status": "Pre-Owned",
   "pre_owned_condition": "Good",
   "condition": "Pre-owned with creasing and scuffs; kiltie fringe shows a small tear; stamped leather soles and spikes show wear.",
@@ -70,7 +70,6 @@
     "golf shoes",
     "wingtip brogues",
     "oxfords",
-    "loafers",
     "black leather",
     "kiltie fringe",
     "metal spikes",
@@ -91,31 +90,55 @@
   "min_profit_price": "49.99",
   "min_profit_estimate": "28.97",
   "min_profit_time_to_sell": "About 2-6 weeks",
-  "offer_recommendation": "",
+  "offer_recommendation": "Offer recommendation: Set min offer to $43, auto accept above $54.",
   "time_to_sell_sentence": "Estimated time to sell: about 3 months (vintage golf shoe niche).",
   "platforms": [
     {
       "platform": "eBay",
-      "reason": "Largest audience for vintage golf shoes and size 11.5D searches."
+      "reason": "Yes: Largest audience for vintage golf shoes and size 11.5D searches."
     },
     {
       "platform": "Etsy",
-      "reason": "Vintage-leaning marketplace where classic golf shoes can stand out."
+      "reason": "Yes: Vintage-leaning marketplace where classic golf shoes can stand out."
     },
     {
       "platform": "Poshmark",
-      "reason": "Strong demand for men's leather shoes and easy offers."
+      "reason": "Yes: Strong demand for men's leather shoes and easy offers."
     },
     {
       "platform": "Mercari",
-      "reason": "Good for mid-range vintage footwear with quick buyers."
+      "reason": "Yes: Good for mid-range vintage footwear with quick buyers."
     },
     {
       "platform": "Depop",
-      "reason": "Vintage styling plays well with trend-focused buyers."
+      "reason": "Yes: Vintage styling plays well with trend-focused buyers."
+    },
+    {
+      "platform": "Grailed",
+      "reason": "Maybe: Menswear audience that responds to vintage/preppy leather shoes."
+    },
+    {
+      "platform": "Facebook Marketplace",
+      "reason": "Maybe: Local buyers for pre-owned footwear and quick pickup."
+    },
+    {
+      "platform": "Shopify",
+      "reason": "Maybe: Works if you list on your own store and cross-promote."
+    },
+    {
+      "platform": "Vestiaire Collective",
+      "reason": "Maybe: Designer/vintage marketplace for heritage brands."
+    },
+    {
+      "platform": "Vinted",
+      "reason": "Maybe: Value-focused shoppers for vintage shoes."
+    },
+    {
+      "platform": "Whatnot",
+      "reason": "Maybe: Live-selling platform for vintage and collectible footwear."
     }
   ],
-  "types_block": "Depop Shoes Type: Oxfords\nEbay Shoes Type: Loafers\nOccasions: Work, Special Occasion, Casual\nStyles: Preppy, Retro, Casual",
-  "listing_body": "Vintage Dexter Medina wingtip golf shoes with metal spikes and kiltie fringe in size 11.5D.\n\nVintage Dexter Medina men's black leather golf shoes with wingtip brogue detailing, stamped leather soles, and metal spikes; Made in USA lace-ups with classic kiltie fringe.\n\nYou will receive the following item:\n- Men's golf shoes (pair)\n\nApproximate measurements:\n- Outsole length (heel-to-toe): ~12.75 in (32.4 cm)\n- Outsole width (widest): ~4.5 in (11.4 cm)\n- Insole length (heel to toe): ~11.75 in (29.8 cm)\n- Insole width (ball area): ~3.9 in (9.9 cm)\n- Heel height: ~1.0 in (2.5 cm)\n- Platform height (forefoot): ~0.4 in (1.0 cm)\n- Toe box height: ~1.2 in (3.0 cm)\n- Weight (pair): ~3.6 lb (1.63 kg)\n\nvintage, dexter medina, golf shoes, wingtip brogues, oxfords, loafers, black leather, kiltie fringe, metal spikes, made in usa, mens 11.5d\n\nPre-owned with creasing and scuffs; kiltie fringe shows a small tear; stamped leather soles and spikes show wear.\n\nPhotos show condition and measurements; ask if you need a specific angle or detail confirmed.\n\nRetail estimate: $59.99. Free shipping: $69.99 | Buyer pays shipping: $59.99\nEstimated shipping: $18 via USPS Priority (shoes ~3-5 lb, ~14 x 10 x 6 in).\nEstimated time to sell: about 3 months (vintage golf shoe niche).",
+  "types_block": "Depop Shoes Type: Oxfords\nEbay Shoes Type: Oxfords\nOccasions: Golf, Work, Special Occasion\nStyles: Preppy, Vintage, Classic",
+  "listing_body": "Vintage Dexter Medina wingtip golf shoes with metal spikes and kiltie fringe in size 11.5D.\n\nVintage Dexter Medina men's black leather golf shoes with wingtip brogue detailing, stamped leather soles, and metal spikes; Made in USA lace-ups with classic kiltie fringe.\n\nYou will receive the following item:\n- Men's golf shoes (pair)\n\nApproximate measurements:\n- Outsole length (heel-to-toe): ~12.75 in (32.4 cm)\n- Outsole width (widest): ~4.5 in (11.4 cm)\n- Insole length (heel to toe): ~11.75 in (29.8 cm)\n- Insole width (ball area): ~3.9 in (9.9 cm)\n- Heel height: ~1.0 in (2.5 cm)\n- Platform height (forefoot): ~0.4 in (1.0 cm)\n- Toe box height: ~1.2 in (3.0 cm)\n- Weight (pair): ~3.6 lb (1.63 kg)\n\nvintage, dexter medina, golf shoes, wingtip brogues, oxfords, black leather, kiltie fringe, metal spikes, made in usa, mens 11.5d\n\nPre-owned with creasing and scuffs; kiltie fringe shows a small tear; stamped leather soles and spikes show wear.\n\nPhotos show condition and measurements; ask if you need a specific angle or detail confirmed.\n\nRetail estimate: $59.99. Free shipping: $69.99 | Buyer pays shipping: $59.99\nEstimated shipping: $18 via USPS Priority (shoes ~3-5 lb, ~14 x 10 x 6 in).\nEstimated time to sell: about 3 months (vintage golf shoe niche).",
   "question": "None"
 }

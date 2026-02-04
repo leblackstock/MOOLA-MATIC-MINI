@@ -33,7 +33,7 @@ JSON FILE CONTENT (EXACT)
 - The JSON file must be a single JSON object with these keys (always include all keys):
   title, hook, description, included_items, measurements, measurements_imperial, measurements_metric, tags_line, tags, condition, cta,
   pricing_sentence, free_shipping_price, buyer_pays_shipping_price, shipping_estimate_sentence,
-  shipping_cost_estimate, offer_recommendation, time_to_sell_sentence, platforms, types_block, listing_body,
+  shipping_cost_estimate, offer_recommendation, comps_day_range, time_to_sell_sentence, platforms, types_block, listing_body,
   listperfectly_description, question,
   sku, quantity, cogs, upc, brand, color, material, size_or_fit, style_features, country_of_origin, msrp, era_status, era_notes, style_tags,
   condition_status, intended_for, shipping_weight_lb, shipping_weight_oz,
@@ -41,7 +41,7 @@ JSON FILE CONTENT (EXACT)
   purchase_date, purchase_location, notes
 
 FIELD TYPES (STRICT)
-- Strings: title, hook, description, tags_line, condition, cta, pricing_sentence, shipping_estimate_sentence, offer_recommendation, time_to_sell_sentence,
+- Strings: title, hook, description, tags_line, condition, cta, pricing_sentence, shipping_estimate_sentence, offer_recommendation, comps_day_range, time_to_sell_sentence,
   types_block, listing_body, listperfectly_description, question, sku, quantity, cogs, upc, brand, color, material, size_or_fit,
   style_features, country_of_origin, msrp, era_status, era_notes, condition_status, shipping_weight_lb, shipping_weight_oz, package_length, package_width, package_height,
   shipping_zip, purchase_date, purchase_location, notes, shipping_cost_estimate, free_shipping_price, buyer_pays_shipping_price.
@@ -67,6 +67,7 @@ FIELD RULES
 - shipping_estimate_sentence = sentence from step 10.
 - shipping_cost_estimate = estimated shipping dollar amount (string, e.g., "18.00").
 - offer_recommendation = optional offer guidance sentence (e.g., "Offer recommendation: Set min offer to $50, auto accept above $60."); otherwise empty.
+- comps_day_range = comps lookback window in days as a string (e.g., "30", "90", "365"); otherwise empty.
 - time_to_sell_sentence = sentence from step 11.
 - platforms = array of objects like {"platform":"eBay","reason":"..."} from step 12.
 - types_block = Types block text from step 13 (preserve line breaks).

@@ -186,6 +186,7 @@
           <button id="downloadBtn" disabled>Download JSON</button>
           <button id="previewBtn" disabled>Preview Listing</button>
           <button id="mergeBtn" disabled>Update/Merge JSON</button>
+          <button id="terapeakBtn" disabled>Open Terapeak comps</button>
           <button id="prevBtn" disabled>Prev</button>
           <button id="nextBtn" disabled>Next</button>
         </div>
@@ -427,10 +428,24 @@
         <div id="ebayPlatformFields"></div>
         <div class="section-title">Depop</div>
         <div id="depopPlatformFields"></div>
-        <div class="section-title">Misc Types (Occasions/Styles)</div>
-        <div id="typesMiscFields"></div>
-        <div class="section-title">Other Platforms</div>
-        <div id="otherPlatformFields"></div>
+        <div class="section-title">Etsy</div>
+        <div id="etsyPlatformFields"></div>
+        <div class="section-title">Poshmark</div>
+        <div id="poshmarkPlatformFields"></div>
+        <div class="section-title">Mercari</div>
+        <div id="mercariPlatformFields"></div>
+        <div class="section-title">Grailed</div>
+        <div id="grailedPlatformFields"></div>
+        <div class="section-title">Facebook Marketplace</div>
+        <div id="facebookPlatformFields"></div>
+        <div class="section-title">Shopify</div>
+        <div id="shopifyPlatformFields"></div>
+        <div class="section-title">Vestiaire Collective</div>
+        <div id="vestiairePlatformFields"></div>
+        <div class="section-title">Vinted</div>
+        <div id="vintedPlatformFields"></div>
+        <div class="section-title">Whatnot</div>
+        <div id="whatnotPlatformFields"></div>
       </details>
 
       <details id="additionalPanel" class="panel" style="display: none" open>
@@ -438,6 +453,8 @@
         <div class="note" style="margin-top: 6px">
           Listing content and other non-selector fields.
         </div>
+        <div class="section-title">Misc Types</div>
+        <div id="typesMiscFields"></div>
         <div id="additionalFields"></div>
       </details>
     </div>
@@ -447,6 +464,7 @@
       const downloadBtn = document.getElementById("downloadBtn");
       const previewBtn = document.getElementById("previewBtn");
       const mergeBtn = document.getElementById("mergeBtn");
+      const terapeakBtn = document.getElementById("terapeakBtn");
       const expandAllBtn = document.getElementById("expandAllBtn");
       const collapseAllBtn = document.getElementById("collapseAllBtn");
       const clearAllBtn = document.getElementById("clearAllBtn");
@@ -462,11 +480,34 @@
       const depopPlatformFieldsContainer = document.getElementById(
         "depopPlatformFields"
       );
+      const etsyPlatformFieldsContainer =
+        document.getElementById("etsyPlatformFields");
+      const poshmarkPlatformFieldsContainer = document.getElementById(
+        "poshmarkPlatformFields"
+      );
+      const mercariPlatformFieldsContainer = document.getElementById(
+        "mercariPlatformFields"
+      );
+      const grailedPlatformFieldsContainer = document.getElementById(
+        "grailedPlatformFields"
+      );
+      const facebookPlatformFieldsContainer = document.getElementById(
+        "facebookPlatformFields"
+      );
+      const shopifyPlatformFieldsContainer = document.getElementById(
+        "shopifyPlatformFields"
+      );
+      const vestiairePlatformFieldsContainer = document.getElementById(
+        "vestiairePlatformFields"
+      );
+      const vintedPlatformFieldsContainer = document.getElementById(
+        "vintedPlatformFields"
+      );
+      const whatnotPlatformFieldsContainer = document.getElementById(
+        "whatnotPlatformFields"
+      );
       const typesMiscFieldsContainer =
         document.getElementById("typesMiscFields");
-      const otherPlatformFieldsContainer = document.getElementById(
-        "otherPlatformFields"
-      );
       const additionalFieldsContainer =
         document.getElementById("additionalFields");
       const status = document.getElementById("status");
@@ -572,6 +613,97 @@
           .split(/[,\n]/)
           .map((item) => item.trim())
           .filter(Boolean);
+      }
+
+      function buildTerapeakQuery(data) {
+        if (!data) return "";
+        const title = String(data.title || "").trim();
+        const brand = String(data.brand || "").trim();
+        let base = title || brand;
+        base = String(base)
+          .replace(/\b(us|uk|eu)?\s*\d+(\.\d+)?[a-z]?\b/gi, "")
+          .replace(/\b(men'?s|women'?s|mens|womens)\b/gi, "")
+          .replace(/\s+/g, " ")
+          .trim();
+        const extras = [];
+        if (Array.isArray(data.style_tags)) {
+          extras.push(...data.style_tags);
+        }
+        const era = String(data.era_status || "").toLowerCase();
+        if (era === "vintage" || era === "antique") {
+          extras.push(era);
+        }
+        const intended = Array.isArray(data.intended_for)
+          ? data.intended_for
+          : [];
+        const intendedMap = {
+          unisex: "unisex",
+          men: "mens",
+          women: "womens",
+          "unisex kids": "kids",
+          girls: "girls",
+          boys: "boys",
+          babies: "babies",
+          maternity: "maternity",
+          pets: "pets",
+          cats: "cats",
+          dogs: "dogs",
+          none: "",
+        };
+        const intendedTokens = intended
+          .map((value) => {
+            const key = String(value || "")
+              .toLowerCase()
+              .trim();
+            return intendedMap[key] || "";
+          })
+          .filter(Boolean);
+        const baseTokens = base.split(/\s+/).filter(Boolean);
+        const extraTokens = extras.join(" ").split(/\s+/).filter(Boolean);
+        const brandTokens = brand ? brand.split(/\s+/).filter(Boolean) : [];
+        const orderedTokens = [
+          ...brandTokens,
+          ...intendedTokens,
+          ...baseTokens,
+          ...extraTokens,
+        ];
+        const seen = new Set();
+        const deduped = [];
+        orderedTokens.forEach((token) => {
+          const key = token.toLowerCase();
+          if (seen.has(key)) return;
+          seen.add(key);
+          deduped.push(token);
+        });
+        return deduped.join(" ").trim();
+      }
+
+      function buildTerapeakUrl(data) {
+        const query = buildTerapeakQuery(data);
+        const baseUrl = "https://www.ebay.com/sh/research";
+        const tz =
+          Intl.DateTimeFormat().resolvedOptions().timeZone ||
+          "America/New_York";
+        const dayRangeRaw = String(data?.comps_day_range || "").trim();
+        const dayRangeNum = Number.parseInt(dayRangeRaw, 10);
+        const dayRange =
+          Number.isFinite(dayRangeNum) && dayRangeNum > 0 ? dayRangeNum : 365;
+        const endDate = Date.now();
+        const startDate = endDate - dayRange * 24 * 60 * 60 * 1000;
+        const params = new URLSearchParams();
+        params.set("marketplace", "EBAY-US");
+        if (query) params.set("keywords", query);
+        params.set("dayRange", String(dayRange));
+        params.set("startDate", String(startDate));
+        params.set("endDate", String(endDate));
+        params.set("categoryId", "0");
+        params.set("offset", "0");
+        params.set("limit", "50");
+        params.set("tabName", "SOLD");
+        params.set("tz", tz);
+        params.set("conditions", "USED");
+        params.set("buyingOptions", "FIXED_PRICE|BEST_OFFER");
+        return `${baseUrl}?${params.toString()}`;
       }
 
       function normalizeKey(value) {
@@ -725,10 +857,10 @@
       function getTypesParts(data) {
         const text = String(data?.types_block || "");
         const depopMatch = text.match(
-          /^(?:Depop Boots Type|Depop Types):\s*(.+)$/im
+          /^(?:Depop Boots Type|Depop Shoes Type|Depop Types):\s*(.+)$/im
         );
         const ebayMatch = text.match(
-          /^(?:Ebay Boots Type|Ebay Types):\s*(.+)$/im
+          /^(?:Ebay Boots Type|Ebay Shoes Type|Ebay Types):\s*(.+)$/im
         );
         const occasionsMatch = text.match(/^Occasions:\s*(.+)$/im);
         const stylesMatch = text.match(/^Styles:\s*(.+)$/im);
@@ -736,6 +868,14 @@
         const ebay = ebayMatch ? ebayMatch[1].trim() : "";
         const occasions = occasionsMatch ? occasionsMatch[1].trim() : "";
         const styles = stylesMatch ? stylesMatch[1].trim() : "";
+        const isShoes = /depop shoes type:|ebay shoes type:/i.test(text);
+        const isBoots = /depop boots type:|ebay boots type:/i.test(text);
+        const depopLabel = depopMatch
+          ? String(depopMatch[0]).split(":")[0].trim()
+          : "";
+        const ebayLabel = ebayMatch
+          ? String(ebayMatch[0]).split(":")[0].trim()
+          : "";
         const lines = text
           .split(/\\n/)
           .map((line) => line.trim())
@@ -743,23 +883,41 @@
         const misc = lines.filter((line) => {
           const lower = line.toLowerCase();
           if (lower.startsWith("depop boots type:")) return false;
+          if (lower.startsWith("depop shoes type:")) return false;
           if (lower.startsWith("depop types:")) return false;
           if (lower.startsWith("ebay boots type:")) return false;
+          if (lower.startsWith("ebay shoes type:")) return false;
           if (lower.startsWith("ebay types:")) return false;
           if (lower.startsWith("occasions:")) return false;
           if (lower.startsWith("styles:")) return false;
           return true;
         });
-        return { depop, ebay, occasions, styles, misc };
+        return {
+          depop,
+          ebay,
+          occasions,
+          styles,
+          misc,
+          isShoes,
+          isBoots,
+          depopLabel,
+          ebayLabel,
+        };
       }
 
       function buildTypesBlock(parts) {
         const lines = [];
         if (parts.depop) {
-          lines.push(`Depop Boots Type: ${parts.depop}`);
+          const label =
+            parts.depopLabel ||
+            (parts.isShoes ? "Depop Shoes Type" : "Depop Boots Type");
+          lines.push(`${label}: ${parts.depop}`);
         }
         if (parts.ebay) {
-          lines.push(`Ebay Boots Type: ${parts.ebay}`);
+          const label =
+            parts.ebayLabel ||
+            (parts.isShoes ? "Ebay Shoes Type" : "Ebay Boots Type");
+          lines.push(`${label}: ${parts.ebay}`);
         }
         if (parts.occasions) {
           lines.push(`Occasions: ${parts.occasions}`);
@@ -819,6 +977,15 @@
           list.push({ platform, reason: trimmed });
         }
         data.platforms = list;
+      }
+
+      function buildPlatformReasonField(platform, labelOverride) {
+        return {
+          label: labelOverride || `${platform} reason`,
+          multiline: true,
+          getValue: (data) => getPlatformReason(data, platform),
+          setValue: (data, value) => setPlatformReason(data, platform, value),
+        };
       }
 
       function buildListperfectlyDescription(data) {
@@ -1886,11 +2053,11 @@
         ebayPlatformFieldsContainer.innerHTML = "";
         depopPlatformFieldsContainer.innerHTML = "";
         typesMiscFieldsContainer.innerHTML = "";
-        otherPlatformFieldsContainer.innerHTML = "";
         additionalFieldsContainer.innerHTML = "";
         downloadBtn.disabled = true;
         if (previewBtn) previewBtn.disabled = true;
         if (mergeBtn) mergeBtn.disabled = true;
+        if (terapeakBtn) terapeakBtn.disabled = true;
         prevBtn.disabled = true;
         nextBtn.disabled = true;
         if (fileInput) fileInput.value = "";
@@ -2243,11 +2410,10 @@
 
         if (field.key) {
           fieldInputMap[field.key] = input;
-          input.addEventListener("input", () => {
+          const handleFieldInput = () => {
             if (!currentData) return;
-            const parsedValue = field.parse
-              ? field.parse(input.value)
-              : input.value;
+            const rawInput = input.value;
+            const parsedValue = field.parse ? field.parse(rawInput) : rawInput;
             if (field.setValue) {
               field.setValue(currentData, parsedValue);
             } else {
@@ -2288,7 +2454,9 @@
             items[currentIndex].data = currentData;
             saveSession();
             updateCharCounter(field.key);
-          });
+          };
+
+          input.addEventListener("input", handleFieldInput);
         }
 
         fieldEl.appendChild(row);
@@ -2321,8 +2489,16 @@
         lpFieldsContainer.innerHTML = "";
         ebayPlatformFieldsContainer.innerHTML = "";
         depopPlatformFieldsContainer.innerHTML = "";
+        etsyPlatformFieldsContainer.innerHTML = "";
+        poshmarkPlatformFieldsContainer.innerHTML = "";
+        mercariPlatformFieldsContainer.innerHTML = "";
+        grailedPlatformFieldsContainer.innerHTML = "";
+        facebookPlatformFieldsContainer.innerHTML = "";
+        shopifyPlatformFieldsContainer.innerHTML = "";
+        vestiairePlatformFieldsContainer.innerHTML = "";
+        vintedPlatformFieldsContainer.innerHTML = "";
+        whatnotPlatformFieldsContainer.innerHTML = "";
         typesMiscFieldsContainer.innerHTML = "";
-        otherPlatformFieldsContainer.innerHTML = "";
         additionalFieldsContainer.innerHTML = "";
         fieldInputs = [];
         fieldInputMap = {};
@@ -2420,12 +2596,7 @@
         ];
 
         const ebayPlatformFields = [
-          {
-            label: "Ebay Reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "eBay"),
-            setValue: (data, value) => setPlatformReason(data, "eBay", value),
-          },
+          buildPlatformReasonField("eBay", "Ebay Reason"),
           {
             label: "Ebay Types",
             multiline: true,
@@ -2435,102 +2606,64 @@
         ];
 
         const depopPlatformFields = [
-          {
-            label: "Depop Reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Depop"),
-            setValue: (data, value) => setPlatformReason(data, "Depop", value),
-          },
+          buildPlatformReasonField("Depop", "Depop Reason"),
           {
             label: "Depop Types",
             multiline: true,
             getValue: (data) => getTypesParts(data).depop,
             setValue: (data, value) => setTypesPart(data, "depop", value),
           },
-        ];
-
-        const miscTypesFields = [
           {
-            label: "Occasions",
+            label: "Depop Occasions",
             multiline: true,
             getValue: (data) => getTypesParts(data).occasions,
             setValue: (data, value) => setTypesPart(data, "occasions", value),
           },
           {
-            label: "Styles",
+            label: "Depop Styles",
             multiline: true,
             getValue: (data) => getTypesParts(data).styles,
             setValue: (data, value) => setTypesPart(data, "styles", value),
           },
         ];
 
-        const otherPlatformFields = [
+        const etsyPlatformFields = [
+          buildPlatformReasonField("Etsy", "Etsy Reason"),
+        ];
+        const poshmarkPlatformFields = [
+          buildPlatformReasonField("Poshmark", "Poshmark Reason"),
+        ];
+        const mercariPlatformFields = [
+          buildPlatformReasonField("Mercari", "Mercari Reason"),
+        ];
+        const grailedPlatformFields = [
+          buildPlatformReasonField("Grailed", "Grailed Reason"),
+        ];
+        const facebookPlatformFields = [
+          buildPlatformReasonField(
+            "Facebook Marketplace",
+            "Facebook Marketplace Reason"
+          ),
+        ];
+        const shopifyPlatformFields = [
+          buildPlatformReasonField("Shopify", "Shopify Reason"),
+        ];
+        const vestiairePlatformFields = [
+          buildPlatformReasonField("Vestiaire Collective", "Vestiaire Reason"),
+        ];
+        const vintedPlatformFields = [
+          buildPlatformReasonField("Vinted", "Vinted Reason"),
+        ];
+        const whatnotPlatformFields = [
+          buildPlatformReasonField("Whatnot", "Whatnot Reason"),
+        ];
+
+        const miscTypesFields = [
           {
-            label: "Etsy reason",
+            label: "Other type lines (optional)",
             multiline: true,
-            getValue: (data) => getPlatformReason(data, "Etsy"),
-            setValue: (data, value) => setPlatformReason(data, "Etsy", value),
-          },
-          {
-            label: "Facebook Marketplace reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Facebook Marketplace"),
-            setValue: (data, value) =>
-              setPlatformReason(data, "Facebook Marketplace", value),
-          },
-          {
-            label: "Mercari reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Mercari"),
-            setValue: (data, value) =>
-              setPlatformReason(data, "Mercari", value),
-          },
-          {
-            label: "Poshmark reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Poshmark"),
-            setValue: (data, value) =>
-              setPlatformReason(data, "Poshmark", value),
-          },
-          {
-            label: "Grailed reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Grailed"),
-            setValue: (data, value) =>
-              setPlatformReason(data, "Grailed", value),
-          },
-          {
-            label: "Depop reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Depop"),
-            setValue: (data, value) => setPlatformReason(data, "Depop", value),
-          },
-          {
-            label: "Shopify reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Shopify"),
-            setValue: (data, value) =>
-              setPlatformReason(data, "Shopify", value),
-          },
-          {
-            label: "Vestiaire Collective reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Vestiaire Collective"),
-            setValue: (data, value) =>
-              setPlatformReason(data, "Vestiaire Collective", value),
-          },
-          {
-            label: "Vinted reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Vinted"),
-            setValue: (data, value) => setPlatformReason(data, "Vinted", value),
-          },
-          {
-            label: "Whatnot reason",
-            multiline: true,
-            getValue: (data) => getPlatformReason(data, "Whatnot"),
-            setValue: (data, value) =>
-              setPlatformReason(data, "Whatnot", value),
+            getValue: (data) => getTypesParts(data).misc.join("\n"),
+            setValue: (data, value) => setTypesPart(data, "misc", value),
           },
         ];
 
@@ -2562,6 +2695,7 @@
           { label: "Min profit estimate", key: "min_profit_estimate" },
           { label: "Min profit time to sell", key: "min_profit_time_to_sell" },
           { label: "Offer recommendation", key: "offer_recommendation" },
+          { label: "Comps day range", key: "comps_day_range" },
           {
             label: "Time-to-sell sentence",
             key: "time_to_sell_sentence",
@@ -2579,11 +2713,35 @@
         depopPlatformFields.forEach((field) =>
           addField(field, data, depopPlatformFieldsContainer)
         );
+        etsyPlatformFields.forEach((field) =>
+          addField(field, data, etsyPlatformFieldsContainer)
+        );
+        poshmarkPlatformFields.forEach((field) =>
+          addField(field, data, poshmarkPlatformFieldsContainer)
+        );
+        mercariPlatformFields.forEach((field) =>
+          addField(field, data, mercariPlatformFieldsContainer)
+        );
+        grailedPlatformFields.forEach((field) =>
+          addField(field, data, grailedPlatformFieldsContainer)
+        );
+        facebookPlatformFields.forEach((field) =>
+          addField(field, data, facebookPlatformFieldsContainer)
+        );
+        shopifyPlatformFields.forEach((field) =>
+          addField(field, data, shopifyPlatformFieldsContainer)
+        );
+        vestiairePlatformFields.forEach((field) =>
+          addField(field, data, vestiairePlatformFieldsContainer)
+        );
+        vintedPlatformFields.forEach((field) =>
+          addField(field, data, vintedPlatformFieldsContainer)
+        );
+        whatnotPlatformFields.forEach((field) =>
+          addField(field, data, whatnotPlatformFieldsContainer)
+        );
         miscTypesFields.forEach((field) =>
           addField(field, data, typesMiscFieldsContainer)
-        );
-        otherPlatformFields.forEach((field) =>
-          addField(field, data, otherPlatformFieldsContainer)
         );
         additionalFields.forEach((field) =>
           addField(field, data, additionalFieldsContainer)
@@ -2716,6 +2874,14 @@
           } catch (err) {
             status.textContent = `Could not parse JSON: ${file.name}`;
           }
+        });
+      }
+
+      if (terapeakBtn) {
+        terapeakBtn.addEventListener("click", () => {
+          if (!currentData) return;
+          const url = buildTerapeakUrl(currentData);
+          window.open(url, "_blank");
         });
       }
 
@@ -2878,6 +3044,7 @@
         downloadBtn.disabled = false;
         if (previewBtn) previewBtn.disabled = false;
         if (mergeBtn) mergeBtn.disabled = false;
+        if (terapeakBtn) terapeakBtn.disabled = false;
         updateStatus();
         saveSession();
       }
