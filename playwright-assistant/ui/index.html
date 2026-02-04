@@ -301,11 +301,12 @@
         </div>
         <div id="shoeFields">
           <div class="field">
-            <label>Size tag (US / UK / EU / Width)</label>
+            <label>Size tag (US / UK / EU / AU / Width)</label>
             <div class="row">
               <input id="sizeUsInput" type="text" placeholder="US" />
               <input id="sizeUkInput" type="text" placeholder="UK" />
               <input id="sizeEuInput" type="text" placeholder="EU" />
+              <input id="sizeAuInput" type="text" placeholder="AU" />
               <input
                 id="sizeWidthInput"
                 type="text"
@@ -541,6 +542,7 @@
       const sizeUsInput = document.getElementById("sizeUsInput");
       const sizeUkInput = document.getElementById("sizeUkInput");
       const sizeEuInput = document.getElementById("sizeEuInput");
+      const sizeAuInput = document.getElementById("sizeAuInput");
       const sizeWidthInput = document.getElementById("sizeWidthInput");
       const outsoleLengthInput = document.getElementById("outsoleLengthInput");
       const outsoleWidthInput = document.getElementById("outsoleWidthInput");
@@ -759,6 +761,24 @@
       function mergeMissingFields(base, incoming) {
         if (!base || !incoming) return false;
         let changed = false;
+        if (
+          isBlankString(base.purchase_date) &&
+          !isBlankString(incoming.purchase_date)
+        ) {
+          base.purchase_date = incoming.purchase_date;
+          changed = true;
+        }
+        if (
+          isBlankString(base.purchase_location) &&
+          !isBlankString(incoming.purchase_location)
+        ) {
+          base.purchase_location = incoming.purchase_location;
+          changed = true;
+        }
+        if (isBlankString(base.notes) && !isBlankString(incoming.notes)) {
+          base.notes = incoming.notes;
+          changed = true;
+        }
         Object.keys(incoming).forEach((key) => {
           const incomingValue = incoming[key];
           if (key === "platforms") {
@@ -1288,14 +1308,14 @@
           : [];
         const isWomen = intended.includes("women");
         if (isWomen) {
-          return { usToUk: -2, usToEu: 31 };
+          return { usToUk: -2, usToEu: 31, usToAu: 0 };
         }
-        return { usToUk: -1, usToEu: 33 };
+        return { usToUk: -1, usToEu: 33, usToAu: -1 };
       }
 
       function convertSizeValues(raw, offsets) {
-        let { us, uk, eu } = raw;
-        let estimated = { us: false, uk: false, eu: false };
+        let { us, uk, eu, au } = raw;
+        let estimated = { us: false, uk: false, eu: false, au: false };
         if (us !== null) {
           if (uk === null) {
             uk = us + offsets.usToUk;
@@ -1305,9 +1325,28 @@
             eu = us + offsets.usToEu;
             estimated.eu = true;
           }
+          if (au === null) {
+            au = us + offsets.usToAu;
+            estimated.au = true;
+          }
         } else if (uk !== null) {
           us = uk - offsets.usToUk;
           estimated.us = true;
+          if (eu === null) {
+            eu = us + offsets.usToEu;
+            estimated.eu = true;
+          }
+          if (au === null) {
+            au = us + offsets.usToAu;
+            estimated.au = true;
+          }
+        } else if (au !== null) {
+          us = au - offsets.usToAu;
+          estimated.us = true;
+          if (uk === null) {
+            uk = us + offsets.usToUk;
+            estimated.uk = true;
+          }
           if (eu === null) {
             eu = us + offsets.usToEu;
             estimated.eu = true;
@@ -1317,8 +1356,10 @@
           estimated.us = true;
           uk = us + offsets.usToUk;
           estimated.uk = true;
+          au = us + offsets.usToAu;
+          estimated.au = true;
         }
-        return { us, uk, eu, estimated };
+        return { us, uk, eu, au, estimated };
       }
 
       function applySizeConversions(data) {
@@ -1326,12 +1367,14 @@
           us: parseNumber(sizeUsInput?.value),
           uk: parseNumber(sizeUkInput?.value),
           eu: parseNumber(sizeEuInput?.value),
+          au: parseNumber(sizeAuInput?.value),
         };
         const offsets = getSizeOffsets(data);
         const values = convertSizeValues(raw, offsets);
         setInputValue(sizeUsInput, values.us);
         setInputValue(sizeUkInput, values.uk);
         setInputValue(sizeEuInput, values.eu);
+        setInputValue(sizeAuInput, values.au);
         return values;
       }
 
@@ -1448,10 +1491,16 @@
           values.estimated?.eu,
           verified
         );
+        const auText = formatSizeValue(
+          values.au,
+          values.estimated?.au,
+          verified
+        );
         const parts = [];
         if (usText !== null) parts.push(`US ${usText}`);
         if (ukText !== null) parts.push(`UK ${ukText}`);
         if (euText !== null) parts.push(`EU ${euText}`);
+        if (auText !== null) parts.push(`AU ${auText}`);
         const widthText = formatWidthText(width);
         return `${parts.join(" / ")} / Width ${widthText}`;
       }
@@ -1582,14 +1631,20 @@
           standardHeight: parseNumber(standardHeightInput?.value),
         };
 
-        if (!hasMeasurementInputs(values)) return;
+        let sizeTag = buildSizeTagFromInputs(currentData);
+        if (!sizeTag) {
+          sizeTag = String(currentData.size_or_fit || "").trim();
+        }
+        const hasMeasurements = hasMeasurementInputs(values);
+        if (!hasMeasurements && !(sizeTag && isIncluded(includeToggles.size))) {
+          return;
+        }
 
         const lines = [];
         const imperial = [];
         const metric = [];
         const verified = measurementsVerifiedToggle?.checked;
 
-        const sizeTag = String(currentData.size_or_fit || "").trim();
         if (sizeTag && isIncluded(includeToggles.size)) {
           lines.push(`Size / Fit: ${sizeTag}`);
         }
@@ -1977,10 +2032,12 @@
           const usMatch = sizeText.match(/US\s*([0-9.]+)/i);
           const ukMatch = sizeText.match(/UK\s*([0-9.]+)/i);
           const euMatch = sizeText.match(/EU\s*([0-9.]+)/i);
+          const auMatch = sizeText.match(/AU\s*([0-9.]+)/i);
           const widthMatch = sizeText.match(/Width\s*([A-Za-z0-9]+)/i);
           if (usMatch) setInputValue(sizeUsInput, usMatch[1]);
           if (ukMatch) setInputValue(sizeUkInput, ukMatch[1]);
           if (euMatch) setInputValue(sizeEuInput, euMatch[1]);
+          if (auMatch) setInputValue(sizeAuInput, auMatch[1]);
           if (widthMatch) setInputValue(sizeWidthInput, widthMatch[1]);
         }
         updateSizeOrFitFromHelper(data);
@@ -2180,7 +2237,20 @@
         addSection("Included Items", readPreviewValue("included_items"));
         addSection("Material", readPreviewValue("material"));
         addSection("Country of Origin", readPreviewValue("country_of_origin"));
-        addSection("Measurements", readPreviewValue("measurements"));
+        const previewMeasurements = toLines(readPreviewValue("measurements"));
+        const sizeTag = buildSizeTagFromInputs(currentData);
+        if (sizeTag && (!includeToggles.size || includeToggles.size.checked)) {
+          const sizeLine = `Size / Fit: ${sizeTag}`;
+          const sizeIdx = previewMeasurements.findIndex((line) =>
+            /^size\s*\/\s*fit:/i.test(line)
+          );
+          if (sizeIdx >= 0) {
+            previewMeasurements[sizeIdx] = sizeLine;
+          } else {
+            previewMeasurements.unshift(sizeLine);
+          }
+        }
+        addSection("Measurements", previewMeasurements);
         const tagsLine = readPreviewValue("tags_line");
         const styleTags = readPreviewValue("style_tags");
         const tagsSection = [];
@@ -2257,13 +2327,13 @@
         color-scheme: dark;
       }
       body {
-        font-family: "Segoe UI", "Inter", Arial, sans-serif;
+        font-family: "Inter", "Segoe UI", Tahoma, Arial, sans-serif;
         margin: 24px;
         color: #f4edff;
         background: radial-gradient(circle at top, #2a104a 0%, #0f081b 55%, #0b0614 100%);
         font-size: 16px;
-        line-height: 1.6;
-        letter-spacing: 0.2px;
+        line-height: 1.7;
+        letter-spacing: 0;
       }
       h1 {
         margin-bottom: 12px;
@@ -2771,6 +2841,7 @@
         sizeUsInput,
         sizeUkInput,
         sizeEuInput,
+        sizeAuInput,
         sizeWidthInput,
         outsoleLengthInput,
         outsoleWidthInput,
@@ -2868,6 +2939,7 @@
             toggleMeasurementFields();
             populateMeasurementHelperFromData(currentData);
             applyIncludeDefaultsFromInputs();
+            updateMeasurementsFromHelper();
             updateFieldEditability();
             saveSession();
             mergePicker.value = "";
@@ -3041,6 +3113,7 @@
         toggleMeasurementFields();
         populateMeasurementHelperFromData(currentData);
         applyIncludeDefaultsFromInputs();
+        updateMeasurementsFromHelper();
         downloadBtn.disabled = false;
         if (previewBtn) previewBtn.disabled = false;
         if (mergeBtn) mergeBtn.disabled = false;

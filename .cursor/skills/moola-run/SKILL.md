@@ -16,6 +16,7 @@ description: Execute MOOLA-MATIC Run mode for identify/value by default and list
   - Create the JSON file and respond with `JSON file created.`
   - If `era_status` is Vintage or Antique, include Etsy in `platforms` with a clear reason.
   - If `era_status` is Vintage or Antique, include Vinted in `platforms` with a clear reason.
+  - Hook/Description/CTA: use a vivid, factual use-case or setting when appropriate, then back it up with specific features; avoid generic phrasing and include light urgency in the CTA.
 
 ## References
 

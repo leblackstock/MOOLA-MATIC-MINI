@@ -6,7 +6,7 @@ Label: ~X in (Y cm)
 Use only what you can estimate; omit unknowns.
 
 Size tag format (if provided):
-US __ / UK __ / EU __ / Width __
+US __ / UK __ / EU __ / AU __ / Width __
 
 Required (core):
 - Outsole length (heel-to-toe): ~__ in (__ cm)

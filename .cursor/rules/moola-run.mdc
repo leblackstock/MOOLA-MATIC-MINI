@@ -49,5 +49,6 @@ alwaysApply: false
   - Description: High (engaging, vivid, still factual). Do not repeat the hook; add new details and benefits.
   - Description: include the most searched keywords naturally in sentences.
   - CTA: High (friendly, energetic prompt, include light urgency)
-  - CTA style: use a sentence similar to “Photos show condition and measurements; ask if you need a specific angle or detail confirmed—grab them before they’re gone.”
+  - CTA style: use a sentence similar to "Photos show condition and measurements; ask if you need a specific angle or detail confirmed—grab them before they're gone."
+  - Hook/Description emphasis: lead with a vivid, factual use-case or setting when appropriate (e.g., "built for the fairway and sharp enough for the clubhouse"), then support with specific construction/features. Avoid generic, feature-only phrasing.
 - Ask only one question when required to proceed.
