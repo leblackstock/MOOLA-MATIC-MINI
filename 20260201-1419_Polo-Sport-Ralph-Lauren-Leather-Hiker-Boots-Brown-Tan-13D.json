@@ -100,6 +100,7 @@
   "min_profit_price": "69.99",
   "min_profit_estimate": "46.37",
   "min_profit_time_to_sell": "About 2-4 weeks",
+  "offer_recommendation": "Offer recommendation: Set min offer to $59, auto accept above $85.",
   "time_to_sell_sentence": "Estimated time to sell: about 3-5 months (size 13 narrows buyer pool).",
   "platforms": [
     {

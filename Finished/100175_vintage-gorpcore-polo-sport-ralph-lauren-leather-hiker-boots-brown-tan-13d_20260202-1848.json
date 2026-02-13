@@ -4,9 +4,7 @@
   "listperfectly_description": "Vintage Polo Sport Ralph Lauren leather hiker boots with lug‑sole traction solve slick‑ground footing for size 13D.\n\nVintage men's Polo Sport Ralph Lauren leather hiking boots in brown/tan/black with duck toe bumper, padded collar, brass eyelets, and an instep strap; rugged gorpcore‑ready outdoor boots built for trail, workwear, and casual wear.\n\nYou will receive the following item(s):\n\n- Men's Boots (pair)\n\nMeasurements are as follows:\n\n- Size / Fit: US 13 / UK ~12 / EU ~46 (Width D (Reg))\n- Outsole length (heel-to-toe): 13.5 in (34.3 cm)\n- Outsole width (widest): 4.8 in (12.2 cm)\n- Insole length (heel to toe): 12.5 in (31.8 cm)\n- Insole width (ball area): 4.3 in (10.9 cm)\n- Heel height: 1.5 in (3.8 cm)\n- Platform height (forefoot): 0.7 in (1.8 cm)\n- Toe box height: 1.5 in (3.8 cm)\n- Shaft height (from outsole): 5.5 in (14 cm)\n- Shaft opening (circumference): 11 in (27.9 cm)\n- Weight (pair): 4.50 lb (2.04 kg)\n\nPhotos show condition and measurements; ask if you need a specific angle or detail confirmed.",
   "hook": "Vintage Polo Sport Ralph Lauren leather hiker boots with lug‑sole traction solve slick‑ground footing for size 13D.",
   "description": "Vintage men's Polo Sport Ralph Lauren leather hiking boots in brown/tan/black with duck toe bumper, padded collar, brass eyelets, and an instep strap; rugged gorpcore‑ready outdoor boots built for trail, workwear, and casual wear.",
-  "included_items": [
-    "Men's Boots (pair)"
-  ],
+  "included_items": ["Men's Boots (pair)"],
   "measurements": [
     "Size / Fit: US 13 / UK ~12 / EU ~46 (Width D (Reg))",
     "Outsole length (heel-to-toe): 13.5 in (34.3 cm)",
@@ -52,11 +50,7 @@
   "size_or_fit": "US 13 / UK ~12 / EU ~46 (Width D (Reg))",
   "era_status": "Vintage",
   "era_notes": "Likely 1990s based on Polo Sport label/style.",
-  "style_tags": [
-    "vintage",
-    "gorpcore",
-    "90s"
-  ],
+  "style_tags": ["vintage", "gorpcore", "90s"],
   "tags_line": "vintage, gorpcore, polo sport, ralph lauren, 90s polo sport, leather boots, hiker boots, lug sole, duck toe, strap detail, brown tan, men's 13d, wide d, trail boots",
   "condition_status": "Pre-Owned",
   "pre_owned_condition": "Good",
@@ -66,9 +60,7 @@
   "msrp": "79.99",
   "upc": "",
   "quantity": "1",
-  "intended_for": [
-    "Men"
-  ],
+  "intended_for": ["Men"],
   "shipping_weight_lb": "5",
   "shipping_weight_oz": "8",
   "package_length": "12.25",
@@ -108,6 +100,7 @@
   "min_profit_price": "69.99",
   "min_profit_estimate": "46.37",
   "min_profit_time_to_sell": "About 2-4 weeks",
+  "offer_recommendation": "Offer recommendation: Set min offer to $59, auto accept above $85.",
   "time_to_sell_sentence": "Estimated time to sell: about 3-5 months (size 13 narrows buyer pool).",
   "platforms": [
     {

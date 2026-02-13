@@ -575,6 +575,7 @@
       const standardHeightInput = document.getElementById(
         "standardHeightInput"
       );
+      let lastSizeEdited = null;
       let items = [];
       let currentIndex = 0;
       let currentData = null;
@@ -582,7 +583,7 @@
       let editMode = true;
       let fieldInputs = [];
       let fieldInputMap = {};
-      let lastAutoNotes = "";
+      let lastAutoNotes = [];
       let lastAutoSize = "";
       let includeToggles = {};
       let measurementTogglePairs = [];
@@ -1061,30 +1062,44 @@
         }
       }
 
-      function buildSellerNotes(data, existingNotes) {
+      function stripOfferRecommendation(value) {
+        const text = String(value || "").trim();
+        if (!text) return "";
+        return text.replace(/^offer recommendation\s*[:\-]?\s*/i, "").trim();
+      }
+
+      function getAutoSellerNotes(data) {
+        if (!data) return [];
         const base =
           data?.purchase_date && data?.purchase_location
             ? `${data.purchase_date} Purchased from ${data.purchase_location}`
             : "";
+        const offerLine = stripOfferRecommendation(data?.offer_recommendation);
+        return [offerLine, base].filter(Boolean);
+      }
+
+      function buildSellerNotes(data, existingNotes) {
+        const autoNotes = getAutoSellerNotes(data);
         const lines = String(existingNotes || "")
           .split(/\n/)
           .map((line) => line.trim())
           .filter(Boolean);
+        const previousAutoNotes = Array.isArray(lastAutoNotes)
+          ? lastAutoNotes
+          : [lastAutoNotes].filter(Boolean);
         const extras = lines.filter(
-          (line) => line !== base && line !== lastAutoNotes
+          (line) =>
+            !autoNotes.includes(line) && !previousAutoNotes.includes(line)
         );
-        if (!base) return extras.join("\n");
-        return [base, ...extras].join("\n").trim();
+        if (!autoNotes.length) return extras.join("\n");
+        return [...autoNotes, ...extras].join("\n").trim();
       }
 
       function updateSellerNotes(data) {
         if (!data) return;
+        const autoNotes = getAutoSellerNotes(data);
         const next = buildSellerNotes(data, data.notes);
-        const base =
-          data?.purchase_date && data?.purchase_location
-            ? `${data.purchase_date} Purchased from ${data.purchase_location}`
-            : "";
-        lastAutoNotes = base;
+        lastAutoNotes = autoNotes;
         data.notes = next;
         const input = fieldInputMap.notes;
         if (input && input.value !== next) {
@@ -1146,6 +1161,37 @@
 
       function updateIncludeToggleForInput(input) {
         if (!input) return;
+        if (
+          [
+            sizeUsInput,
+            sizeUkInput,
+            sizeEuInput,
+            sizeAuInput,
+            sizeWidthInput,
+          ].includes(input)
+        ) {
+          const pair = measurementTogglePairs.find(
+            (item) => item.input === sizeUsInput
+          );
+          if (!pair || !pair.toggle) return;
+          const hasAnySizeValue = [
+            sizeUsInput,
+            sizeUkInput,
+            sizeEuInput,
+            sizeAuInput,
+            sizeWidthInput,
+          ].some((field) => Boolean(String(field?.value || "").trim()));
+          if (!hasAnySizeValue) {
+            pair.toggle.checked = false;
+            pair.toggle.dataset.manual = "false";
+            return;
+          }
+          if (pair.toggle.dataset.manual === "true" && !pair.toggle.checked) {
+            return;
+          }
+          pair.toggle.checked = true;
+          return;
+        }
         const pair = measurementTogglePairs.find(
           (item) => item.input === input
         );
@@ -1302,56 +1348,72 @@
         return estimated ? `~${text}` : text;
       }
 
+      function getIntendedForValues(data) {
+        const input = fieldInputMap?.intended_for;
+        const inputValues = input ? parseList(input.value) : [];
+        if (inputValues.length) return inputValues;
+        return Array.isArray(data?.intended_for) ? data.intended_for : [];
+      }
+
       function getSizeOffsets(data) {
-        const intended = Array.isArray(data?.intended_for)
-          ? data.intended_for.map((item) => String(item).toLowerCase())
-          : [];
-        const isWomen = intended.includes("women");
+        const intended = getIntendedForValues(data).map((item) =>
+          String(item).toLowerCase()
+        );
+        const isUnisex = intended.includes("unisex");
+        const isWomen = intended.includes("women") && !isUnisex;
         if (isWomen) {
           return { usToUk: -2, usToEu: 31, usToAu: 0 };
         }
-        return { usToUk: -1, usToEu: 33, usToAu: -1 };
+        return { usToUk: -1, usToEu: 32, usToAu: -1 };
       }
 
-      function convertSizeValues(raw, offsets) {
+      function getRawSizeInputs() {
+        return {
+          us: parseNumber(sizeUsInput?.value),
+          uk: parseNumber(sizeUkInput?.value),
+          eu: parseNumber(sizeEuInput?.value),
+          au: parseNumber(sizeAuInput?.value),
+        };
+      }
+
+      function resolveSizeBase(raw, preferred) {
+        const hasValue = (value) => value !== null;
+        if (preferred && hasValue(raw[preferred])) return preferred;
+        if (hasValue(raw.us)) return "us";
+        if (hasValue(raw.uk)) return "uk";
+        if (hasValue(raw.au)) return "au";
+        if (hasValue(raw.eu)) return "eu";
+        return null;
+      }
+
+      function convertSizeValues(raw, offsets, preferred) {
         let { us, uk, eu, au } = raw;
         let estimated = { us: false, uk: false, eu: false, au: false };
-        if (us !== null) {
-          if (uk === null) {
-            uk = us + offsets.usToUk;
-            estimated.uk = true;
-          }
-          if (eu === null) {
-            eu = us + offsets.usToEu;
-            estimated.eu = true;
-          }
-          if (au === null) {
-            au = us + offsets.usToAu;
-            estimated.au = true;
-          }
-        } else if (uk !== null) {
+        const source = resolveSizeBase(raw, preferred);
+        if (!source) return { us, uk, eu, au, estimated, source };
+
+        if (source === "us") {
+          uk = us + offsets.usToUk;
+          estimated.uk = true;
+          eu = us + offsets.usToEu;
+          estimated.eu = true;
+          au = us + offsets.usToAu;
+          estimated.au = true;
+        } else if (source === "uk") {
           us = uk - offsets.usToUk;
           estimated.us = true;
-          if (eu === null) {
-            eu = us + offsets.usToEu;
-            estimated.eu = true;
-          }
-          if (au === null) {
-            au = us + offsets.usToAu;
-            estimated.au = true;
-          }
-        } else if (au !== null) {
+          eu = us + offsets.usToEu;
+          estimated.eu = true;
+          au = us + offsets.usToAu;
+          estimated.au = true;
+        } else if (source === "au") {
           us = au - offsets.usToAu;
           estimated.us = true;
-          if (uk === null) {
-            uk = us + offsets.usToUk;
-            estimated.uk = true;
-          }
-          if (eu === null) {
-            eu = us + offsets.usToEu;
-            estimated.eu = true;
-          }
-        } else if (eu !== null) {
+          uk = us + offsets.usToUk;
+          estimated.uk = true;
+          eu = us + offsets.usToEu;
+          estimated.eu = true;
+        } else if (source === "eu") {
           us = eu - offsets.usToEu;
           estimated.us = true;
           uk = us + offsets.usToUk;
@@ -1359,22 +1421,23 @@
           au = us + offsets.usToAu;
           estimated.au = true;
         }
-        return { us, uk, eu, au, estimated };
+        return { us, uk, eu, au, estimated, source };
       }
 
-      function applySizeConversions(data) {
-        const raw = {
-          us: parseNumber(sizeUsInput?.value),
-          uk: parseNumber(sizeUkInput?.value),
-          eu: parseNumber(sizeEuInput?.value),
-          au: parseNumber(sizeAuInput?.value),
-        };
+      function setSizeInputValue(input, value, sourceKey, inputKey) {
+        if (!input || value === null || Number.isNaN(value)) return;
+        if (sourceKey && inputKey === sourceKey) return;
+        input.value = value;
+      }
+
+      function applySizeConversions(data, rawOverride) {
+        const raw = rawOverride || getRawSizeInputs();
         const offsets = getSizeOffsets(data);
-        const values = convertSizeValues(raw, offsets);
-        setInputValue(sizeUsInput, values.us);
-        setInputValue(sizeUkInput, values.uk);
-        setInputValue(sizeEuInput, values.eu);
-        setInputValue(sizeAuInput, values.au);
+        const values = convertSizeValues(raw, offsets, lastSizeEdited);
+        setSizeInputValue(sizeUsInput, values.us, values.source, "us");
+        setSizeInputValue(sizeUkInput, values.uk, values.source, "uk");
+        setSizeInputValue(sizeEuInput, values.eu, values.source, "eu");
+        setSizeInputValue(sizeAuInput, values.au, values.source, "au");
         return values;
       }
 
@@ -1470,11 +1533,16 @@
       }
 
       function buildSizeTagFromInputs(data) {
-        const values = applySizeConversions(data);
+        const raw = getRawSizeInputs();
+        const values = applySizeConversions(data, raw);
         const width = String(sizeWidthInput?.value || "").trim();
         if (values.us === null && values.uk === null && values.eu === null) {
           return "";
         }
+        const intended = getIntendedForValues(data).map((item) =>
+          String(item).toLowerCase()
+        );
+        const isUnisex = intended.includes("unisex");
         const verified = measurementsVerifiedToggle?.checked;
         const usText = formatSizeValue(
           values.us,
@@ -1497,7 +1565,23 @@
           verified
         );
         const parts = [];
-        if (usText !== null) parts.push(`US ${usText}`);
+        if (isUnisex) {
+          const womenOffsets = { usToUk: -2, usToEu: 31, usToAu: 0 };
+          const womenValues = convertSizeValues(
+            raw,
+            womenOffsets,
+            lastSizeEdited
+          );
+          const womenUsText = formatSizeValue(
+            womenValues.us,
+            womenValues.estimated?.us,
+            verified
+          );
+          if (usText !== null) parts.push(`US M ${usText}`);
+          if (womenUsText !== null) parts.push(`US W ${womenUsText}`);
+        } else if (usText !== null) {
+          parts.push(`US ${usText}`);
+        }
         if (ukText !== null) parts.push(`UK ${ukText}`);
         if (euText !== null) parts.push(`EU ${euText}`);
         if (auText !== null) parts.push(`AU ${auText}`);
@@ -1505,9 +1589,73 @@
         return `${parts.join(" / ")} / Width ${widthText}`;
       }
 
+      function inferBaseSizeFromText(text) {
+        const input = String(text || "");
+        const usMenMatch = input.match(/US\s*M\s*([0-9.]+)/i);
+        const usWomenMatch = input.match(/US\s*W\s*([0-9.]+)/i);
+        const usMatch = input.match(/US\s*([0-9.]+)/i);
+        const ukMatch = input.match(/UK\s*([0-9.]+)/i);
+        const euMatch = input.match(/EU\s*([0-9.]+)/i);
+        const auMatch = input.match(/AU\s*([0-9.]+)/i);
+        const entries = [
+          usMenMatch ? ["us", usMenMatch[1]] : null,
+          usWomenMatch ? ["us", usWomenMatch[1]] : null,
+          usMatch ? ["us", usMatch[1]] : null,
+          ukMatch ? ["uk", ukMatch[1]] : null,
+          euMatch ? ["eu", euMatch[1]] : null,
+          auMatch ? ["au", auMatch[1]] : null,
+        ].filter(Boolean);
+        const unique = [];
+        entries.forEach(([key, value]) => {
+          if (unique.find((item) => item.key === key)) return;
+          unique.push({ key, value });
+        });
+        if (unique.length !== 1) return null;
+        return unique[0];
+      }
+
+      function normalizeSizeInputsFromBase(data) {
+        const base = inferBaseSizeFromText(data?.size_or_fit);
+        if (!base) return;
+        const value = parseNumber(base.value);
+        if (value === null) return;
+        if (base.key === "us") {
+          sizeUsInput.value = value;
+          clearOtherSizeInputs(sizeUsInput);
+          updateIncludeToggleForInput(sizeUsInput);
+        } else if (base.key === "uk") {
+          sizeUkInput.value = value;
+          clearOtherSizeInputs(sizeUkInput);
+          updateIncludeToggleForInput(sizeUkInput);
+        } else if (base.key === "eu") {
+          sizeEuInput.value = value;
+          clearOtherSizeInputs(sizeEuInput);
+          updateIncludeToggleForInput(sizeEuInput);
+        } else if (base.key === "au") {
+          sizeAuInput.value = value;
+          clearOtherSizeInputs(sizeAuInput);
+          updateIncludeToggleForInput(sizeAuInput);
+        }
+        lastSizeEdited = base.key;
+        if (currentData) {
+          currentData.last_size_edited = base.key;
+        }
+      }
+
+      function buildSizeOrFitValue(data) {
+        const raw = getRawSizeInputs();
+        const source = resolveSizeBase(raw, lastSizeEdited);
+        if (!source) return "";
+        const value = raw[source];
+        if (value === null) return "";
+        const sizeText = formatNumber(value, 1);
+        const sizeLabel = source.toUpperCase();
+        return `${sizeLabel} ${sizeText}`;
+      }
+
       function updateSizeOrFitFromHelper(data) {
         if (!data) return;
-        const next = buildSizeTagFromInputs(data);
+        const next = buildSizeOrFitValue(data);
         const current = String(data.size_or_fit || "").trim();
         const hasPlaceholder = current.includes("__");
         const currentWidthMatch = current.match(/Width\s*([^)]+)/i);
@@ -1605,6 +1753,7 @@
 
       function updateMeasurementsFromHelper() {
         if (!currentData) return;
+        normalizeSizeInputsFromBase(currentData);
         const template = getSelectedTemplate();
         const values = {
           outsoleLength: parseNumber(outsoleLengthInput?.value),
@@ -1892,6 +2041,10 @@
         setFieldValue("measurements", lines);
         setFieldValue("measurements_imperial", imperial);
         setFieldValue("measurements_metric", metric);
+        currentData.measurements_verified = Boolean(
+          measurementsVerifiedToggle?.checked
+        );
+        currentData.last_size_edited = lastSizeEdited || "";
         updateListperfectlyDescription(currentData);
         saveSession();
       }
@@ -2029,12 +2182,16 @@
 
         const sizeText = String(data.size_or_fit || "");
         if (sizeText) {
+          const usMenMatch = sizeText.match(/US\s*M\s*([0-9.]+)/i);
+          const usWomenMatch = sizeText.match(/US\s*W\s*([0-9.]+)/i);
           const usMatch = sizeText.match(/US\s*([0-9.]+)/i);
           const ukMatch = sizeText.match(/UK\s*([0-9.]+)/i);
           const euMatch = sizeText.match(/EU\s*([0-9.]+)/i);
           const auMatch = sizeText.match(/AU\s*([0-9.]+)/i);
           const widthMatch = sizeText.match(/Width\s*([A-Za-z0-9]+)/i);
-          if (usMatch) setInputValue(sizeUsInput, usMatch[1]);
+          if (usMenMatch) setInputValue(sizeUsInput, usMenMatch[1]);
+          else if (usMatch) setInputValue(sizeUsInput, usMatch[1]);
+          else if (usWomenMatch) setInputValue(sizeUsInput, usWomenMatch[1]);
           if (ukMatch) setInputValue(sizeUkInput, ukMatch[1]);
           if (euMatch) setInputValue(sizeEuInput, euMatch[1]);
           if (auMatch) setInputValue(sizeAuInput, auMatch[1]);
@@ -2119,6 +2276,42 @@
         nextBtn.disabled = true;
         if (fileInput) fileInput.value = "";
         updateStatus();
+      }
+
+      function resetMeasurementHelper() {
+        lastAutoSize = "";
+        lastSizeEdited = currentData?.last_size_edited || null;
+        includeDefaultsApplied = false;
+        if (measurementsVerifiedToggle) {
+          measurementsVerifiedToggle.checked = Boolean(
+            currentData?.measurements_verified
+          );
+        }
+        if (measurementTemplateSelect) {
+          measurementTemplateSelect.value = "auto";
+        }
+        if (weightPerSelect) {
+          weightPerSelect.value = "pair";
+        }
+        if (Array.isArray(measurementInputs)) {
+          measurementInputs.forEach((input) => {
+            if (!input) return;
+            input.value = "";
+          });
+        }
+        measurementTogglePairs.forEach(({ toggle }) => {
+          if (!toggle) return;
+          toggle.checked = false;
+          toggle.dataset.manual = "false";
+        });
+      }
+
+      function clearOtherSizeInputs(sourceInput) {
+        const sizeInputs = [sizeUsInput, sizeUkInput, sizeEuInput, sizeAuInput];
+        sizeInputs.forEach((input) => {
+          if (!input || input === sourceInput) return;
+          input.value = "";
+        });
       }
 
       function loadSession() {
@@ -2495,6 +2688,9 @@
             if (field.key === "platforms") {
               currentData.platforms = parsePlatforms(input.value);
             }
+          if (field.key === "intended_for") {
+            handleMeasurementInput();
+          }
             if (
               [
                 "measurements",
@@ -2518,7 +2714,11 @@
             if (["buyer_pays_shipping_price", "msrp"].includes(field.key)) {
               normalizeMsrp(currentData);
             }
-            if (["purchase_date", "purchase_location"].includes(field.key)) {
+            if (
+              ["purchase_date", "purchase_location", "offer_recommendation"].includes(
+                field.key
+              )
+            ) {
               updateSellerNotes(currentData);
             }
             items[currentIndex].data = currentData;
@@ -2870,6 +3070,22 @@
       measurementInputs.forEach((input) => {
         if (!input) return;
         input.addEventListener("input", () => {
+          if (input === sizeUsInput) {
+            lastSizeEdited = "us";
+            clearOtherSizeInputs(sizeUsInput);
+          }
+          if (input === sizeUkInput) {
+            lastSizeEdited = "uk";
+            clearOtherSizeInputs(sizeUkInput);
+          }
+          if (input === sizeEuInput) {
+            lastSizeEdited = "eu";
+            clearOtherSizeInputs(sizeEuInput);
+          }
+          if (input === sizeAuInput) {
+            lastSizeEdited = "au";
+            clearOtherSizeInputs(sizeAuInput);
+          }
           updateIncludeToggleForInput(input);
           handleMeasurementInput();
         });
@@ -2888,6 +3104,10 @@
 
       if (measurementsVerifiedToggle) {
         measurementsVerifiedToggle.addEventListener("change", () => {
+          if (currentData) {
+            currentData.measurements_verified =
+              measurementsVerifiedToggle.checked;
+          }
           updateMeasurementsFromHelper();
         });
       }
@@ -2896,6 +3116,9 @@
         saveVerifiedBtn.addEventListener("click", () => {
           if (measurementsVerifiedToggle) {
             measurementsVerifiedToggle.checked = true;
+          }
+          if (currentData) {
+            currentData.measurements_verified = true;
           }
           handleMeasurementInput();
         });
@@ -3111,6 +3334,7 @@
         normalizeMsrp(currentData);
         updateFieldEditability();
         toggleMeasurementFields();
+        resetMeasurementHelper();
         populateMeasurementHelperFromData(currentData);
         applyIncludeDefaultsFromInputs();
         updateMeasurementsFromHelper();
@@ -3216,6 +3440,7 @@
       if (clearAllBtn) {
         clearAllBtn.addEventListener("click", () => {
           clearSession();
+          resetMeasurementHelper();
           resetToEmpty();
         });
       }
