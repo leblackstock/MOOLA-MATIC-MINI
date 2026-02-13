@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -124,6 +124,35 @@
         align-items: center;
         flex-wrap: wrap;
       }
+      .size-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .size-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 120px;
+        flex: 1 1 120px;
+      }
+      .size-toggles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .measurement-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .measurement-grid .field {
+        flex: 1 1 calc(33.333% - 10px);
+        min-width: 240px;
+      }
+      .measurement-grid .size-tag-field {
+        flex: 1 1 100%;
+      }
       .row button {
         padding: 9px 14px;
         border: 1px solid #6b3ddb;
@@ -132,7 +161,9 @@
         border-radius: 10px;
         cursor: pointer;
         font-weight: 600;
-        transition: transform 0.05s ease, box-shadow 0.15s ease;
+        transition:
+          transform 0.05s ease,
+          box-shadow 0.15s ease;
       }
       .row button:hover {
         box-shadow: 0 8px 16px rgba(124, 58, 237, 0.35);
@@ -295,13 +326,6 @@
           Enter inches; cm is auto-calculated. Auto-generated values use "~".
         </div>
         <div class="field">
-          <label>Measurements verified</label>
-          <div class="row">
-            <input id="measurementsVerifiedToggle" type="checkbox" />
-            <button id="saveVerifiedBtn" type="button">Save verified</button>
-          </div>
-        </div>
-        <div class="field">
           <label>Measurement template</label>
           <select id="measurementTemplateSelect">
             <option value="auto">Auto (detect)</option>
@@ -310,21 +334,44 @@
             <option value="garment">Garments</option>
             <option value="standard">Standard L/W/H</option>
           </select>
+          <div class="row" style="margin-top: 8px">
+            <button id="saveMeasurementsBtn" type="button">
+              Save measurements
+            </button>
+          </div>
         </div>
-        <div id="shoeFields">
-          <div class="field">
+        <div id="shoeFields" class="measurement-grid">
+          <div class="field size-tag-field">
             <label>Size tag (US M / US W / UK / EU / AU / Width)</label>
-            <div class="row">
-              <input id="sizeUsMenInput" type="text" placeholder="US M" />
-              <input id="sizeUsWomenInput" type="text" placeholder="US W" />
-              <input id="sizeUkInput" type="text" placeholder="UK" />
-              <input id="sizeEuInput" type="text" placeholder="EU" />
-              <input id="sizeAuInput" type="text" placeholder="AU" />
-              <input
-                id="sizeWidthInput"
-                type="text"
-                placeholder="Width (Reg/Wide/Extra Wide/XXWide/Narrow)"
-              />
+            <div class="size-grid">
+              <div class="size-cell">
+                <input id="sizeUsMenInput" type="text" placeholder="US M" />
+                <div class="size-toggles" id="sizeUsMenToggles"></div>
+              </div>
+              <div class="size-cell">
+                <input id="sizeUsWomenInput" type="text" placeholder="US W" />
+                <div class="size-toggles" id="sizeUsWomenToggles"></div>
+              </div>
+              <div class="size-cell">
+                <input id="sizeUkInput" type="text" placeholder="UK" />
+                <div class="size-toggles" id="sizeUkToggles"></div>
+              </div>
+              <div class="size-cell">
+                <input id="sizeEuInput" type="text" placeholder="EU" />
+                <div class="size-toggles" id="sizeEuToggles"></div>
+              </div>
+              <div class="size-cell">
+                <input id="sizeAuInput" type="text" placeholder="AU" />
+                <div class="size-toggles" id="sizeAuToggles"></div>
+              </div>
+              <div class="size-cell">
+                <input
+                  id="sizeWidthInput"
+                  type="text"
+                  placeholder="Width (Reg/Wide/Extra Wide/XXWide/Narrow)"
+                />
+                <div class="size-toggles" id="sizeWidthToggles"></div>
+              </div>
             </div>
             <div class="note">
               Width note: Reg, Wide, Extra Wide, XXWide, Narrow. Default to Reg.
@@ -359,9 +406,20 @@
             <input id="toeBoxHeightInput" type="number" step="0.1" />
           </div>
           <div class="field">
-            <label>Weight (lb)</label>
+            <label>Weight</label>
             <div class="row">
-              <input id="weightValueInput" type="number" step="0.1" />
+              <input
+                id="weightLbInput"
+                type="number"
+                step="1"
+                placeholder="lb"
+              />
+              <input
+                id="weightOzInput"
+                type="number"
+                step="1"
+                placeholder="oz"
+              />
               <select id="weightPerSelect">
                 <option value="pair">Per pair</option>
                 <option value="boot">Per boot</option>
@@ -369,7 +427,7 @@
             </div>
           </div>
         </div>
-        <div id="bootFields">
+        <div id="bootFields" class="measurement-grid">
           <div class="field">
             <label>Shaft height (top of outsole to top, in)</label>
             <input id="shaftHeightInput" type="number" step="0.1" />
@@ -383,7 +441,7 @@
             <input id="calfCircInput" type="number" step="0.1" />
           </div>
         </div>
-        <div id="garmentFields">
+        <div id="garmentFields" class="measurement-grid">
           <div class="field">
             <label>Chest (pit to pit, in)</label>
             <input id="garmentChestInput" type="number" step="0.1" />
@@ -417,7 +475,7 @@
             <input id="garmentHipInput" type="number" step="0.1" />
           </div>
         </div>
-        <div id="standardFields">
+        <div id="standardFields" class="measurement-grid">
           <div class="field">
             <label>Length (in)</label>
             <input id="standardLengthInput" type="number" step="0.1" />
@@ -484,7 +542,7 @@
       const clearAllBtn = document.getElementById("clearAllBtn");
       const lpPanel = document.getElementById("lpPanel");
       const measurementsHelperPanel = document.getElementById(
-        "measurementsHelperPanel"
+        "measurementsHelperPanel",
       );
       const platformPanel = document.getElementById("platformPanel");
       const additionalPanel = document.getElementById("additionalPanel");
@@ -492,33 +550,33 @@
       const ebayPlatformFieldsContainer =
         document.getElementById("ebayPlatformFields");
       const depopPlatformFieldsContainer = document.getElementById(
-        "depopPlatformFields"
+        "depopPlatformFields",
       );
       const etsyPlatformFieldsContainer =
         document.getElementById("etsyPlatformFields");
       const poshmarkPlatformFieldsContainer = document.getElementById(
-        "poshmarkPlatformFields"
+        "poshmarkPlatformFields",
       );
       const mercariPlatformFieldsContainer = document.getElementById(
-        "mercariPlatformFields"
+        "mercariPlatformFields",
       );
       const grailedPlatformFieldsContainer = document.getElementById(
-        "grailedPlatformFields"
+        "grailedPlatformFields",
       );
       const facebookPlatformFieldsContainer = document.getElementById(
-        "facebookPlatformFields"
+        "facebookPlatformFields",
       );
       const shopifyPlatformFieldsContainer = document.getElementById(
-        "shopifyPlatformFields"
+        "shopifyPlatformFields",
       );
       const vestiairePlatformFieldsContainer = document.getElementById(
-        "vestiairePlatformFields"
+        "vestiairePlatformFields",
       );
       const vintedPlatformFieldsContainer = document.getElementById(
-        "vintedPlatformFields"
+        "vintedPlatformFields",
       );
       const whatnotPlatformFieldsContainer = document.getElementById(
-        "whatnotPlatformFields"
+        "whatnotPlatformFields",
       );
       const typesMiscFieldsContainer =
         document.getElementById("typesMiscFields");
@@ -541,12 +599,11 @@
       const skuChangeBtn = document.getElementById("skuChangeBtn");
       const skuHint = document.getElementById("skuHint");
       const autoMeasurementsToggle = null;
-      const measurementsVerifiedToggle = document.getElementById(
-        "measurementsVerifiedToggle"
-      );
-      const saveVerifiedBtn = document.getElementById("saveVerifiedBtn");
       const measurementTemplateSelect = document.getElementById(
-        "measurementTemplateSelect"
+        "measurementTemplateSelect",
+      );
+      const saveMeasurementsBtn = document.getElementById(
+        "saveMeasurementsBtn",
       );
       const shoeFields = document.getElementById("shoeFields");
       const bootFields = document.getElementById("bootFields");
@@ -558,16 +615,23 @@
       const sizeEuInput = document.getElementById("sizeEuInput");
       const sizeAuInput = document.getElementById("sizeAuInput");
       const sizeWidthInput = document.getElementById("sizeWidthInput");
+      const sizeUsMenToggles = document.getElementById("sizeUsMenToggles");
+      const sizeUsWomenToggles = document.getElementById("sizeUsWomenToggles");
+      const sizeUkToggles = document.getElementById("sizeUkToggles");
+      const sizeEuToggles = document.getElementById("sizeEuToggles");
+      const sizeAuToggles = document.getElementById("sizeAuToggles");
+      const sizeWidthToggles = document.getElementById("sizeWidthToggles");
       const outsoleLengthInput = document.getElementById("outsoleLengthInput");
       const outsoleWidthInput = document.getElementById("outsoleWidthInput");
       const insoleLengthInput = document.getElementById("insoleLengthInput");
       const insoleWidthInput = document.getElementById("insoleWidthInput");
       const heelHeightInput = document.getElementById("heelHeightInput");
       const platformHeightInput = document.getElementById(
-        "platformHeightInput"
+        "platformHeightInput",
       );
       const toeBoxHeightInput = document.getElementById("toeBoxHeightInput");
-      const weightValueInput = document.getElementById("weightValueInput");
+      const weightLbInput = document.getElementById("weightLbInput");
+      const weightOzInput = document.getElementById("weightOzInput");
       const weightPerSelect = document.getElementById("weightPerSelect");
       const shaftHeightInput = document.getElementById("shaftHeightInput");
       const shaftCircInput = document.getElementById("shaftCircInput");
@@ -575,7 +639,7 @@
       const garmentChestInput = document.getElementById("garmentChestInput");
       const garmentLengthInput = document.getElementById("garmentLengthInput");
       const garmentShoulderInput = document.getElementById(
-        "garmentShoulderInput"
+        "garmentShoulderInput",
       );
       const garmentSleeveInput = document.getElementById("garmentSleeveInput");
       const garmentWaistInput = document.getElementById("garmentWaistInput");
@@ -583,11 +647,11 @@
       const garmentRiseInput = document.getElementById("garmentRiseInput");
       const garmentHipInput = document.getElementById("garmentHipInput");
       const standardLengthInput = document.getElementById(
-        "standardLengthInput"
+        "standardLengthInput",
       );
       const standardWidthInput = document.getElementById("standardWidthInput");
       const standardHeightInput = document.getElementById(
-        "standardHeightInput"
+        "standardHeightInput",
       );
       let lastSizeEdited = null;
       let items = [];
@@ -601,6 +665,7 @@
       let lastAutoNotes = [];
       let lastAutoSize = "";
       let includeToggles = {};
+      let verifiedToggles = {};
       let measurementTogglePairs = [];
       let includeDefaultsApplied = false;
       let mergedFieldKeys = new Set();
@@ -964,7 +1029,7 @@
           .filter(
             (token) =>
               !/^(us|uk|eu|au|m|w)\d+(\.\d+)?$/.test(token) &&
-              !/^\d+(\.\d+)?$/.test(token)
+              !/^\d+(\.\d+)?$/.test(token),
           );
       }
 
@@ -1069,7 +1134,9 @@
         const titleA = normalizeKey(base.title);
         const titleB = normalizeKey(incoming.title);
         const titlePartialMatch =
-          titleA && titleB && (titleA.includes(titleB) || titleB.includes(titleA));
+          titleA &&
+          titleB &&
+          (titleA.includes(titleB) || titleB.includes(titleA));
         const brandMatch =
           normalizeKey(base.brand) &&
           normalizeKey(base.brand) === normalizeKey(incoming.brand);
@@ -1131,20 +1198,23 @@
             key === "measurements_imperial" ||
             key === "measurements_metric"
           ) {
-            const { merged, changed: mergedChanged, addedCount, addedLabels } =
-              mergeMeasurementArrays(base[key], incomingValue);
+            const {
+              merged,
+              changed: mergedChanged,
+              addedCount,
+              addedLabels,
+            } = mergeMeasurementArrays(base[key], incomingValue);
             if (mergedChanged) {
               base[key] = merged;
               changed = true;
-              const label =
-                addedCount > 0 ? `+${addedCount} lines` : "cleaned";
+              const label = addedCount > 0 ? `+${addedCount} lines` : "cleaned";
               markChanged(key, label);
               if (addedCount > 0) {
                 measurementLinesAdded = true;
               }
               if (addedLabels.length) {
                 addedLabels.forEach((labelKey) =>
-                  measurementAddedLabels.add(labelKey)
+                  measurementAddedLabels.add(labelKey),
                 );
               }
             }
@@ -1161,7 +1231,7 @@
             const existing = new Set(
               base.platforms
                 .map((item) => normalizeKey(item?.platform))
-                .filter(Boolean)
+                .filter(Boolean),
             );
             incomingValue.forEach((item) => {
               const name = normalizeKey(item?.platform);
@@ -1259,10 +1329,10 @@
       function getTypesParts(data) {
         const text = String(data?.types_block || "");
         const depopMatch = text.match(
-          /^(?:Depop Boots Type|Depop Shoes Type|Depop Types):\s*(.+)$/im
+          /^(?:Depop Boots Type|Depop Shoes Type|Depop Types):\s*(.+)$/im,
         );
         const ebayMatch = text.match(
-          /^(?:Ebay Boots Type|Ebay Shoes Type|Ebay Types):\s*(.+)$/im
+          /^(?:Ebay Boots Type|Ebay Shoes Type|Ebay Types):\s*(.+)$/im,
         );
         const occasionsMatch = text.match(/^Occasions:\s*(.+)$/im);
         const stylesMatch = text.match(/^Styles:\s*(.+)$/im);
@@ -1354,7 +1424,7 @@
         const match = list.find(
           (item) =>
             String(item?.platform || "").toLowerCase() ===
-            platform.toLowerCase()
+            platform.toLowerCase(),
         );
         return match?.reason || "";
       }
@@ -1366,7 +1436,7 @@
         const idx = list.findIndex(
           (item) =>
             String(item?.platform || "").toLowerCase() ===
-            platform.toLowerCase()
+            platform.toLowerCase(),
         );
         if (!trimmed) {
           if (idx >= 0) list.splice(idx, 1);
@@ -1408,7 +1478,7 @@
           parts.push(
             `You will receive the following item(s):\n${cleanIncluded
               .map((item) => `- ${item}`)
-              .join("\n")}`
+              .join("\n")}`,
           );
         }
 
@@ -1422,7 +1492,7 @@
           parts.push(
             `Measurements:\n${cleanMeasurements
               .map((item) => `- ${item}`)
-              .join("\n")}`
+              .join("\n")}`,
           );
         }
 
@@ -1470,7 +1540,7 @@
           : [lastAutoNotes].filter(Boolean);
         const extras = lines.filter(
           (line) =>
-            !autoNotes.includes(line) && !previousAutoNotes.includes(line)
+            !autoNotes.includes(line) && !previousAutoNotes.includes(line),
         );
         if (!autoNotes.length) return extras.join("\n");
         return [...autoNotes, ...extras].join("\n").trim();
@@ -1505,220 +1575,413 @@
         }
       }
 
-      function ensureIncludeToggle(input, toggleId, labelText) {
-        if (!input) return null;
-        const existing = document.getElementById(toggleId);
-        if (existing) return existing;
-        const field = input.closest(".field");
-        if (!field) return null;
-        const row = document.createElement("div");
-        row.className = "row";
+      function createInlineToggle(toggleId, labelText) {
         const label = document.createElement("label");
         label.className = "inline-check";
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.id = toggleId;
-        checkbox.checked = Boolean(String(input.value || "").trim());
         checkbox.addEventListener("change", () => {
           checkbox.dataset.manual = "true";
         });
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(` ${labelText}`));
-        row.appendChild(label);
-        field.appendChild(row);
-        measurementTogglePairs.push({ toggle: checkbox, input });
-        return checkbox;
+        return { label, checkbox };
       }
 
-      function hasAnySizeValues() {
-        return [
-          sizeUsMenInput,
-          sizeUsWomenInput,
-          sizeUkInput,
-          sizeEuInput,
-          sizeAuInput,
-          sizeWidthInput,
-        ].some((field) => Boolean(String(field?.value || "").trim()));
+      function setToggleChecked(toggle, checked) {
+        if (!toggle) return;
+        if (toggle.dataset.manual === "true") return;
+        toggle.checked = checked;
+        toggle.dataset.manual = "false";
+      }
+
+      function ensureMeasurementToggles({
+        input,
+        key,
+        includeId,
+        verifiedId,
+        includeLabel,
+        verifiedLabel,
+        rowLabel,
+        container,
+      }) {
+        if (!input) return { includeToggle: null, verifiedToggle: null };
+        const existingInclude = document.getElementById(includeId);
+        const existingVerified = document.getElementById(verifiedId);
+        if (existingInclude || existingVerified) {
+          includeToggles[key] = existingInclude || null;
+          verifiedToggles[key] = existingVerified || null;
+          measurementTogglePairs.push({
+            input,
+            key,
+            includeToggle: existingInclude || null,
+            verifiedToggle: existingVerified || null,
+          });
+          return {
+            includeToggle: existingInclude || null,
+            verifiedToggle: existingVerified || null,
+          };
+        }
+        const field = container || input.closest(".field");
+        if (!field) return { includeToggle: null, verifiedToggle: null };
+        const row = document.createElement("div");
+        row.className = "row";
+        if (rowLabel) {
+          const label = document.createElement("div");
+          label.className = "note";
+          label.textContent = rowLabel;
+          row.appendChild(label);
+        }
+        const includeToggle = createInlineToggle(includeId, includeLabel);
+        const verifiedToggle = createInlineToggle(verifiedId, verifiedLabel);
+        row.appendChild(includeToggle.label);
+        row.appendChild(verifiedToggle.label);
+        field.appendChild(row);
+        includeToggle.checkbox.checked = Boolean(
+          String(input.value || "").trim(),
+        );
+        includeToggle.checkbox.dataset.manual = "false";
+        verifiedToggle.checkbox.checked = false;
+        verifiedToggle.checkbox.dataset.manual = "false";
+        measurementTogglePairs.push({
+          input,
+          key,
+          includeToggle: includeToggle.checkbox,
+          verifiedToggle: verifiedToggle.checkbox,
+        });
+        includeToggles[key] = includeToggle.checkbox;
+        verifiedToggles[key] = verifiedToggle.checkbox;
+        return {
+          includeToggle: includeToggle.checkbox,
+          verifiedToggle: verifiedToggle.checkbox,
+        };
       }
 
       function applyIncludeDefaultsFromInputs() {
         if (includeDefaultsApplied) return;
-        measurementTogglePairs.forEach(({ toggle, input }) => {
-          if (!toggle || !input) return;
-          if (input === sizeUsMenInput) {
-            toggle.checked = hasAnySizeValues();
-          } else {
-            toggle.checked = Boolean(String(input.value || "").trim());
-          }
-          toggle.dataset.manual = "false";
-        });
+        measurementTogglePairs.forEach(
+          ({ includeToggle, verifiedToggle, input }) => {
+            if (!input) return;
+            if (includeToggle) {
+              const hasValue =
+                input === weightLbInput
+                  ? getWeightPartsFromInputs().hasValue
+                  : Boolean(String(input.value || "").trim());
+              includeToggle.checked = hasValue;
+              includeToggle.dataset.manual = "false";
+            }
+            if (verifiedToggle) {
+              verifiedToggle.checked = false;
+              verifiedToggle.dataset.manual = "false";
+            }
+          },
+        );
+        syncSizeVerifiedDefaults(
+          convertSizeValues(getRawSizeInputs(), currentData, lastSizeEdited),
+        );
         includeDefaultsApplied = true;
       }
 
       function updateIncludeToggleForInput(input) {
         if (!input) return;
-        if (
-          [
-            sizeUsMenInput,
-            sizeUsWomenInput,
-            sizeUkInput,
-            sizeEuInput,
-            sizeAuInput,
-            sizeWidthInput,
-          ].includes(input)
-        ) {
-          const pair = measurementTogglePairs.find(
-            (item) => item.input === sizeUsMenInput
-          );
-          if (!pair || !pair.toggle) return;
-          const hasAnySizeValue = hasAnySizeValues();
-          if (!hasAnySizeValue) {
-            pair.toggle.checked = false;
-            pair.toggle.dataset.manual = "false";
-            return;
-          }
-          if (pair.toggle.dataset.manual === "true" && !pair.toggle.checked) {
-            return;
-          }
-          pair.toggle.checked = true;
-          return;
-        }
+        const targetInput = input === weightOzInput ? weightLbInput : input;
         const pair = measurementTogglePairs.find(
-          (item) => item.input === input
+          (item) => item.input === targetInput,
         );
-        if (!pair || !pair.toggle) return;
-        const hasValue = Boolean(String(input.value || "").trim());
+        if (!pair || !pair.includeToggle) return;
+        const hasValue =
+          targetInput === weightLbInput
+            ? getWeightPartsFromInputs().hasValue
+            : Boolean(String(input.value || "").trim());
         if (!hasValue) {
-          pair.toggle.checked = false;
-          pair.toggle.dataset.manual = "false";
+          pair.includeToggle.checked = false;
+          pair.includeToggle.dataset.manual = "false";
+          if (pair.verifiedToggle) {
+            pair.verifiedToggle.checked = false;
+            pair.verifiedToggle.dataset.manual = "false";
+          }
           return;
         }
-        if (pair.toggle.dataset.manual === "true" && !pair.toggle.checked) {
+        if (
+          pair.includeToggle.dataset.manual === "true" &&
+          !pair.includeToggle.checked
+        ) {
           return;
         }
-        pair.toggle.checked = true;
+        pair.includeToggle.checked = true;
+      }
+
+      function syncSizeVerifiedDefaults(values) {
+        const resolved =
+          values ||
+          convertSizeValues(getRawSizeInputs(), currentData, lastSizeEdited);
+        const baseKey = resolved?.source || null;
+        [
+          { sourceKey: "us_m", value: resolved?.usMen, toggleKey: "sizeUsMen" },
+          {
+            sourceKey: "us_w",
+            value: resolved?.usWomen,
+            toggleKey: "sizeUsWomen",
+          },
+          { sourceKey: "uk", value: resolved?.uk, toggleKey: "sizeUk" },
+          { sourceKey: "eu", value: resolved?.eu, toggleKey: "sizeEu" },
+          { sourceKey: "au", value: resolved?.au, toggleKey: "sizeAu" },
+        ].forEach(({ sourceKey, value, toggleKey }) => {
+          const toggle = verifiedToggles[toggleKey];
+          if (!toggle) return;
+          if (value === null || Number.isNaN(value)) {
+            setToggleChecked(toggle, false);
+            return;
+          }
+          setToggleChecked(toggle, sourceKey === baseKey);
+        });
+        const widthToggle = verifiedToggles.sizeWidth;
+        if (widthToggle) {
+          const hasWidth = Boolean(String(sizeWidthInput?.value || "").trim());
+          setToggleChecked(widthToggle, hasWidth);
+        }
       }
 
       function initMeasurementToggles() {
-        includeToggles.size = ensureIncludeToggle(
-          sizeUsMenInput,
-          "sizeIncludeToggle",
-          "Include Size/Fit in measurements"
-        );
-        includeToggles.outsoleLength = ensureIncludeToggle(
-          outsoleLengthInput,
-          "outsoleLengthInclude",
-          "Include"
-        );
-        includeToggles.outsoleWidth = ensureIncludeToggle(
-          outsoleWidthInput,
-          "outsoleWidthInclude",
-          "Include"
-        );
-        includeToggles.insoleLength = ensureIncludeToggle(
-          insoleLengthInput,
-          "insoleLengthInclude",
-          "Include"
-        );
-        includeToggles.insoleWidth = ensureIncludeToggle(
-          insoleWidthInput,
-          "insoleWidthInclude",
-          "Include"
-        );
-        includeToggles.heelHeight = ensureIncludeToggle(
-          heelHeightInput,
-          "heelHeightInclude",
-          "Include"
-        );
-        includeToggles.platformHeight = ensureIncludeToggle(
-          platformHeightInput,
-          "platformHeightInclude",
-          "Include"
-        );
-        includeToggles.toeBoxHeight = ensureIncludeToggle(
-          toeBoxHeightInput,
-          "toeBoxHeightInclude",
-          "Include"
-        );
-        includeToggles.weight = ensureIncludeToggle(
-          weightValueInput,
-          "weightInclude",
-          "Include"
-        );
-        includeToggles.shaftHeight = ensureIncludeToggle(
-          shaftHeightInput,
-          "shaftHeightInclude",
-          "Include"
-        );
-        includeToggles.shaftCirc = ensureIncludeToggle(
-          shaftCircInput,
-          "shaftCircInclude",
-          "Include"
-        );
-        includeToggles.calfCirc = ensureIncludeToggle(
-          calfCircInput,
-          "calfCircInclude",
-          "Include"
-        );
-        includeToggles.garmentChest = ensureIncludeToggle(
-          garmentChestInput,
-          "garmentChestInclude",
-          "Include"
-        );
-        includeToggles.garmentLength = ensureIncludeToggle(
-          garmentLengthInput,
-          "garmentLengthInclude",
-          "Include"
-        );
-        includeToggles.garmentShoulder = ensureIncludeToggle(
-          garmentShoulderInput,
-          "garmentShoulderInclude",
-          "Include"
-        );
-        includeToggles.garmentSleeve = ensureIncludeToggle(
-          garmentSleeveInput,
-          "garmentSleeveInclude",
-          "Include"
-        );
-        includeToggles.garmentWaist = ensureIncludeToggle(
-          garmentWaistInput,
-          "garmentWaistInclude",
-          "Include"
-        );
-        includeToggles.garmentInseam = ensureIncludeToggle(
-          garmentInseamInput,
-          "garmentInseamInclude",
-          "Include"
-        );
-        includeToggles.garmentRise = ensureIncludeToggle(
-          garmentRiseInput,
-          "garmentRiseInclude",
-          "Include"
-        );
-        includeToggles.garmentHip = ensureIncludeToggle(
-          garmentHipInput,
-          "garmentHipInclude",
-          "Include"
-        );
-        includeToggles.standardLength = ensureIncludeToggle(
-          standardLengthInput,
-          "standardLengthInclude",
-          "Include"
-        );
-        includeToggles.standardWidth = ensureIncludeToggle(
-          standardWidthInput,
-          "standardWidthInclude",
-          "Include"
-        );
-        includeToggles.standardHeight = ensureIncludeToggle(
-          standardHeightInput,
-          "standardHeightInclude",
-          "Include"
-        );
+        ensureMeasurementToggles({
+          input: sizeUsMenInput,
+          key: "sizeUsMen",
+          includeId: "sizeUsMenInclude",
+          verifiedId: "sizeUsMenVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+          container: sizeUsMenToggles,
+        });
+        ensureMeasurementToggles({
+          input: sizeUsWomenInput,
+          key: "sizeUsWomen",
+          includeId: "sizeUsWomenInclude",
+          verifiedId: "sizeUsWomenVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+          container: sizeUsWomenToggles,
+        });
+        ensureMeasurementToggles({
+          input: sizeUkInput,
+          key: "sizeUk",
+          includeId: "sizeUkInclude",
+          verifiedId: "sizeUkVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+          container: sizeUkToggles,
+        });
+        ensureMeasurementToggles({
+          input: sizeEuInput,
+          key: "sizeEu",
+          includeId: "sizeEuInclude",
+          verifiedId: "sizeEuVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+          container: sizeEuToggles,
+        });
+        ensureMeasurementToggles({
+          input: sizeAuInput,
+          key: "sizeAu",
+          includeId: "sizeAuInclude",
+          verifiedId: "sizeAuVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+          container: sizeAuToggles,
+        });
+        ensureMeasurementToggles({
+          input: sizeWidthInput,
+          key: "sizeWidth",
+          includeId: "sizeWidthInclude",
+          verifiedId: "sizeWidthVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+          container: sizeWidthToggles,
+        });
+        ensureMeasurementToggles({
+          input: outsoleLengthInput,
+          key: "outsoleLength",
+          includeId: "outsoleLengthInclude",
+          verifiedId: "outsoleLengthVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: outsoleWidthInput,
+          key: "outsoleWidth",
+          includeId: "outsoleWidthInclude",
+          verifiedId: "outsoleWidthVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: insoleLengthInput,
+          key: "insoleLength",
+          includeId: "insoleLengthInclude",
+          verifiedId: "insoleLengthVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: insoleWidthInput,
+          key: "insoleWidth",
+          includeId: "insoleWidthInclude",
+          verifiedId: "insoleWidthVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: heelHeightInput,
+          key: "heelHeight",
+          includeId: "heelHeightInclude",
+          verifiedId: "heelHeightVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: platformHeightInput,
+          key: "platformHeight",
+          includeId: "platformHeightInclude",
+          verifiedId: "platformHeightVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: toeBoxHeightInput,
+          key: "toeBoxHeight",
+          includeId: "toeBoxHeightInclude",
+          verifiedId: "toeBoxHeightVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: weightLbInput,
+          key: "weight",
+          includeId: "weightInclude",
+          verifiedId: "weightVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: shaftHeightInput,
+          key: "shaftHeight",
+          includeId: "shaftHeightInclude",
+          verifiedId: "shaftHeightVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: shaftCircInput,
+          key: "shaftCirc",
+          includeId: "shaftCircInclude",
+          verifiedId: "shaftCircVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: calfCircInput,
+          key: "calfCirc",
+          includeId: "calfCircInclude",
+          verifiedId: "calfCircVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: garmentChestInput,
+          key: "garmentChest",
+          includeId: "garmentChestInclude",
+          verifiedId: "garmentChestVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: garmentLengthInput,
+          key: "garmentLength",
+          includeId: "garmentLengthInclude",
+          verifiedId: "garmentLengthVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: garmentShoulderInput,
+          key: "garmentShoulder",
+          includeId: "garmentShoulderInclude",
+          verifiedId: "garmentShoulderVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: garmentSleeveInput,
+          key: "garmentSleeve",
+          includeId: "garmentSleeveInclude",
+          verifiedId: "garmentSleeveVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: garmentWaistInput,
+          key: "garmentWaist",
+          includeId: "garmentWaistInclude",
+          verifiedId: "garmentWaistVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: garmentInseamInput,
+          key: "garmentInseam",
+          includeId: "garmentInseamInclude",
+          verifiedId: "garmentInseamVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: garmentRiseInput,
+          key: "garmentRise",
+          includeId: "garmentRiseInclude",
+          verifiedId: "garmentRiseVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: garmentHipInput,
+          key: "garmentHip",
+          includeId: "garmentHipInclude",
+          verifiedId: "garmentHipVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: standardLengthInput,
+          key: "standardLength",
+          includeId: "standardLengthInclude",
+          verifiedId: "standardLengthVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: standardWidthInput,
+          key: "standardWidth",
+          includeId: "standardWidthInclude",
+          verifiedId: "standardWidthVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
+        ensureMeasurementToggles({
+          input: standardHeightInput,
+          key: "standardHeight",
+          includeId: "standardHeightInclude",
+          verifiedId: "standardHeightVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+        });
       }
 
       function isIncluded(toggle) {
         return !toggle || toggle.checked;
+      }
+
+      function isVerified(toggle) {
+        return Boolean(toggle && toggle.checked);
       }
 
       function parseNumber(value) {
@@ -1748,7 +2011,7 @@
 
       function getSizeOffsets(data) {
         const intended = getIntendedForValues(data).map((item) =>
-          String(item).toLowerCase()
+          String(item).toLowerCase(),
         );
         const isUnisex = intended.includes("unisex");
         const isWomen = intended.includes("women") && !isUnisex;
@@ -1760,7 +2023,7 @@
 
       function getPreferredUsType(data) {
         const intended = getIntendedForValues(data).map((item) =>
-          String(item).toLowerCase()
+          String(item).toLowerCase(),
         );
         const isUnisex = intended.includes("unisex");
         const isWomen = intended.includes("women") && !isUnisex;
@@ -1858,6 +2121,7 @@
         if (!input || value === null || Number.isNaN(value)) return;
         if (sourceKey && inputKey === sourceKey) return;
         input.value = value;
+        updateIncludeToggleForInput(input);
       }
 
       function applySizeConversions(data, rawOverride) {
@@ -1868,11 +2132,12 @@
           sizeUsWomenInput,
           values.usWomen,
           values.source,
-          "us_w"
+          "us_w",
         );
         setSizeInputValue(sizeUkInput, values.uk, values.source, "uk");
         setSizeInputValue(sizeEuInput, values.eu, values.source, "eu");
         setSizeInputValue(sizeAuInput, values.au, values.source, "au");
+        syncSizeVerifiedDefaults(values);
         return values;
       }
 
@@ -1904,17 +2169,54 @@
         return raw;
       }
 
-      function formatWidthText(raw) {
-        const cleaned = String(raw || "").trim();
-        const label = normalizeWidthLabel(cleaned);
-        if (!label) return "Reg";
-        if (!cleaned) return label;
-        const compact = cleaned.replace(/[^a-z0-9]/gi, "");
-        const isCodeOnly = /^[a-z0-9]+$/i.test(compact) && compact.length <= 3;
-        if (isCodeOnly && label !== cleaned) {
-          return `${cleaned} (${label})`;
+      function normalizeWidthCode(value) {
+        const raw = String(value || "").trim();
+        if (!raw) return "";
+        const lower = raw.toLowerCase();
+        if (["us", "uk", "eu", "au"].includes(lower)) return "";
+        if (lower.includes("narrow")) return "B";
+        if (
+          lower.includes("xx") ||
+          lower.includes("4e") ||
+          lower.includes("eeee")
+        ) {
+          return "EEEE";
         }
-        return label;
+        if (lower.includes("extra")) return "EEE";
+        if (lower.includes("wide") || lower === "w") return "EE";
+        if (lower === "reg" || lower === "regular" || lower === "m") {
+          return "D";
+        }
+        const compact = lower.replace(/[^a-z0-9]/g, "");
+        if (["us", "uk", "eu", "au"].includes(compact)) return "";
+        if (compact === "d") return "D";
+        if (compact === "b" || compact === "c") return "B";
+        if (compact === "e" || compact === "ee" || compact === "2e") {
+          return "EE";
+        }
+        if (compact === "eee" || compact === "3e") return "EEE";
+        if (compact === "4e" || compact === "eeee") return "EEEE";
+        return compact ? compact.toUpperCase() : "";
+      }
+
+      function getWidthLabelFromCode(code) {
+        const compact = String(code || "")
+          .trim()
+          .toUpperCase();
+        if (!compact) return "";
+        if (["B", "C", "A", "AA", "AAA"].includes(compact)) return "Narrow";
+        if (compact === "D" || compact === "M") return "Reg";
+        if (compact === "E" || compact === "EE") return "Wide";
+        if (compact === "EEE") return "Extra Wide";
+        if (compact === "EEEE") return "XXWide";
+        return normalizeWidthLabel(compact);
+      }
+
+      function formatWidthTag(raw) {
+        const code = normalizeWidthCode(raw);
+        if (!code) return "";
+        const label = getWidthLabelFromCode(code);
+        return label ? `${code} ${label} Width` : `${code} Width`;
       }
 
       function formatNumber(value, decimals) {
@@ -1933,13 +2235,31 @@
         return `${formatNumber(value * 2.54, 1)} cm`;
       }
 
-      function formatPounds(value, verified) {
-        const text = `${formatNumber(value, 2)} lb`;
-        return verified ? text : `~${text}`;
-      }
-
       function formatKilograms(value) {
         return `${formatNumber(value * 0.453592, 2)} kg`;
+      }
+
+      function formatWeightParts(lb, oz) {
+        const parts = [];
+        if (lb !== null && !Number.isNaN(lb)) {
+          parts.push(`${formatNumber(lb, 0)} lb`);
+        }
+        if (oz !== null && !Number.isNaN(oz)) {
+          const ozText = `${formatNumber(oz, 0)} oz`;
+          if (!parts.length) {
+            parts.push(`0 lb`);
+          }
+          parts.push(ozText);
+        }
+        return parts.join(" ");
+      }
+
+      function getWeightPartsFromInputs() {
+        const lb = parseNumber(weightLbInput?.value);
+        const oz = parseNumber(weightOzInput?.value);
+        const hasValue = lb !== null || oz !== null;
+        const totalPounds = hasValue ? (lb || 0) + (oz || 0) / 16 : null;
+        return { lb, oz, totalPounds, hasValue };
       }
 
       function addMeasurementLine(
@@ -1948,7 +2268,7 @@
         lines,
         imperial,
         metric,
-        verified
+        verified,
       ) {
         if (inches === null) return;
         const inText = formatInches(inches, verified);
@@ -1958,10 +2278,18 @@
         metric.push(`${label}: ${cmText}`);
       }
 
-      function addWeightLine(label, pounds, lines, imperial, metric, verified) {
-        if (pounds === null) return;
-        const lbText = formatPounds(pounds, verified);
-        const kgText = formatKilograms(pounds);
+      function addWeightLine(
+        label,
+        weightParts,
+        lines,
+        imperial,
+        metric,
+        verified,
+      ) {
+        if (!weightParts || weightParts.totalPounds === null) return;
+        const weightText = formatWeightParts(weightParts.lb, weightParts.oz);
+        const lbText = verified ? weightText : `~${weightText}`;
+        const kgText = formatKilograms(weightParts.totalPounds);
         lines.push(`${label}: ${lbText} (${kgText})`);
         imperial.push(`${label}: ${lbText}`);
         metric.push(`${label}: ${kgText}`);
@@ -1980,11 +2308,15 @@
           return "";
         }
         const intended = getIntendedForValues(data).map((item) =>
-          String(item).toLowerCase()
+          String(item).toLowerCase(),
         );
         const isUnisex = intended.includes("unisex");
         const isWomen = intended.includes("women") && !isUnisex;
-        const verified = measurementsVerifiedToggle?.checked;
+        const usMenVerified = isVerified(verifiedToggles.sizeUsMen);
+        const usWomenVerified = isVerified(verifiedToggles.sizeUsWomen);
+        const ukVerified = isVerified(verifiedToggles.sizeUk);
+        const euVerified = isVerified(verifiedToggles.sizeEu);
+        const auVerified = isVerified(verifiedToggles.sizeAu);
         const deriveUsFromValues = (offsets) => {
           if (values.uk !== null) return values.uk - offsets.usToUk;
           if (values.eu !== null) return values.eu - offsets.usToEu;
@@ -2031,46 +2363,71 @@
           }
           womenValue = null;
         }
-        const usMenText = formatSizeValue(menValue, menEstimated, verified);
+        const usMenText = formatSizeValue(
+          menValue,
+          menEstimated,
+          usMenVerified,
+        );
         const usWomenText = formatSizeValue(
           womenValue,
           womenEstimated,
-          verified
+          usWomenVerified,
         );
         const ukText = formatSizeValue(
           values.uk,
           values.estimated?.uk,
-          verified
+          ukVerified,
         );
         const euText = formatSizeValue(
           values.eu,
           values.estimated?.eu,
-          verified
+          euVerified,
         );
         const auText = formatSizeValue(
           values.au,
           values.estimated?.au,
-          verified
+          auVerified,
         );
         const parts = [];
         if (isUnisex) {
-          if (usMenText !== null) parts.push(`US M ${usMenText}`);
-          if (usWomenText !== null) parts.push(`US W ${usWomenText}`);
+          if (usMenText !== null && isIncluded(includeToggles.sizeUsMen)) {
+            parts.push(`US M ${usMenText}`);
+          }
+          if (usWomenText !== null && isIncluded(includeToggles.sizeUsWomen)) {
+            parts.push(`US W ${usWomenText}`);
+          }
         } else {
           if (isWomen) {
-            if (usWomenText !== null) parts.push(`US W ${usWomenText}`);
-          } else if (usMenText !== null) {
+            if (
+              usWomenText !== null &&
+              isIncluded(includeToggles.sizeUsWomen)
+            ) {
+              parts.push(`US W ${usWomenText}`);
+            }
+          } else if (
+            usMenText !== null &&
+            isIncluded(includeToggles.sizeUsMen)
+          ) {
             parts.push(`US M ${usMenText}`);
           }
         }
-        if (ukText !== null) parts.push(`UK ${ukText}`);
-        if (euText !== null) parts.push(`EU ${euText}`);
-        if (auText !== null) parts.push(`AU ${auText}`);
-        const widthText = formatWidthText(width);
-        return `${parts.join(" / ")} / Width ${widthText}`;
+        if (ukText !== null && isIncluded(includeToggles.sizeUk)) {
+          parts.push(`UK ${ukText}`);
+        }
+        if (euText !== null && isIncluded(includeToggles.sizeEu)) {
+          parts.push(`EU ${euText}`);
+        }
+        if (auText !== null && isIncluded(includeToggles.sizeAu)) {
+          parts.push(`AU ${auText}`);
+        }
+        const widthText = formatWidthTag(width);
+        if (widthText && isIncluded(includeToggles.sizeWidth)) {
+          parts.push(widthText);
+        }
+        return parts.join(" / ");
       }
 
-      function inferBaseSizeFromText(text) {
+      function inferBaseSizeFromText(text, data) {
         const input = String(text || "");
         const usMenMatch = input.match(/US\s*M\s*([0-9.]+)/i);
         const usWomenMatch = input.match(/US\s*W\s*([0-9.]+)/i);
@@ -2091,12 +2448,27 @@
           if (unique.find((item) => item.key === key)) return;
           unique.push({ key, value });
         });
-        if (unique.length !== 1) return null;
-        return unique[0];
+        const preferredKey =
+          getPreferredUsType(data || currentData) === "women" ? "us_w" : "us_m";
+        const preferred =
+          unique.find((item) => item.key === preferredKey) ||
+          unique.find((item) => item.key === "us_m") ||
+          unique.find((item) => item.key === "us_w");
+        if (preferred) return preferred;
+        if (unique.length === 1) return unique[0];
+        const plainMatch = input.match(/^\s*([0-9]+(?:\.[0-9]+)?)/);
+        if (plainMatch) {
+          const usType = getPreferredUsType(data || currentData);
+          return {
+            key: usType === "women" ? "us_w" : "us_m",
+            value: plainMatch[1],
+          };
+        }
+        return null;
       }
 
       function normalizeSizeInputsFromBase(data) {
-        const base = inferBaseSizeFromText(data?.size_or_fit);
+        const base = inferBaseSizeFromText(data?.size_or_fit, data);
         if (!base) return;
         const value = parseNumber(base.value);
         if (value === null) return;
@@ -2127,31 +2499,85 @@
         }
       }
 
+      function syncSizeInputsFromSizeOrFit(data) {
+        if (!data) return;
+        const sizeText = String(data.size_or_fit || "").trim();
+        const clearInputs = [
+          sizeUsMenInput,
+          sizeUsWomenInput,
+          sizeUkInput,
+          sizeEuInput,
+          sizeAuInput,
+          sizeWidthInput,
+        ];
+        clearInputs.forEach((input) => {
+          if (!input) return;
+          input.value = "";
+          updateIncludeToggleForInput(input);
+        });
+        if (!sizeText) return;
+        const base = inferBaseSizeFromText(sizeText, data);
+        if (base) {
+          const value = parseNumber(base.value);
+          if (value !== null) {
+            if (base.key === "us_m") {
+              sizeUsMenInput.value = value;
+              lastSizeEdited = "us_m";
+            } else if (base.key === "us_w") {
+              sizeUsWomenInput.value = value;
+              lastSizeEdited = "us_w";
+            } else if (base.key === "uk") {
+              sizeUkInput.value = value;
+              lastSizeEdited = "uk";
+            } else if (base.key === "eu") {
+              sizeEuInput.value = value;
+              lastSizeEdited = "eu";
+            } else if (base.key === "au") {
+              sizeAuInput.value = value;
+              lastSizeEdited = "au";
+            }
+            if (data) data.last_size_edited = lastSizeEdited;
+          }
+        }
+        const widthMatch = sizeText.match(/Width\s*([A-Za-z0-9]+)/i);
+        let widthValue = widthMatch ? widthMatch[1] : "";
+        if (!widthValue) {
+          const trailingWidthMatch = sizeText.match(
+            /[0-9]+(?:\.[0-9]+)?\s*([A-Za-z]{1,4}|[0-9]E)\b/i,
+          );
+          widthValue = trailingWidthMatch ? trailingWidthMatch[1] : "";
+        }
+        const widthCode = normalizeWidthCode(widthValue);
+        if (widthCode) {
+          sizeWidthInput.value = widthCode;
+        }
+        clearInputs.forEach((input) => {
+          if (!input) return;
+          updateIncludeToggleForInput(input);
+        });
+        applySizeConversions(data, getRawSizeInputs());
+      }
+
       function buildSizeOrFitValue(data) {
         const raw = getRawSizeInputs();
         const source = resolveSizeBase(raw, lastSizeEdited, data);
         if (!source) return "";
         let value = null;
-        let sizeLabel = "";
         if (source === "us_m") {
           value = raw.usMen;
-          sizeLabel = "US M";
         } else if (source === "us_w") {
           value = raw.usWomen;
-          sizeLabel = "US W";
         } else if (source === "uk") {
           value = raw.uk;
-          sizeLabel = "UK";
         } else if (source === "eu") {
           value = raw.eu;
-          sizeLabel = "EU";
         } else if (source === "au") {
           value = raw.au;
-          sizeLabel = "AU";
         }
         if (value === null) return "";
         const sizeText = formatNumber(value, 1);
-        return `${sizeLabel} ${sizeText}`;
+        const widthCode = normalizeWidthCode(sizeWidthInput?.value);
+        return widthCode ? `${sizeText} ${widthCode}` : sizeText;
       }
 
       function updateSizeOrFitFromHelper(data) {
@@ -2159,15 +2585,10 @@
         const next = buildSizeOrFitValue(data);
         const current = String(data.size_or_fit || "").trim();
         const hasPlaceholder = current.includes("__");
-        const currentWidthMatch = current.match(/Width\s*([^)]+)/i);
-        const currentWidthRaw = currentWidthMatch
-          ? currentWidthMatch[1].trim()
-          : "";
-        const currentWidthFormatted = currentWidthRaw
-          ? formatWidthText(currentWidthRaw)
-          : "";
-        const widthNeedsNormalize =
-          currentWidthRaw && currentWidthFormatted !== currentWidthRaw;
+        const needsNormalize =
+          /\b(US|UK|EU|AU)\b/i.test(current) ||
+          /Width/i.test(current) ||
+          current.includes("/");
         if (!next) {
           if (hasPlaceholder) {
             data.size_or_fit = "";
@@ -2183,7 +2604,7 @@
           current &&
           current !== lastAutoSize &&
           !hasPlaceholder &&
-          !widthNeedsNormalize
+          !needsNormalize
         ) {
           return;
         }
@@ -2267,7 +2688,7 @@
           shaftHeight: parseNumber(shaftHeightInput?.value),
           shaftCirc: parseNumber(shaftCircInput?.value),
           calfCirc: parseNumber(calfCircInput?.value),
-          weightValue: parseNumber(weightValueInput?.value),
+          weightParts: getWeightPartsFromInputs(),
           garmentChest: parseNumber(garmentChestInput?.value),
           garmentLength: parseNumber(garmentLengthInput?.value),
           garmentShoulder: parseNumber(garmentShoulderInput?.value),
@@ -2281,21 +2702,18 @@
           standardHeight: parseNumber(standardHeightInput?.value),
         };
 
-        let sizeTag = buildSizeTagFromInputs(currentData);
-        if (!sizeTag) {
-          sizeTag = String(currentData.size_or_fit || "").trim();
-        }
+        const sizeTag = buildSizeTagFromInputs(currentData);
         const hasMeasurements = hasMeasurementInputs(values);
-        if (!hasMeasurements && !(sizeTag && isIncluded(includeToggles.size))) {
+        if (!hasMeasurements && !sizeTag) {
           return;
         }
 
         const lines = [];
         const imperial = [];
         const metric = [];
-        const verified = measurementsVerifiedToggle?.checked;
+        const isMeasurementVerified = (key) => isVerified(verifiedToggles[key]);
 
-        if (sizeTag && isIncluded(includeToggles.size)) {
+        if (sizeTag) {
           lines.push(`Size / Fit: ${sizeTag}`);
         }
 
@@ -2307,7 +2725,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("outsoleLength"),
             );
           }
           if (isIncluded(includeToggles.outsoleWidth)) {
@@ -2317,7 +2735,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("outsoleWidth"),
             );
           }
           if (isIncluded(includeToggles.insoleLength)) {
@@ -2327,7 +2745,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("insoleLength"),
             );
           }
           if (isIncluded(includeToggles.insoleWidth)) {
@@ -2337,7 +2755,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("insoleWidth"),
             );
           }
           if (isIncluded(includeToggles.heelHeight)) {
@@ -2347,7 +2765,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("heelHeight"),
             );
           }
           if (isIncluded(includeToggles.platformHeight)) {
@@ -2357,7 +2775,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("platformHeight"),
             );
           }
           if (isIncluded(includeToggles.toeBoxHeight)) {
@@ -2367,7 +2785,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("toeBoxHeight"),
             );
           }
 
@@ -2379,7 +2797,7 @@
                 lines,
                 imperial,
                 metric,
-                verified
+                isMeasurementVerified("shaftHeight"),
               );
             }
             if (isIncluded(includeToggles.shaftCirc)) {
@@ -2389,7 +2807,7 @@
                 lines,
                 imperial,
                 metric,
-                verified
+                isMeasurementVerified("shaftCirc"),
               );
             }
             if (isIncluded(includeToggles.calfCirc)) {
@@ -2399,13 +2817,13 @@
                 lines,
                 imperial,
                 metric,
-                verified
+                isMeasurementVerified("calfCirc"),
               );
             }
           }
 
           if (
-            values.weightValue !== null &&
+            values.weightParts?.hasValue &&
             isIncluded(includeToggles.weight)
           ) {
             const weightLabel =
@@ -2414,11 +2832,11 @@
                 : "Weight (pair)";
             addWeightLine(
               weightLabel,
-              values.weightValue,
+              values.weightParts,
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("weight"),
             );
           }
         }
@@ -2431,7 +2849,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("garmentChest"),
             );
           }
           if (isIncluded(includeToggles.garmentLength)) {
@@ -2441,7 +2859,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("garmentLength"),
             );
           }
           if (isIncluded(includeToggles.garmentShoulder)) {
@@ -2451,7 +2869,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("garmentShoulder"),
             );
           }
           if (isIncluded(includeToggles.garmentSleeve)) {
@@ -2461,7 +2879,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("garmentSleeve"),
             );
           }
           if (isIncluded(includeToggles.garmentWaist)) {
@@ -2471,7 +2889,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("garmentWaist"),
             );
           }
           if (isIncluded(includeToggles.garmentInseam)) {
@@ -2481,7 +2899,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("garmentInseam"),
             );
           }
           if (isIncluded(includeToggles.garmentRise)) {
@@ -2491,7 +2909,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("garmentRise"),
             );
           }
           if (isIncluded(includeToggles.garmentHip)) {
@@ -2501,7 +2919,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("garmentHip"),
             );
           }
         }
@@ -2514,7 +2932,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("standardLength"),
             );
           }
           if (isIncluded(includeToggles.standardWidth)) {
@@ -2524,7 +2942,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("standardWidth"),
             );
           }
           if (isIncluded(includeToggles.standardHeight)) {
@@ -2534,7 +2952,7 @@
               lines,
               imperial,
               metric,
-              verified
+              isMeasurementVerified("standardHeight"),
             );
           }
         }
@@ -2542,9 +2960,6 @@
         setFieldValue("measurements", lines);
         setFieldValue("measurements_imperial", imperial);
         setFieldValue("measurements_metric", metric);
-        currentData.measurements_verified = Boolean(
-          measurementsVerifiedToggle?.checked
-        );
         currentData.last_size_edited = lastSizeEdited || "";
         updateListperfectlyDescription(currentData);
         saveSession();
@@ -2558,18 +2973,18 @@
             : measurementTemplateSelect.value;
         if (shoeFields) {
           shoeFields.style.display =
-            template === "shoe" || template === "boot" ? "block" : "none";
+            template === "shoe" || template === "boot" ? "flex" : "none";
         }
         if (bootFields) {
-          bootFields.style.display = template === "boot" ? "block" : "none";
+          bootFields.style.display = template === "boot" ? "flex" : "none";
         }
         if (garmentFields) {
           garmentFields.style.display =
-            template === "garment" ? "block" : "none";
+            template === "garment" ? "flex" : "none";
         }
         if (standardFields) {
           standardFields.style.display =
-            template === "standard" ? "block" : "none";
+            template === "standard" ? "flex" : "none";
         }
       }
 
@@ -2578,9 +2993,14 @@
         return match ? Number.parseFloat(match[1]) : null;
       }
 
-      function extractPounds(line) {
-        const match = String(line || "").match(/:\s*~?([\d.]+)\s*lb\b/i);
-        return match ? Number.parseFloat(match[1]) : null;
+      function extractWeightParts(line) {
+        const text = String(line || "");
+        const lbMatch = text.match(/:\s*~?([\d.]+)\s*lb\b/i);
+        const ozMatch = text.match(/([\d.]+)\s*oz\b/i);
+        const lb = lbMatch ? Number.parseFloat(lbMatch[1]) : null;
+        const oz = ozMatch ? Number.parseFloat(ozMatch[1]) : null;
+        if (lb === null && oz === null) return null;
+        return { lb, oz };
       }
 
       function setInputValue(input, value) {
@@ -2613,50 +3033,50 @@
         setFromLabel(
           "Outsole length (heel-to-toe)",
           outsoleLengthInput,
-          extractInches
+          extractInches,
         );
         setFromLabel(
           "Outsole width (widest)",
           outsoleWidthInput,
-          extractInches
+          extractInches,
         );
         setFromLabel(
           "Insole length (heel to toe)",
           insoleLengthInput,
-          extractInches
+          extractInches,
         );
         setFromLabel(
           "Insole width (ball area)",
           insoleWidthInput,
-          extractInches
+          extractInches,
         );
         setFromLabel("Heel height", heelHeightInput, extractInches);
         setFromLabel(
           "Platform height (forefoot)",
           platformHeightInput,
-          extractInches
+          extractInches,
         );
         setFromLabel("Toe box height", toeBoxHeightInput, extractInches);
         setFromLabel(
           "Shaft height (from outsole)",
           shaftHeightInput,
-          extractInches
+          extractInches,
         );
         setFromLabel(
           "Shaft opening (circumference)",
           shaftCircInput,
-          extractInches
+          extractInches,
         );
         setFromLabel(
           "Calf circumference (widest point)",
           calfCircInput,
-          extractInches
+          extractInches,
         );
         setFromLabel("Chest (pit to pit)", garmentChestInput, extractInches);
         setFromLabel(
           "Length (shoulder to hem)",
           garmentLengthInput,
-          extractInches
+          extractInches,
         );
         setFromLabel("Shoulder width", garmentShoulderInput, extractInches);
         setFromLabel("Sleeve length", garmentSleeveInput, extractInches);
@@ -2670,8 +3090,10 @@
 
         lines.forEach((line) => {
           if (!line.toLowerCase().includes("weight")) return;
-          const pounds = extractPounds(line);
-          setInputValue(weightValueInput, pounds);
+          const parts = extractWeightParts(line);
+          if (!parts) return;
+          if (parts.lb !== null) setInputValue(weightLbInput, parts.lb);
+          if (parts.oz !== null) setInputValue(weightOzInput, parts.oz);
           if (weightPerSelect) {
             if (line.toLowerCase().includes("per boot")) {
               weightPerSelect.value = "boot";
@@ -2696,7 +3118,33 @@
           if (ukMatch) setInputValue(sizeUkInput, ukMatch[1]);
           if (euMatch) setInputValue(sizeEuInput, euMatch[1]);
           if (auMatch) setInputValue(sizeAuInput, auMatch[1]);
-          if (widthMatch) setInputValue(sizeWidthInput, widthMatch[1]);
+          if (
+            !usMenMatch &&
+            !usWomenMatch &&
+            !usMatch &&
+            !ukMatch &&
+            !euMatch &&
+            !auMatch
+          ) {
+            const plainMatch = sizeText.match(/^\s*([0-9]+(?:\.[0-9]+)?)/);
+            if (plainMatch) {
+              const preferred = getPreferredUsType(data);
+              if (preferred === "women") {
+                setInputValue(sizeUsWomenInput, plainMatch[1]);
+              } else {
+                setInputValue(sizeUsMenInput, plainMatch[1]);
+              }
+            }
+          }
+          let widthValue = widthMatch ? widthMatch[1] : "";
+          if (!widthValue) {
+            const trailingWidthMatch = sizeText.match(
+              /[0-9]+(?:\.[0-9]+)?\s*([A-Za-z]{1,4}|[0-9]E)\b/i,
+            );
+            widthValue = trailingWidthMatch ? trailingWidthMatch[1] : "";
+          }
+          const widthCode = normalizeWidthCode(widthValue);
+          if (widthCode) setInputValue(sizeWidthInput, widthCode);
         }
         updateSizeOrFitFromHelper(data);
       }
@@ -2741,7 +3189,7 @@
         try {
           window.localStorage.setItem(
             sessionStorageKey,
-            JSON.stringify(currentData)
+            JSON.stringify(currentData),
           );
         } catch (err) {
           // Ignore storage errors.
@@ -2784,11 +3232,6 @@
         lastSizeEdited = currentData?.last_size_edited || null;
         if (lastSizeEdited === "us") lastSizeEdited = "us_m";
         includeDefaultsApplied = false;
-        if (measurementsVerifiedToggle) {
-          measurementsVerifiedToggle.checked = Boolean(
-            currentData?.measurements_verified
-          );
-        }
         if (measurementTemplateSelect) {
           measurementTemplateSelect.value = "auto";
         }
@@ -2801,10 +3244,15 @@
             input.value = "";
           });
         }
-        measurementTogglePairs.forEach(({ toggle }) => {
-          if (!toggle) return;
-          toggle.checked = false;
-          toggle.dataset.manual = "false";
+        measurementTogglePairs.forEach(({ includeToggle, verifiedToggle }) => {
+          if (includeToggle) {
+            includeToggle.checked = false;
+            includeToggle.dataset.manual = "false";
+          }
+          if (verifiedToggle) {
+            verifiedToggle.checked = false;
+            verifiedToggle.dataset.manual = "false";
+          }
         });
       }
 
@@ -2944,10 +3392,10 @@
         addSection("Country of Origin", readPreviewValue("country_of_origin"));
         const previewMeasurements = toLines(readPreviewValue("measurements"));
         const sizeTag = buildSizeTagFromInputs(currentData);
-        if (sizeTag && (!includeToggles.size || includeToggles.size.checked)) {
+        if (sizeTag) {
           const sizeLine = `Size / Fit: ${sizeTag}`;
           const sizeIdx = previewMeasurements.findIndex((line) =>
-            /^size\s*\/\s*fit:/i.test(line)
+            /^size\s*\/\s*fit:/i.test(line),
           );
           if (sizeIdx >= 0) {
             previewMeasurements[sizeIdx] = sizeLine;
@@ -2984,18 +3432,18 @@
         }
         if (!maxProfitTime && !minProfitTime) {
           profitLines.push(
-            `Time To Sell: ${readPreviewValue("time_to_sell_sentence")}`
+            `Time To Sell: ${readPreviewValue("time_to_sell_sentence")}`,
           );
         }
         addSection("Profit Estimates", profitLines);
         addSection(
           "Shipping Estimate",
-          readPreviewValue("shipping_estimate_sentence")
+          readPreviewValue("shipping_estimate_sentence"),
         );
         addSection("Fees Breakdown", [
           `Platform fees: ${readPreviewValue("platform_fee_estimate")}`,
           `Payment processing: ${readPreviewValue(
-            "payment_processing_fee_estimate"
+            "payment_processing_fee_estimate",
           )}`,
           `Labor: ${readPreviewValue("labor_cost_estimate")}`,
           `Fees or Other Costs: ${readPreviewValue("fees_or_other_costs")}`,
@@ -3018,7 +3466,7 @@
           <section>
             <h2>${escapeHtml(section.label)}</h2>
             ${section.html}
-          </section>`
+          </section>`,
           )
           .join("");
 
@@ -3158,8 +3606,8 @@
         const rawValue = field.getValue
           ? field.getValue(data)
           : data
-          ? data[field.key]
-          : "";
+            ? data[field.key]
+            : "";
         const displayValue = field.format
           ? field.format(rawValue)
           : toStringValue(rawValue);
@@ -3204,9 +3652,13 @@
             if (field.key === "platforms") {
               currentData.platforms = parsePlatforms(input.value);
             }
-          if (field.key === "intended_for") {
-            handleMeasurementInput();
-          }
+            if (field.key === "intended_for") {
+              handleMeasurementInput();
+            }
+            if (field.key === "size_or_fit") {
+              syncSizeInputsFromSizeOrFit(currentData);
+              handleMeasurementInput();
+            }
             if (
               [
                 "measurements",
@@ -3231,9 +3683,11 @@
               normalizeMsrp(currentData);
             }
             if (
-              ["purchase_date", "purchase_location", "offer_recommendation"].includes(
-                field.key
-              )
+              [
+                "purchase_date",
+                "purchase_location",
+                "offer_recommendation",
+              ].includes(field.key)
             ) {
               updateSellerNotes(currentData);
             }
@@ -3429,7 +3883,7 @@
         const facebookPlatformFields = [
           buildPlatformReasonField(
             "Facebook Marketplace",
-            "Facebook Marketplace Reason"
+            "Facebook Marketplace Reason",
           ),
         ];
         const shopifyPlatformFields = [
@@ -3492,46 +3946,46 @@
         ];
 
         listperfectlyFields.forEach((field) =>
-          addField(field, data, lpFieldsContainer)
+          addField(field, data, lpFieldsContainer),
         );
         ebayPlatformFields.forEach((field) =>
-          addField(field, data, ebayPlatformFieldsContainer)
+          addField(field, data, ebayPlatformFieldsContainer),
         );
         depopPlatformFields.forEach((field) =>
-          addField(field, data, depopPlatformFieldsContainer)
+          addField(field, data, depopPlatformFieldsContainer),
         );
         etsyPlatformFields.forEach((field) =>
-          addField(field, data, etsyPlatformFieldsContainer)
+          addField(field, data, etsyPlatformFieldsContainer),
         );
         poshmarkPlatformFields.forEach((field) =>
-          addField(field, data, poshmarkPlatformFieldsContainer)
+          addField(field, data, poshmarkPlatformFieldsContainer),
         );
         mercariPlatformFields.forEach((field) =>
-          addField(field, data, mercariPlatformFieldsContainer)
+          addField(field, data, mercariPlatformFieldsContainer),
         );
         grailedPlatformFields.forEach((field) =>
-          addField(field, data, grailedPlatformFieldsContainer)
+          addField(field, data, grailedPlatformFieldsContainer),
         );
         facebookPlatformFields.forEach((field) =>
-          addField(field, data, facebookPlatformFieldsContainer)
+          addField(field, data, facebookPlatformFieldsContainer),
         );
         shopifyPlatformFields.forEach((field) =>
-          addField(field, data, shopifyPlatformFieldsContainer)
+          addField(field, data, shopifyPlatformFieldsContainer),
         );
         vestiairePlatformFields.forEach((field) =>
-          addField(field, data, vestiairePlatformFieldsContainer)
+          addField(field, data, vestiairePlatformFieldsContainer),
         );
         vintedPlatformFields.forEach((field) =>
-          addField(field, data, vintedPlatformFieldsContainer)
+          addField(field, data, vintedPlatformFieldsContainer),
         );
         whatnotPlatformFields.forEach((field) =>
-          addField(field, data, whatnotPlatformFieldsContainer)
+          addField(field, data, whatnotPlatformFieldsContainer),
         );
         miscTypesFields.forEach((field) =>
-          addField(field, data, typesMiscFieldsContainer)
+          addField(field, data, typesMiscFieldsContainer),
         );
         additionalFields.forEach((field) =>
-          addField(field, data, additionalFieldsContainer)
+          addField(field, data, additionalFieldsContainer),
         );
         updateListperfectlyDescription(data);
         updateSellerNotes(data);
@@ -3569,7 +4023,8 @@
         heelHeightInput,
         platformHeightInput,
         toeBoxHeightInput,
-        weightValueInput,
+        weightLbInput,
+        weightOzInput,
         shaftHeightInput,
         shaftCircInput,
         calfCircInput,
@@ -3625,25 +4080,15 @@
         });
       }
 
-      if (measurementsVerifiedToggle) {
-        measurementsVerifiedToggle.addEventListener("change", () => {
-          if (currentData) {
-            currentData.measurements_verified =
-              measurementsVerifiedToggle.checked;
-          }
-          updateMeasurementsFromHelper();
-        });
-      }
-
-      if (saveVerifiedBtn) {
-        saveVerifiedBtn.addEventListener("click", () => {
-          if (measurementsVerifiedToggle) {
-            measurementsVerifiedToggle.checked = true;
-          }
-          if (currentData) {
-            currentData.measurements_verified = true;
-          }
+      if (saveMeasurementsBtn) {
+        saveMeasurementsBtn.addEventListener("click", () => {
+          if (!currentData) return;
           handleMeasurementInput();
+          saveSession();
+          status.textContent = "Measurements saved.";
+          setTimeout(() => {
+            if (items.length) updateStatus();
+          }, 1200);
         });
       }
 
@@ -3685,7 +4130,7 @@
             setMergedMeasurementLabelKeys(
               result.measurementIncomingLabels?.length
                 ? result.measurementIncomingLabels
-                : result.measurementAddedLabels || []
+                : result.measurementAddedLabels || [],
             );
             updateSkuPanel(currentData);
             renderFields(currentData);
@@ -3745,7 +4190,7 @@
               "C:\\\\Users\\\\outdo\\\\Documents\\\\MOOLA-MATIC MINI";
             window.localStorage.setItem(
               "moola_project_path",
-              projectPathInput.value
+              projectPathInput.value,
             );
           } else {
             projectPathInput.value = savedProject;
@@ -3770,7 +4215,7 @@
         if (projectPathInput.value) {
           window.localStorage.setItem(
             "moola_project_path",
-            projectPathInput.value
+            projectPathInput.value,
           );
         }
         if (jsonPathInput.value) {

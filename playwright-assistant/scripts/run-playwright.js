@@ -86,14 +86,53 @@ function getRawValue(obj, keyPath) {
   return current;
 }
 
+function normalizeWidthCode(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const lower = raw.toLowerCase();
+  if (["us", "uk", "eu", "au"].includes(lower)) return "";
+  if (lower.includes("narrow")) return "B";
+  if (lower.includes("xx") || lower.includes("4e") || lower.includes("eeee")) {
+    return "EEEE";
+  }
+  if (lower.includes("extra")) return "EEE";
+  if (lower.includes("wide") || lower === "w") return "EE";
+  if (lower === "reg" || lower === "regular" || lower === "m") {
+    return "D";
+  }
+  const compact = lower.replace(/[^a-z0-9]/g, "");
+  if (["us", "uk", "eu", "au"].includes(compact)) return "";
+  if (compact === "d") return "D";
+  if (compact === "b" || compact === "c") return "B";
+  if (compact === "e" || compact === "ee" || compact === "2e") return "EE";
+  if (compact === "eee" || compact === "3e") return "EEE";
+  if (compact === "4e" || compact === "eeee") return "EEEE";
+  return compact ? compact.toUpperCase() : "";
+}
+
+function extractWidthCode(text) {
+  const widthMatch = text.match(/Width\s*([A-Za-z0-9]+)/i);
+  if (widthMatch) {
+    return normalizeWidthCode(widthMatch[1]);
+  }
+  const trailingWidthMatch = text.match(
+    /[0-9]+(?:\.[0-9]+)?\s*([A-Za-z]{1,4}|[0-9]E)\b/i,
+  );
+  if (trailingWidthMatch) {
+    return normalizeWidthCode(trailingWidthMatch[1]);
+  }
+  return "";
+}
+
 function extractUsSize(value) {
   const text = String(value || "").trim();
   if (!text) return "";
-  const usMatch = text.match(/US\s*([0-9.]+)/i);
-  if (usMatch) return usMatch[1];
+  const usMatch = text.match(/US\s*(?:M|W)?\s*([0-9.]+)/i);
   const numericMatch = text.match(/([0-9]+(?:\.[0-9]+)?)/);
-  if (numericMatch) return numericMatch[1];
-  return text;
+  const size = usMatch ? usMatch[1] : numericMatch ? numericMatch[1] : "";
+  if (!size) return text;
+  const widthCode = extractWidthCode(text);
+  return widthCode ? `${size} ${widthCode}` : size;
 }
 
 function normalizeText(value) {
@@ -178,7 +217,7 @@ async function scrollIfNeeded(locator, field) {
 async function getTagInputLocator(locator) {
   try {
     const inputLocator = locator.locator(
-      "input, textarea, [contenteditable], [role='textbox'], .tagify__input"
+      "input, textarea, [contenteditable], [role='textbox'], .tagify__input",
     );
     if (await inputLocator.count()) {
       return inputLocator.first();
@@ -189,7 +228,7 @@ async function getTagInputLocator(locator) {
         (el) =>
           el.isContentEditable ||
           el.getAttribute("role") === "textbox" ||
-          el.hasAttribute("contenteditable")
+          el.hasAttribute("contenteditable"),
       )
       .catch(() => false);
     if (isEditable) {
@@ -462,7 +501,7 @@ async function fillField(page, field, data, options) {
   }
   if (!locator) {
     console.log(
-      `Skipping ${field.name || selector}: no selector/label/placeholder/text`
+      `Skipping ${field.name || selector}: no selector/label/placeholder/text`,
     );
     return;
   }
@@ -503,7 +542,7 @@ async function fillField(page, field, data, options) {
     const delay = options.typingDelayMs
       ? randomBetween(
           Math.max(0, options.typingDelayMs - 40),
-          options.typingDelayMs + 60
+          options.typingDelayMs + 60,
         )
       : 0;
     await targetLocator.first().type(value, delay ? { delay } : undefined);
@@ -523,7 +562,7 @@ async function fillField(page, field, data, options) {
     await targetLocator.first().fill("");
     const delay = randomBetween(
       Math.max(0, options.typingDelayMs - 40),
-      options.typingDelayMs + 60
+      options.typingDelayMs + 60,
     );
     await targetLocator.first().type(value, { delay });
     if (field.pressEnter) {
@@ -554,7 +593,7 @@ async function main() {
   const jsonPath = getArgValue("--json", "listing.json");
   const selectorsPath = getArgValue(
     "--selectors",
-    path.join(__dirname, "selectors.json")
+    path.join(__dirname, "selectors.json"),
   );
   const safe = process.argv.includes("--safe");
   const headed = process.argv.includes("--headed");
@@ -574,7 +613,7 @@ async function main() {
     if (jsonStat.isDirectory()) {
       console.error(`JSON path is a folder: ${jsonPath}`);
       console.error(
-        "Please download the JSON from the UI and pass the full .json file path."
+        "Please download the JSON from the UI and pass the full .json file path.",
       );
       process.exit(1);
     }
@@ -600,7 +639,7 @@ async function main() {
     Number(typingDelayArg || options.typingDelayMs || (safe ? 90 : 0)) || 0;
   const betweenFieldsDelayMs =
     Number(
-      betweenDelayArg || options.betweenFieldsDelayMs || (safe ? 300 : 0)
+      betweenDelayArg || options.betweenFieldsDelayMs || (safe ? 300 : 0),
     ) || 0;
   const skuOptions = options.sku || {};
   const userDataDir = userDataDirArg || options.userDataDir || "";
@@ -648,7 +687,7 @@ async function main() {
 
   if (options.pauseForManualStart) {
     await waitForEnter(
-      "Complete login/navigation, then press Enter to start auto-fill..."
+      "Complete login/navigation, then press Enter to start auto-fill...",
     );
   }
   if (options.waitForSelector) {
@@ -665,7 +704,7 @@ async function main() {
     if (betweenFieldsDelayMs) {
       const delay = randomBetween(
         Math.max(0, betweenFieldsDelayMs - 120),
-        betweenFieldsDelayMs + 220
+        betweenFieldsDelayMs + 220,
       );
       await sleep(delay);
     }
@@ -693,7 +732,7 @@ async function main() {
       console.log("Submitted form.");
     } else {
       console.log(
-        "Form filled. Review the page, then rerun with --submit if desired."
+        "Form filled. Review the page, then rerun with --submit if desired.",
       );
     }
   } else {
@@ -702,7 +741,7 @@ async function main() {
 
   if (options.pauseForReview) {
     await waitForEnter(
-      "Review the page, then press Enter to close the browser..."
+      "Review the page, then press Enter to close the browser...",
     );
   }
 

@@ -9,6 +9,8 @@ Run mode
 - Trigger: user message begins with "/run-moola" or open `commands/run-moola.md`.
 - Default output: Identify + Value unless the user explicitly says "List" or "Listing".
 - Listing output: follow `Original/MOOLA-MATIC LIST.txt` and `Original/MOOLA-MATIC JSON SCHEMA.txt`.
+- Do not include size info in the description; keep size details in size fields or measurements only.
+- Listing platforms: include ALL supported platforms with Yes/No/Maybe reasons.
 - Measurement estimates must be generated in the initial JSON (not in the UI).
 - Listing JSON: create the JSON file and respond with:
   JSON file created.
