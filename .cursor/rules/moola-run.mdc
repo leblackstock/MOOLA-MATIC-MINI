@@ -6,49 +6,6 @@ alwaysApply: false
 
 # Run mode
 
-- Follow `Original/PROJECT SYSTEM INSTRUCTIONS - MOOLA-MATIC.txt` as reference-only.
+- Source of truth: follow `Original-Editable/PROJECT SYSTEM INSTRUCTIONS - MOOLA-MATIC.txt`, then the file order in `Original-Editable/MOOLA-MATIC PROMPT.txt`.
+- Use `commands/run-moola.md` for the multi-pass workflow and pass-logging behavior.
 - Default output is Identify+Value unless the user explicitly requests List/Listing.
-- If List is requested, follow `Original/MOOLA-MATIC LIST.txt` and `Original/MOOLA-MATIC JSON SCHEMA.txt`.
-- ListPerfectly priority: populate all fields used by `playwright-assistant/scripts/selectors.json` first.
-- When listing, include estimated measurements in the initial JSON output.
-- When listing, include estimated measurements in the listing output when the LIST rules allow it (use "~" and both units).
-- When listing, `included_items` must include one descriptor with the item. Prefer gender when known (e.g., "Men's Boots (pair)"). If gender is not applicable or unknown, use a category descriptor with quantity (e.g., "Decor (1 piece)", "Wall Art (2 pieces)").
-- When listing, set `pre_owned_condition` to Like New/Good/Fair/Poor/None. Use None when `condition_status` is not Pre-Owned.
-- When listing, estimate `era_status` as Vintage (20+ years), Antique (100+ years), Modern, or Unknown, and include a short `era_notes` basis when possible.
-- When listing, if `era_status` is Vintage or Antique, include "vintage" or "antique" in `tags_line` and naturally in the description. Add style terms like "gorpcore" when the item fits outdoor/technical/utilitarian aesthetics.
-- When listing, populate `style_tags` with relevant aesthetic/era/style keywords (e.g., boho, mid century modern, art nouveau, hipster, gorpcore, workwear, western). Include the best 2-5 of these in `tags_line` and naturally in the description when they apply.
-- When listing, use the most relevant 1-2 `style_tags` in the title when they fit naturally (avoid stuffing; keep the title readable and accurate).
-- When listing, use `era_status` and `style_tags` to guide comps: look for comparable sold items that explicitly include those keywords, and base pricing on those comps rather than applying an automatic premium.
-- When listing and exact comps are not available, provide a best-guess price based on the closest modern comps plus adjustments for condition, brand tier, size scarcity, material quality, and relevant `style_tags` demand. Keep the estimate realistic and note that it is a best-guess in the pricing rationale (without adding new JSON keys).
-- When listing, if `era_status` is Vintage or Antique, include Etsy in `platforms` with an honest reason (e.g., "Vintage-focused marketplace; good for retro/heritage styles when keywords like vintage/90s apply.").
-- When listing, if `era_status` is Vintage or Antique, include Vinted in `platforms` with an honest reason (e.g., "Vintage-friendly marketplace; good for retro/heritage styles at accessible price points.").
-- When listing, ensure `msrp` is not lower than `buyer_pays_shipping_price`. If it would be lower or unknown, set `msrp` to the buyer-pays-shipping price.
-- When listing, decide whether to include `offer_recommendation`. Include it for most mid-range items when a reasonable offer strategy would help; omit it for rare/collector/luxury items or when margins are too thin. If included, base it on pricing (e.g., min offer around ~85% of `min_profit_price`, auto-accept above ~90% of `max_profit_price`) and output as a single sentence like: "Offer recommendation: Set min offer to $50, auto accept above $60."
-- When listing, populate `country_of_origin` when known; otherwise leave it blank.
-- When listing, set `comps_day_range` based on expected sales speed: fast sellers (trend/high demand) use shorter windows like 30–60 days; slow sellers (niche, rare sizes, higher price) use 180–365 days.
-- When listing, set `shipping_cost_estimate` to the estimated Priority Mail shipping price.
-- Platforms & Types (LIST mode):
-  - `platforms` array: include ALL supported platforms with a short, honest reason only (no types/occasions/styles text here).
-    - Supported platforms: eBay, Etsy, Poshmark, Mercari, Depop, Grailed, Facebook Marketplace, Shopify, Vestiaire Collective, Vinted, Whatnot.
-    - Each platform reason must start with Yes/No/Maybe, e.g., "Yes: Largest audience for ...", "No: Not the right buyer base", "Maybe: Worth testing if ...".
-  - `types_block`: follow `Original/MOOLA-MATIC TYPES.txt` EXACT format for the item type.
-    - Shoes/boots must include Depop Types + eBay Types + Occasions + Styles.
-    - Occasions/Styles are Depop-focused and should appear only inside `types_block` (no duplicate “misc” lines elsewhere).
-    - Do not add extra lines beyond the required format.
-- When listing, set `fees_or_other_costs` to total costs excluding purchase price; include average eBay platform fees, payment processing fees, and labor.
-- When listing, populate the fee breakdown keys: `platform_fee_estimate`, `payment_processing_fee_estimate`, and `labor_cost_estimate`.
-- Fee defaults: platform fee 13% of sale price; payment processing $0.30.
-- Labor defaults: 20 minutes at $20/hr if item is clean and photo-ready; add time for cleaning/repair/refurbishment.
-- When listing, populate profit estimates: `max_profit_price` and `max_profit_estimate` (full price, buyer pays shipping) and `min_profit_price` and `min_profit_estimate` (near-guaranteed quick sale, buyer pays shipping). Also add time-to-sell estimates for each: `max_profit_time_to_sell` and `min_profit_time_to_sell`. Use: profit = sale price - platform fee - payment processing - labor - COGS (exclude shipping when buyer pays shipping).
-- When listing and a box size is mentioned or implied, warn if any size breakpoint would be exceeded (1 cu ft, length > 22", length > 30", or 2 cu ft).
-- When listing and pricing is checked, choose the cheapest Priority option (flat rate vs regular). Use the matching box dimensions from `templates/shipping/usps-priority-boxes.txt` and populate `package_length`, `package_width`, and `package_height` in the JSON. Estimate and populate `shipping_weight_lb` and `shipping_weight_oz`.
-- When listing, create the JSON file and respond with:
-  "JSON file created."
-- Creativity levels (LIST mode):
-  - Hook: High (marketing flair allowed, still factual; offer to solve a problem). Keep it distinct from the description.
-  - Description: High (engaging, vivid, still factual). Do not repeat the hook; add new details and benefits.
-  - Description: include the most searched keywords naturally in sentences.
-  - CTA: High (friendly, energetic prompt, include light urgency)
-  - CTA style: use a sentence similar to "Photos show condition and measurements; ask if you need a specific angle or detail confirmed—grab them before they're gone."
-  - Hook/Description emphasis: lead with a vivid, factual use-case or setting when appropriate (e.g., "built for the fairway and sharp enough for the clubhouse"), then support with specific construction/features. Avoid generic, feature-only phrasing.
-- Ask only one question when required to proceed.

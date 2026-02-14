@@ -1,6 +1,6 @@
 {
   "sku": "",
-  "title": "Dr. Martens Orson Brown Leather Mule Sandals UK 4 US M5 W6.5 Unisex",
+  "title": "Dr. Martens Orson Brown Leather Mule Sandals UK 4 Unisex",
   "listperfectly_description": "Slip into retro Dr. Martens comfort for easy summer errands and weekend hangs.\nThese Dr. Martens Orson leather mule slide sandals feature a pebbled brown upper, open toe, and classic yellow welt stitching over an AirWair sole. Made in Thailand with a suede footbed, they wear as an easy unisex slip-on for casual outfits and warm-weather travel. Marked UK 4 (US M 5 / US W 6.5 / EU 37) with a 9 in insole; fit note: wearer (US W7.5) found them slightly small, likely fits US W6.5.\nIncluded is one pair of unisex Dr. Martens sandals.\n- Unisex Sandals (pair)\nMeasured for fit:\n- Insole length: 9 in (22.9 cm)\nPhotos show condition and measurements; ask if you need a specific angle or detail confirmed--grab them before they're gone.",
   "hook": "Slip into retro Dr. Martens comfort for easy summer errands and weekend hangs.",
   "description": "These Dr. Martens Orson leather mule slide sandals feature a pebbled brown upper, open toe, and classic yellow welt stitching over an AirWair sole. Made in Thailand with a suede footbed, they wear as an easy unisex slip-on for casual outfits and warm-weather travel. Marked UK 4 (US M 5 / US W 6.5 / EU 37) with a 9 in insole; fit note: wearer (US W7.5) found them slightly small, likely fits US W6.5.",
@@ -13,7 +13,14 @@
   "color": "Brown/Tan",
   "material": "Leather upper, suede footbed",
   "style_features": "Orson model, slip-on mule, open toe, AirWair sole, contrast stitching",
-  "size_or_fit": "UK 4 / US M 5 / US W 6.5 / EU 37 (unisex)",
+  "size_or_fit": "4",
+  "original_size": {
+    "system": "UK",
+    "gender": "Unisex",
+    "age": "",
+    "size": "4",
+    "width": ""
+  },
   "country_of_origin": "Thailand",
   "era_status": "Unknown",
   "era_notes": "",

@@ -47,7 +47,14 @@
   "color": "Leopard print, black, purple",
   "material": "Real fur (pony hair) upper; leather upper; man made sole",
   "style_features": "Platform, stiletto heel, ankle bootie, wrap straps, buckle, leopard print pony hair, purple outsole",
-  "size_or_fit": "US 7.5",
+  "size_or_fit": "7.5",
+  "original_size": {
+    "system": "US",
+    "gender": "Women",
+    "age": "",
+    "size": "7.5",
+    "width": ""
+  },
   "country_of_origin": "China",
   "era_status": "Vintage",
   "era_notes": "2006 per owner; Y2K-era styling.",

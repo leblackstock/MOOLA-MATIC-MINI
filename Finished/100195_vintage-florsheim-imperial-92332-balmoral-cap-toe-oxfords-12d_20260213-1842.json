@@ -1,33 +1,36 @@
 {
-  "sku": "",
+  "sku": "100195",
   "title": "Vintage Florsheim Imperial 92332 Balmoral Cap-Toe Oxfords 12D",
-  "listperfectly_description": "Timeless craftsmanship with brogued cap-toe and classic Balmoral facing.\nCrafted January 1977, these vintage Florsheim Imperial Oxfords feature a sleek Balmoral silhouette with baroque cap-toe and facing. Goodyear welted black leather with leather soles and Cat's Paw heels. Built for formal wear and collectors of American-made craftsmanship.\nIncludes one pair of men's oxford dress shoes.\n- Men's Oxfords (pair)\nApproximate measurements (estimates) are below.\n- Outsole length (heel-to-toe): ~12.75 in (32.4 cm)\n- Outsole width (widest): ~4.5 in (11.4 cm)\n- Insole length (heel to toe): ~12.25 in (31.1 cm)\n- Insole width (ball area): ~4.0 in (10.2 cm)\n- Heel height: ~1.0 in (2.5 cm)\n- Weight (pair): ~2.8 lb (1.27 kg)\nPhotos show condition and measurements; ask if you need a specific angle or detail confirmed—grab them before they're gone.",
+  "listperfectly_description": "Timeless craftsmanship with brogued cap-toe and classic Balmoral facing.\n\nCrafted January 1977, these vintage Florsheim Imperial Oxfords feature a sleek Balmoral silhouette with baroque cap-toe and facing. Goodyear welted black leather with leather soles and Cat's Paw heels. Built for formal wear and collectors of American-made craftsmanship.\n\nYou will receive the following item(s):\n- Men's Oxfords (pair)\n\nMeasurements:\n- Size / Fit: US M 12 / UK ~11 / EU ~44 / AU ~11 / D Reg Width\n- Outsole length (heel-to-toe): ~12.8 in (32.5 cm)\n- Outsole width (widest): ~4.5 in (11.4 cm)\n- Insole length (heel to toe): ~12.3 in (31.2 cm)\n- Insole width (ball area): ~4 in (10.2 cm)\n- Heel height: ~1 in (2.5 cm)\n- Weight (pair): ~2 lb 5 oz (1.05 kg)\n\nPhotos show condition and measurements; ask if you need a specific angle or detail confirmed—grab them before they're gone.",
   "hook": "Timeless craftsmanship with brogued cap-toe and classic Balmoral facing.",
   "description": "Crafted January 1977, these vintage Florsheim Imperial Oxfords feature a sleek Balmoral silhouette with baroque cap-toe and facing. Goodyear welted black leather with leather soles and Cat's Paw heels. Built for formal wear and collectors of American-made craftsmanship.",
-  "included_items": ["Men's Oxfords (pair)"],
+  "included_items": [
+    "Men's Oxfords (pair)"
+  ],
   "measurements": [
-    "Outsole length (heel-to-toe): ~12.75 in (32.4 cm)",
+    "Size / Fit: US M 12 / UK ~11 / EU ~44 / AU ~11 / D Reg Width",
+    "Outsole length (heel-to-toe): ~12.8 in (32.5 cm)",
     "Outsole width (widest): ~4.5 in (11.4 cm)",
-    "Insole length (heel to toe): ~12.25 in (31.1 cm)",
-    "Insole width (ball area): ~4.0 in (10.2 cm)",
-    "Heel height: ~1.0 in (2.5 cm)",
-    "Weight (pair): ~2.8 lb (1.27 kg)"
+    "Insole length (heel to toe): ~12.3 in (31.2 cm)",
+    "Insole width (ball area): ~4 in (10.2 cm)",
+    "Heel height: ~1 in (2.5 cm)",
+    "Weight (pair): ~2 lb 5 oz (1.05 kg)"
   ],
   "measurements_imperial": [
-    "Outsole length (heel-to-toe): ~12.75 in",
+    "Outsole length (heel-to-toe): ~12.8 in",
     "Outsole width (widest): ~4.5 in",
-    "Insole length (heel to toe): ~12.25 in",
-    "Insole width (ball area): ~4.0 in",
-    "Heel height: ~1.0 in",
-    "Weight (pair): ~2.8 lb"
+    "Insole length (heel to toe): ~12.3 in",
+    "Insole width (ball area): ~4 in",
+    "Heel height: ~1 in",
+    "Weight (pair): ~2 lb 5 oz"
   ],
   "measurements_metric": [
-    "Outsole length (heel-to-toe): ~32.4 cm",
-    "Outsole width (widest): ~11.4 cm",
-    "Insole length (heel to toe): ~31.1 cm",
-    "Insole width (ball area): ~10.2 cm",
-    "Heel height: ~2.5 cm",
-    "Weight (pair): ~1.27 kg"
+    "Outsole length (heel-to-toe): 32.5 cm",
+    "Outsole width (widest): 11.4 cm",
+    "Insole length (heel to toe): 31.2 cm",
+    "Insole width (ball area): 10.2 cm",
+    "Heel height: 2.5 cm",
+    "Weight (pair): 1.05 kg"
   ],
   "cta": "Photos show condition and measurements; ask if you need a specific angle or detail confirmed—grab them before they're gone.",
   "brand": "Florsheim",
@@ -45,8 +48,12 @@
   "country_of_origin": "",
   "era_status": "Vintage",
   "era_notes": "Dated Jan 1977",
-  "style_tags": ["vintage", "preppy", "retro"],
-  "tags_line": "Florsheim, Imperial, Oxfords, Balmoral, Vintage, Leather, Cap-Toe, Dress Shoes, Brogue, Cat's Paw, 92332, Size 12D",
+  "style_tags": [
+    "vintage",
+    "preppy",
+    "retro"
+  ],
+  "tags_line": "Florsheim, Imperial, Oxfords, Balmoral, Vintage, Leather, Cap-Toe, Dress Shoes, Brogue, Cat's Paw, 92332, Size 12D, US M12, UK11, EU44, AU11",
   "condition_status": "Pre-Owned",
   "pre_owned_condition": "Good",
   "condition": "Good vintage condition with minor wear on the soles and some creasing on the leather uppers. Uppers are polished and structurally sound; original Cat's Paw heels intact.",
@@ -55,14 +62,16 @@
   "msrp": "119.99",
   "upc": "",
   "quantity": "1",
-  "intended_for": ["Men"],
+  "intended_for": [
+    "Men"
+  ],
   "shipping_weight_lb": "4",
   "shipping_weight_oz": "0",
   "package_length": "14.875",
   "package_width": "7.375",
   "package_height": "5.25",
   "shipping_zip": "30236",
-  "notes": "06/05/2022 Purchased from Goodwill",
+  "notes": "Set min offer to $75, auto accept above $108.\n06/05/2022 Purchased from Goodwill",
   "purchase_date": "06/05/2022",
   "purchase_location": "Goodwill",
   "tags": [
@@ -77,7 +86,11 @@
     "Brogue",
     "Cat's Paw",
     "92332",
-    "Size 12D"
+    "Size 12D",
+    "US M12",
+    "UK11",
+    "EU44",
+    "AU11"
   ],
   "pricing_sentence": "Retail estimate: $119.99; Free shipping: $129.99 | Buyer pays shipping: $119.99",
   "free_shipping_price": "129.99",
@@ -99,11 +112,11 @@
   "platforms": [
     {
       "platform": "eBay",
-      "reason": "Largest audience for vintage men's dress shoes and bigger sizes."
+      "reason": "Yes: Largest audience for vintage men's dress shoes."
     },
     {
       "platform": "Etsy",
-      "reason": "Vintage-focused marketplace; strong fit for 1970s Florsheim Imperials."
+      "reason": "Yes: Vintage-focused marketplace; strong fit for 1970s Florsheim Imperials."
     },
     {
       "platform": "Poshmark",
@@ -115,7 +128,7 @@
     },
     {
       "platform": "Depop",
-      "reason": "Maybe: Vintage menswear can move if styled; size 12 may be slower."
+      "reason": "Maybe: Vintage menswear can move if styled."
     },
     {
       "platform": "Grailed",
@@ -143,6 +156,7 @@
     }
   ],
   "types_block": "Depop Shoes Type: Oxfords\nEbay Shoes Type: Loafers\nOccasions: Work, Special Occasion, Going out\nStyles: Preppy, Retro, Casual",
-  "listing_body": "Timeless craftsmanship with brogued cap-toe and classic Balmoral facing.\nCrafted January 1977, these vintage Florsheim Imperial Oxfords feature a sleek Balmoral silhouette with baroque cap-toe and facing. Goodyear welted black leather with leather soles and Cat's Paw heels. Built for formal wear and collectors of American-made craftsmanship.\nIncludes one pair of men's oxford dress shoes.\n- Men's Oxfords (pair)\nApproximate measurements (estimates) are below.\n- Outsole length (heel-to-toe): ~12.75 in (32.4 cm)\n- Outsole width (widest): ~4.5 in (11.4 cm)\n- Insole length (heel to toe): ~12.25 in (31.1 cm)\n- Insole width (ball area): ~4.0 in (10.2 cm)\n- Heel height: ~1.0 in (2.5 cm)\n- Weight (pair): ~2.8 lb (1.27 kg)\nFlorsheim, Imperial, Oxfords, Balmoral, Vintage, Leather, Cap-Toe, Dress Shoes, Brogue, Cat's Paw, 92332, Size 12D\nGood vintage condition with minor wear on the soles and some creasing on the leather uppers. Uppers are polished and structurally sound; original Cat's Paw heels intact.\nPhotos show condition and measurements; ask if you need a specific angle or detail confirmed—grab them before they're gone.\nRetail estimate: $119.99; Free shipping: $129.99 | Buyer pays shipping: $119.99\nEstimated shipping is $18 via USPS Priority Mail shoe box based on a 4 lb pair.\nEstimated time to sell: about 3 months due to vintage niche size and collector appeal.",
-  "question": "None"
+  "listing_body": "Timeless craftsmanship with brogued cap-toe and classic Balmoral facing.\nCrafted January 1977, these vintage Florsheim Imperial Oxfords feature a sleek Balmoral silhouette with baroque cap-toe and facing. Goodyear welted black leather with leather soles and Cat's Paw heels. Built for formal wear and collectors of American-made craftsmanship.\nIncludes one pair of men's oxford dress shoes.\n- Men's Oxfords (pair)\nApproximate measurements (estimates) are below.\n- Outsole length (heel-to-toe): ~12.75 in (32.4 cm)\n- Outsole width (widest): ~4.5 in (11.4 cm)\n- Insole length (heel to toe): ~12.25 in (31.1 cm)\n- Insole width (ball area): ~4.0 in (10.2 cm)\n- Heel height: ~1.0 in (2.5 cm)\n- Weight (pair): ~2.8 lb (1.27 kg)\nFlorsheim, Imperial, Oxfords, Balmoral, Vintage, Leather, Cap-Toe, Dress Shoes, Brogue, Cat's Paw, 92332, Size 12D, US M12, UK11, EU44, AU11\nGood vintage condition with minor wear on the soles and some creasing on the leather uppers. Uppers are polished and structurally sound; original Cat's Paw heels intact.\nPhotos show condition and measurements; ask if you need a specific angle or detail confirmed—grab them before they're gone.\nRetail estimate: $119.99; Free shipping: $129.99 | Buyer pays shipping: $119.99\nEstimated shipping is $18 via USPS Priority Mail shoe box based on a 4 lb pair.\nEstimated time to sell: about 3 months due to vintage niche size and collector appeal.",
+  "question": "None",
+  "last_size_edited": "us_m"
 }

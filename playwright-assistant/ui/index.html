@@ -374,7 +374,9 @@
               </div>
             </div>
             <div class="note">
-              Width note: Reg, Wide, Extra Wide, XXWide, Narrow. Default to Reg.
+              Original size drives conversions + Verified. Width only if printed
+              (Reg/Wide/Extra Wide/XXWide/Narrow). If blank, Size / Fit shows
+              Reg Width.
             </div>
           </div>
           <div class="field">
@@ -664,6 +666,7 @@
       let fieldLabelMap = {};
       let lastAutoNotes = [];
       let lastAutoSize = "";
+      let originalSizeRef = null;
       let includeToggles = {};
       let verifiedToggles = {};
       let measurementTogglePairs = [];
@@ -1668,7 +1671,11 @@
                 input === weightLbInput
                   ? getWeightPartsFromInputs().hasValue
                   : Boolean(String(input.value || "").trim());
-              includeToggle.checked = hasValue;
+              if (input === sizeWidthInput) {
+                includeToggle.checked = true;
+              } else {
+                includeToggle.checked = hasValue;
+              }
               includeToggle.dataset.manual = "false";
             }
             if (verifiedToggle) {
@@ -1695,8 +1702,12 @@
             ? getWeightPartsFromInputs().hasValue
             : Boolean(String(input.value || "").trim());
         if (!hasValue) {
-          pair.includeToggle.checked = false;
-          pair.includeToggle.dataset.manual = "false";
+          if (targetInput !== sizeWidthInput) {
+            pair.includeToggle.checked = false;
+            pair.includeToggle.dataset.manual = "false";
+          } else if (pair.includeToggle.dataset.manual !== "true") {
+            pair.includeToggle.checked = true;
+          }
           if (pair.verifiedToggle) {
             pair.verifiedToggle.checked = false;
             pair.verifiedToggle.dataset.manual = "false";
@@ -1739,7 +1750,11 @@
         const widthToggle = verifiedToggles.sizeWidth;
         if (widthToggle) {
           const hasWidth = Boolean(String(sizeWidthInput?.value || "").trim());
-          setToggleChecked(widthToggle, hasWidth);
+          if (originalSizeRef) {
+            setToggleChecked(widthToggle, Boolean(originalSizeRef.width));
+          } else {
+            setToggleChecked(widthToggle, hasWidth);
+          }
         }
       }
 
@@ -1993,6 +2008,63 @@
         const cleaned = String(value || "").replace(/[^0-9.]/g, "");
         const parsed = Number.parseFloat(cleaned);
         return Number.isFinite(parsed) ? parsed : null;
+      }
+
+      function getOriginalSizeReference(data) {
+        const original = data?.original_size;
+        if (!original || typeof original !== "object") return null;
+        const system = String(original.system || "").trim().toUpperCase();
+        const sizeValue = parseNumber(original.size);
+        if (!system || sizeValue === null) return null;
+        const gender = String(original.gender || "").trim().toLowerCase();
+        const width = normalizeWidthCode(original.width || "");
+        let key = null;
+        if (system === "US") {
+          key = gender === "women" ? "us_w" : "us_m";
+        } else if (system === "UK") {
+          key = "uk";
+        } else if (system === "EU") {
+          key = "eu";
+        } else if (system === "AU") {
+          key = "au";
+        }
+        if (!key) return null;
+        return { key, size: sizeValue, width, system, gender };
+      }
+
+      function applyOriginalSizeReference(data, options = {}) {
+        const { preserveExisting = false } = options;
+        const reference = getOriginalSizeReference(data);
+        originalSizeRef = reference;
+        if (!reference) return false;
+        const inputMap = {
+          us_m: sizeUsMenInput,
+          us_w: sizeUsWomenInput,
+          uk: sizeUkInput,
+          eu: sizeEuInput,
+          au: sizeAuInput,
+        };
+        const target = inputMap[reference.key];
+        if (target) {
+          if (preserveExisting) {
+            setInputValue(target, reference.size);
+          } else {
+            target.value = reference.size;
+            clearOtherSizeInputs(target);
+          }
+          updateIncludeToggleForInput(target);
+        }
+        if (sizeWidthInput) {
+          if (preserveExisting) {
+            if (reference.width) setInputValue(sizeWidthInput, reference.width);
+          } else {
+            sizeWidthInput.value = reference.width || "";
+          }
+          updateIncludeToggleForInput(sizeWidthInput);
+        }
+        lastSizeEdited = reference.key;
+        if (data) data.last_size_edited = reference.key;
+        return true;
       }
 
       function formatSizeValue(value, estimated, verified) {
@@ -2295,7 +2367,8 @@
         metric.push(`${label}: ${kgText}`);
       }
 
-      function buildSizeTagFromInputs(data) {
+      function buildSizeTagFromInputs(data, options = {}) {
+        const { defaultWidthReg = false } = options;
         const raw = getRawSizeInputs();
         const values = applySizeConversions(data, raw);
         const width = String(sizeWidthInput?.value || "").trim();
@@ -2420,7 +2493,10 @@
         if (auText !== null && isIncluded(includeToggles.sizeAu)) {
           parts.push(`AU ${auText}`);
         }
-        const widthText = formatWidthTag(width);
+        let widthText = formatWidthTag(width);
+        if (!widthText && defaultWidthReg) {
+          widthText = "Reg Width";
+        }
         if (widthText && isIncluded(includeToggles.sizeWidth)) {
           parts.push(widthText);
         }
@@ -2515,6 +2591,12 @@
           input.value = "";
           updateIncludeToggleForInput(input);
         });
+        const usedOriginal = applyOriginalSizeReference(data);
+        if (usedOriginal) {
+          applySizeConversions(data, getRawSizeInputs());
+          return;
+        }
+        originalSizeRef = null;
         if (!sizeText) return;
         const base = inferBaseSizeFromText(sizeText, data);
         if (base) {
@@ -2702,7 +2784,9 @@
           standardHeight: parseNumber(standardHeightInput?.value),
         };
 
-        const sizeTag = buildSizeTagFromInputs(currentData);
+        const sizeTag = buildSizeTagFromInputs(currentData, {
+          defaultWidthReg: true,
+        });
         const hasMeasurements = hasMeasurementInputs(values);
         if (!hasMeasurements && !sizeTag) {
           return;
@@ -3103,6 +3187,15 @@
           }
         });
 
+        const usedOriginal = applyOriginalSizeReference(data, {
+          preserveExisting: true,
+        });
+        if (usedOriginal) {
+          applySizeConversions(data, getRawSizeInputs());
+          updateSizeOrFitFromHelper(data);
+          return;
+        }
+        originalSizeRef = null;
         const sizeText = String(data.size_or_fit || "");
         if (sizeText) {
           const usMenMatch = sizeText.match(/US\s*M\s*([0-9.]+)/i);
@@ -3229,6 +3322,7 @@
 
       function resetMeasurementHelper() {
         lastAutoSize = "";
+        originalSizeRef = null;
         lastSizeEdited = currentData?.last_size_edited || null;
         if (lastSizeEdited === "us") lastSizeEdited = "us_m";
         includeDefaultsApplied = false;
@@ -3391,7 +3485,9 @@
         addSection("Material", readPreviewValue("material"));
         addSection("Country of Origin", readPreviewValue("country_of_origin"));
         const previewMeasurements = toLines(readPreviewValue("measurements"));
-        const sizeTag = buildSizeTagFromInputs(currentData);
+        const sizeTag = buildSizeTagFromInputs(currentData, {
+          defaultWidthReg: true,
+        });
         if (sizeTag) {
           const sizeLine = `Size / Fit: ${sizeTag}`;
           const sizeIdx = previewMeasurements.findIndex((line) =>
@@ -4045,24 +4141,32 @@
         if (!input) return;
         input.addEventListener("input", () => {
           if (input === sizeUsMenInput) {
+            originalSizeRef = null;
             lastSizeEdited = "us_m";
             clearOtherSizeInputs(sizeUsMenInput);
           }
           if (input === sizeUsWomenInput) {
+            originalSizeRef = null;
             lastSizeEdited = "us_w";
             clearOtherSizeInputs(sizeUsWomenInput);
           }
           if (input === sizeUkInput) {
+            originalSizeRef = null;
             lastSizeEdited = "uk";
             clearOtherSizeInputs(sizeUkInput);
           }
           if (input === sizeEuInput) {
+            originalSizeRef = null;
             lastSizeEdited = "eu";
             clearOtherSizeInputs(sizeEuInput);
           }
           if (input === sizeAuInput) {
+            originalSizeRef = null;
             lastSizeEdited = "au";
             clearOtherSizeInputs(sizeAuInput);
+          }
+          if (input === sizeWidthInput) {
+            originalSizeRef = null;
           }
           updateIncludeToggleForInput(input);
           handleMeasurementInput();

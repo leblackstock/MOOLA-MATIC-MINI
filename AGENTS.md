@@ -7,17 +7,9 @@ Two modes are supported: Run and Edit.
 Run mode
 
 - Trigger: user message begins with "/run-moola" or open `commands/run-moola.md`.
+- Source of truth: follow `Original-Editable/PROJECT SYSTEM INSTRUCTIONS - MOOLA-MATIC.txt`, then the file order in `Original-Editable/MOOLA-MATIC PROMPT.txt`.
+- Workflow details (multi-pass, logging, JSON handling) live in `commands/run-moola.md` and the `Original-Editable/*.txt` files.
 - Default output: Identify + Value unless the user explicitly says "List" or "Listing".
-- Listing output: follow `Original/MOOLA-MATIC LIST.txt` and `Original/MOOLA-MATIC JSON SCHEMA.txt`.
-- Do not include size info in the description; keep size details in size fields or measurements only.
-- Listing platforms: include ALL supported platforms with Yes/No/Maybe reasons.
-- Measurement estimates must be generated in the initial JSON (not in the UI).
-- Listing JSON: create the JSON file and respond with:
-  JSON file created.
-- ListPerfectly priority: fill all fields used by `playwright-assistant/scripts/selectors.json` first.
-- After a List run, load the generated JSON file in the Playwright UI to review/edit and download.
-- Creativity levels (LIST mode): Hook = High, Description = Medium, CTA = Medium (all factual).
-- CTA style: use a sentence similar to “Photos show condition and measurements; ask if you need a specific angle or detail confirmed.”
 
 Edit mode
 
@@ -27,8 +19,8 @@ Edit mode
 
 Reference-only files
 
-- `Original/*.txt` are the authoritative reference and must NOT be modified.
-  Use them to guide behavior, but implement changes in Cursor-native files.
+- `Original/*.txt` are reference-only and must NOT be modified.
+- Use `Original-Editable/*.txt` as the editable source of truth.
 
 Templates
 

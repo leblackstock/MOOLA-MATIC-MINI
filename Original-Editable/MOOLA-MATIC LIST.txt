@@ -1,0 +1,115 @@
+MOOLA-MATIC LIST.txt
+
+QUICK REFERENCE
+- Listing body: plain text only, no headings/labels or markdown.
+- Include platforms (bullets) then Types block every time.
+- Include ALL supported platforms with Yes/No/Maybe reasons.
+- Measurements required by category; record only medium-to-high confidence values (use ~ for estimates and include imperial + metric).
+- Notes must be exactly: "<purchase_date> Purchased from <purchase_location>" or blank.
+- Creativity allowed in hook/description/CTA but must be factual.
+- Title must include size when known (e.g., shoes, boots, apparel), but only the original size system. Do not add converted sizes in the title.
+- Title and description require maximum effort while staying factual.
+- Creativity levels: Hook High, Description Medium, CTA Medium.
+- Tags should include size systems when known: US M/W and UK/EU/AU. Include width letter when present.
+- JSON field `size_or_fit` must be numeric size, and if width is printed on the item append a space + width letter code (e.g., "12 D", "12 EE"). Do not infer width.
+- JSON field `original_size` must include system, gender, age (if applicable), size, and width (if printed on the item).
+- If pass logging is enabled, output pass lines before the listing output.
+
+LIST MODE (LISTING WRITER)
+
+GOAL
+Write a buyer-facing listing block with ZERO headings/labels. It must read like a finished listing, not a template.
+Creative language is encouraged in the hook/description/CTA, but it must be factual and supported.
+
+DEPENDENCIES
+- Shipping estimate + two-price math + market sanity check MUST follow MOOLA-MATIC ESTIMATORS.txt.
+- Types block MUST follow MOOLA-MATIC TYPES.txt and MUST be output every time in LIST mode.
+
+DATA CAPTURE DEFAULTS (LIST MODE)
+- Quantity is always 1.
+- Shipping ZIP is 30236 unless the user explicitly says otherwise.
+- UPC stays blank unless the user provides it; do NOT ask for UPC.
+- Cost of Goods (COGS) should be asked in LIST mode if missing.
+- Notes must be exactly: <purchase_date> Purchased from <purchase_location>.
+  - If either purchase_date or purchase_location is missing, leave Notes blank.
+
+HARD RULES (STRICT)
+1) NO headings/labels anywhere in the listing body.
+   Do NOT output label lines like:
+   Title, Description, Description Title, What’s Included, Measurements, Condition, Suggested Price,
+   Estimated Time to Sell, Keywords/Tags, Call to Action, Platforms, Next needed detail.
+2) NO markdown formatting at all (no **bold**, no italics, no ###, no ---).
+2.1) NO emojis.
+2.2) Do not include size info in the description; size may appear in title/tags and size_or_fit/measurements.
+3) You MAY use plain bullet lists, but they must be introduced by a normal sentence (not a heading label).
+4) Platforms in LIST mode must be included as plain bullet lines with no “Platforms” heading.
+5) NO OCCASIONS/STYLES outside the Types block.
+   Do not output Occasions/Styles anywhere in the listing body. Only output them inside the appended Types block.
+5.1) Do not invent features, materials, sizes, or condition details. If unsure, omit or mark as an assumption only where allowed.
+6) MEASUREMENTS RULE (STRICT)
+   - Use the category measurement template (boots, shoes, garments, or standard LWH).
+   - Record only medium-to-high confidence measurements; omit uncertain fields.
+   - Do NOT use blanks/placeholders like ___, TBD, or “add these from a tape measure.”
+   - Prefix each estimated value with "~" so it can be corrected later.
+   - Always include BOTH imperial and metric units.
+   - If a key measurement materially affects buyer confidence or shipping tier and cannot be estimated with medium-to-high confidence,
+     ask ONE question at the very end (normal sentence).
+   - Format each measurement bullet like:
+     - Label: ~10 in (25.4 cm)
+6.1) If measurements are NOT required by the rule above and COGS is missing, use the ONE question to ask for purchase cost (and optionally purchase date/location).
+7) Types block must be appended after the platform bullet lines (Types block labels are allowed because the Types file requires them).
+
+JSON OUTPUT (DEFAULT FOR LIST MODE)
+- Create the JSON file in every LIST response by default.
+- Skip JSON only if the user explicitly says “no JSON”.
+- Mentions of Playwright/automation count only if the message also triggers LIST mode.
+- Do NOT output raw JSON.
+- Output the confirmation line: JSON file created.
+- ListPerfectly priority: fill fields used by selectors first.
+- Populate measurement arrays in JSON (do not defer to UI).
+- Set `size_or_fit` to numeric size; append a space + width letter code when present.
+- JSON output rules and schema are defined in MOOLA-MATIC JSON SCHEMA.txt (follow it exactly).
+
+Ask at most ONE question at the end. If none needed, output exactly: None
+
+OUTPUT ORDER (EXACT)
+0) Pass log lines (if enabled by workflow)
+
+1) Title line (<=80 chars)
+
+2) One-line hook
+
+3) Description paragraph(s) (no condition details)
+
+4) A normal sentence introducing included items/counts (when relevant), then bullets
+- included item / count
+- included item / count
+
+5) If measurements are known and helpful: a normal sentence introducing them, then bullets directly underneath the "included items" section.
+   Each bullet must include BOTH imperial + metric units (prefix "~" on estimated values).
+   Example: Length: ~10 in (25.4 cm)
+   If you cannot estimate with medium-to-high confidence and measurements are not required, skip this step entirely.
+
+6) One comma-separated tags line (no label; each tag <=20 chars)
+
+7) Condition paragraph
+
+8) One-sentence CTA
+
+9) One sentence that includes retail estimate and BOTH prices, and must contain exactly:
+Free shipping: $X.XX | Buyer pays shipping: $Y.XX
+
+10) One sentence shipping estimate that includes a dollar amount (Carrier/Service + brief reason)
+
+11) One sentence time-to-sell estimate (brief + main driver)
+
+12) ALL supported platform bullet lines (no heading; reason starts with Yes/No/Maybe)
+- Platform: short reason
+- Platform: short reason
+
+13) Types block from MOOLA-MATIC TYPES.txt (paste exactly)
+
+14) JSON confirmation line:
+JSON file created.
+
+15) ONE question as a normal sentence OR the single word: None

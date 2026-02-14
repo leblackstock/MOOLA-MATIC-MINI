@@ -47,7 +47,14 @@
   "color": "Brown, tan, black",
   "material": "Leather upper; rubber toe bumper and outsole; padded synthetic collar",
   "style_features": "Instep strap, lace-up, padded collar, lug outsole, rubber toe bumper, metal eyelets",
-  "size_or_fit": "US 13 / UK ~12 / EU ~46 / Width D (Reg)",
+  "size_or_fit": "13 D",
+  "original_size": {
+    "system": "US",
+    "gender": "Men",
+    "age": "",
+    "size": "13",
+    "width": "D"
+  },
   "era_status": "Vintage",
   "era_notes": "Likely 1990s based on Polo Sport label/style.",
   "style_tags": ["vintage", "gorpcore", "90s"],

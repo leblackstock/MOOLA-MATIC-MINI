@@ -37,7 +37,14 @@
   "color": "Brown",
   "material": "Leather upper, rubber sole",
   "style_features": "3-eye lace-up, yellow welt stitching, air-cushion sole, stitched welt, low-profile oxford",
-  "size_or_fit": "UK 4",
+  "size_or_fit": "4",
+  "original_size": {
+    "system": "UK",
+    "gender": "Unisex",
+    "age": "",
+    "size": "4",
+    "width": ""
+  },
   "country_of_origin": "England",
   "era_status": "Vintage",
   "era_notes": "Made in England production suggests older run; exact year unknown.",

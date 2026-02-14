@@ -13,7 +13,14 @@
   "color": "<color_or_blank>",
   "material": "<material_or_blank>",
   "style_features": "<style_features_or_blank>",
-  "size_or_fit": "<size_or_fit_or_blank>",
+  "size_or_fit": "<size_number_or_width_or_blank>",
+  "original_size": {
+    "system": "<size_system_or_blank>",
+    "gender": "<size_gender_or_blank>",
+    "age": "<size_age_or_blank>",
+    "size": "<size_number_or_blank>",
+    "width": "<width_letter_or_blank>"
+  },
   "country_of_origin": "<country_of_origin_or_blank>",
   "era_status": "<Vintage_or_Antique_or_Modern_or_Unknown>",
   "era_notes": "<era_notes_or_blank>",

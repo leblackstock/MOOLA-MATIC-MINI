@@ -40,7 +40,14 @@
   "color": "Black",
   "material": "Leather upper; stamped leather sole; metal spikes",
   "style_features": "Full brogue cap toe, kiltie fringe, derby lace-up, metal spikes, stamped leather sole",
-  "size_or_fit": "US 11.5 D",
+  "size_or_fit": "11.5 D",
+  "original_size": {
+    "system": "US",
+    "gender": "Men",
+    "age": "",
+    "size": "11.5",
+    "width": "D"
+  },
   "country_of_origin": "USA",
   "era_status": "Vintage",
   "era_notes": "Late 1970s to early 1980s based on Medina model verification.",

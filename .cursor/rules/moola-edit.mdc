@@ -7,5 +7,6 @@ alwaysApply: false
 # Edit mode
 - Focus on improving rules, templates, schemas, and workflow docs.
 - Keep `Original/*.txt` as reference-only; do not modify them.
-- Prefer edits in `.cursor/rules/`, `AGENTS.md`, and `commands/`.
+- Use `Original-Editable/*.txt` for editable prompt/rule updates (primary source of truth).
+- Keep `.cursor/rules/`, `AGENTS.md`, and `commands/` in sync with Original-Editable.
 - Do not output listings in Edit mode.
