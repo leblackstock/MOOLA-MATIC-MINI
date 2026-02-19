@@ -35,8 +35,10 @@ Identify (assumptions):
 Pricing sanity check:
 - <sanity_line>
 
-Platforms to list on (why): (ONLY if user explicitly asked for platforms)
+Platforms to list on (why):
 - <Platform_1>: <reason>
 - <Platform_2>: <reason>
 
 Next needed detail (ONE question): <question_or_None>
+
+(When None/ready to list, append: Switch model to Claude Opus 4.6 prior to listing.)

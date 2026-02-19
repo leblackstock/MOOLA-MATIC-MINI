@@ -16,7 +16,7 @@ NOTES / COMMON MISTAKES
 - "intended_for" must be an array of allowed values (even if only one).
 - "platforms" must be an array of {"platform":"...","reason":"..."} objects.
 - "shipping_zip" defaults to "30236" if not provided.
-- "notes" must be exactly "<purchase_date> Purchased from <purchase_location>" or blank.
+- "notes" must be exactly "<purchase_date> Purchased from <purchase_location>" or blank. Put serial numbers, factory codes, QR codes in "internal_notes" instead (Playwright does not use it).
 - "size_or_fit" must be numeric size, and if width is printed on the item append a space + width letter code (e.g., "12 D", "12 EE"). Do not infer width. No other size systems or words.
 - "original_size" must include system, gender, age (if applicable), size, and width (if printed) as separate fields.
 - Do NOT use labels like "Condition:" or "Platforms:" in any sentence fields.
@@ -40,13 +40,13 @@ JSON FILE CONTENT (EXACT)
   sku, quantity, cogs, upc, brand, color, material, size_or_fit, original_size, style_features, country_of_origin, msrp, era_status, era_notes, style_tags,
   condition_status, intended_for, shipping_weight_lb, shipping_weight_oz,
   package_length, package_width, package_height, shipping_zip,
-  purchase_date, purchase_location, notes
+  purchase_date, purchase_location, notes, internal_notes
 
 FIELD TYPES (STRICT)
 - Strings: title, hook, description, tags_line, condition, cta, pricing_sentence, shipping_estimate_sentence, offer_recommendation, comps_day_range, time_to_sell_sentence,
   types_block, listing_body, listperfectly_description, question, sku, quantity, cogs, upc, brand, color, material, size_or_fit,
   style_features, country_of_origin, msrp, era_status, era_notes, condition_status, shipping_weight_lb, shipping_weight_oz, package_length, package_width, package_height,
-  shipping_zip, purchase_date, purchase_location, notes, shipping_cost_estimate, free_shipping_price, buyer_pays_shipping_price.
+  shipping_zip, purchase_date, purchase_location, notes, internal_notes, shipping_cost_estimate, free_shipping_price, buyer_pays_shipping_price.
 - Arrays of strings: included_items, measurements, measurements_imperial, measurements_metric, tags, intended_for, style_tags.
 - Arrays of objects: platforms (each object has "platform" and "reason" strings).
 - Object: original_size (keys: system, gender, age, size, width; all strings).
@@ -113,5 +113,6 @@ FIELD RULES
 - shipping_zip = "30236".
 - purchase_date = purchase date if provided; otherwise empty.
 - purchase_location = purchase location if provided; otherwise empty.
-- notes = exactly "<purchase_date> Purchased from <purchase_location>" (otherwise blank).
+- notes = exactly "<purchase_date> Purchased from <purchase_location>" (otherwise blank). Never include offer text, serial numbers, or other content—offer_recommendation is merged separately by the UI.
+- internal_notes = serial numbers, factory codes, QR codes, authentication tags, or other item-specific reference info for your records. Not used by Playwright/ListPerfectly. Empty if none.
 - Use empty strings or empty arrays instead of guessing missing data. Do not use null unless explicitly stated.

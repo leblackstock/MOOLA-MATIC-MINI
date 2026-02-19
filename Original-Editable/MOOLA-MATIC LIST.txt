@@ -32,6 +32,7 @@ DATA CAPTURE DEFAULTS (LIST MODE)
 - Cost of Goods (COGS) should be asked in LIST mode if missing.
 - Notes must be exactly: <purchase_date> Purchased from <purchase_location>.
   - If either purchase_date or purchase_location is missing, leave Notes blank.
+  - Do NOT put offer text, serial numbers, or other content in Notes. Put serial numbers, factory codes, QR codes, etc. in internal_notes (Playwright does not use it).
 
 HARD RULES (STRICT)
 1) NO headings/labels anywhere in the listing body.
@@ -113,3 +114,5 @@ Free shipping: $X.XX | Buyer pays shipping: $Y.XX
 JSON file created.
 
 15) ONE question as a normal sentence OR the single word: None
+16) When the question is None (ready to list), append at the bottom:
+Switch model to Claude Opus 4.6 prior to listing.

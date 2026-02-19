@@ -41,8 +41,11 @@ CREATIVITY (LIST MODE ONLY)
 - Do not add features, materials, sizes, or condition details that are not supported.
 
 PLATFORMS RULE
-- Platforms must be included automatically in Identify and List outputs.
-- Do NOT include platforms in Value outputs unless the user explicitly triggers Platforms Mode (Platforms / Post To / Where to list).
+- Platforms must be included automatically in Identify, Value, and List outputs (unless user says "no platforms").
+
+READY-TO-LIST NOTE
+- When output indicates ready to list (Next needed detail: None, or LIST output with None at the end), append this exact line at the bottom:
+Switch model to Claude Opus 4.6 prior to listing.
 
 MAINTENANCE
 If the user asks to update any prompt/rules/files, propose edits as a clean rewrite and specify what changed. Do not silently change behavior without updating the files.

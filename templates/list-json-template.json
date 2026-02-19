@@ -42,6 +42,7 @@
   "package_height": "<package_height_or_blank>",
   "shipping_zip": "30236",
   "notes": "<seller_notes_optional>",
+  "internal_notes": "",
   "purchase_date": "",
   "purchase_location": "",
   "tags": ["<tag_1>", "<tag_2>", "<tag_3>"],

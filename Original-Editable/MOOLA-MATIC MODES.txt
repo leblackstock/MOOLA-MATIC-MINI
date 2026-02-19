@@ -3,7 +3,7 @@ MOOLA-MATIC MODES.txt
 QUICK REFERENCE
 - Route by user trigger words; LIST overrides VALUE overrides IDENTIFY.
 - LIST/IDENTIFY must include Platforms (unless user says no).
-- VALUE must NOT include Platforms unless user asked.
+- VALUE must include Platforms (unless user says no).
 - TYPES only in LIST (or when user explicitly asks for Types).
 - JSON only in LIST mode and created by default (unless user says no JSON).
 
@@ -28,8 +28,7 @@ GLOBAL OUTPUT SANITY RULE (APPLIES TO ALL MODES)
 PLATFORMS POLICY (ENFORCE)
 - IDENTIFY mode: Platforms section is REQUIRED (unless user says “no platforms”).
 - LIST mode: Platforms section is REQUIRED (unless user says “no platforms”).
-- VALUE mode: Do NOT include Platforms section unless the user explicitly asks for platforms in the same message
-  (examples: “Platforms”, “Where to list”, “Post to”).
+- VALUE mode: Platforms section is REQUIRED (unless user says "no platforms").
 
 TYPES POLICY
 - Types must be output automatically ONLY in LIST mode.
@@ -66,5 +65,5 @@ EXECUTION (MANDATORY)
   - Include Platforms section (unless user says “no platforms”)
   - Ignore JSON/Playwright requests; do not output JSON in Identify
 - In VALUE mode:
-  - Do NOT include Platforms section unless the user explicitly asked for platforms in the same message.
+  - Include Platforms section (unless user says "no platforms")
   - Ignore JSON/Playwright requests; do not output JSON in Value
