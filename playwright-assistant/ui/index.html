@@ -362,6 +362,11 @@
                 <div class="size-toggles" id="sizeUsWomenToggles"></div>
               </div>
               <div class="size-cell">
+                <div class="size-cell-label">US Kids</div>
+                <input id="sizeUsKidsInput" type="text" placeholder="US Kids" />
+                <div class="size-toggles" id="sizeUsKidsToggles"></div>
+              </div>
+              <div class="size-cell">
                 <div class="size-cell-label">UK</div>
                 <input id="sizeUkInput" type="text" placeholder="UK" />
                 <div class="size-toggles" id="sizeUkToggles"></div>
@@ -649,12 +654,14 @@
       const standardFields = document.getElementById("standardFields");
       const sizeUsMenInput = document.getElementById("sizeUsMenInput");
       const sizeUsWomenInput = document.getElementById("sizeUsWomenInput");
+      const sizeUsKidsInput = document.getElementById("sizeUsKidsInput");
       const sizeUkInput = document.getElementById("sizeUkInput");
       const sizeEuInput = document.getElementById("sizeEuInput");
       const sizeAuInput = document.getElementById("sizeAuInput");
       const sizeWidthInput = document.getElementById("sizeWidthInput");
       const sizeUsMenToggles = document.getElementById("sizeUsMenToggles");
       const sizeUsWomenToggles = document.getElementById("sizeUsWomenToggles");
+      const sizeUsKidsToggles = document.getElementById("sizeUsKidsToggles");
       const sizeUkToggles = document.getElementById("sizeUkToggles");
       const sizeEuToggles = document.getElementById("sizeEuToggles");
       const sizeAuToggles = document.getElementById("sizeAuToggles");
@@ -773,6 +780,7 @@
             return [
               sizeUsMenInput,
               sizeUsWomenInput,
+              sizeUsKidsInput,
               sizeUkInput,
               sizeEuInput,
               sizeAuInput,
@@ -1740,6 +1748,7 @@
         const isSizeInput = [
           sizeUsMenInput,
           sizeUsWomenInput,
+          sizeUsKidsInput,
           sizeUkInput,
           sizeEuInput,
           sizeAuInput,
@@ -1783,6 +1792,11 @@
             value: resolved?.usWomen,
             toggleKey: "sizeUsWomen",
           },
+          {
+            sourceKey: "us_k",
+            value: resolved?.usKids,
+            toggleKey: "sizeUsKids",
+          },
           { sourceKey: "uk", value: resolved?.uk, toggleKey: "sizeUk" },
           { sourceKey: "eu", value: resolved?.eu, toggleKey: "sizeEu" },
           { sourceKey: "au", value: resolved?.au, toggleKey: "sizeAu" },
@@ -1824,6 +1838,15 @@
           includeLabel: "Include",
           verifiedLabel: "Verified",
           container: sizeUsWomenToggles,
+        });
+        ensureMeasurementToggles({
+          input: sizeUsKidsInput,
+          key: "sizeUsKids",
+          includeId: "sizeUsKidsInclude",
+          verifiedId: "sizeUsKidsVerified",
+          includeLabel: "Include",
+          verifiedLabel: "Verified",
+          container: sizeUsKidsToggles,
         });
         ensureMeasurementToggles({
           input: sizeUkInput,
@@ -2065,10 +2088,18 @@
         const sizeValue = parseNumber(original.size);
         if (!system || sizeValue === null) return null;
         const gender = String(original.gender || "").trim().toLowerCase();
+        const age = String(original.age || "").trim().toLowerCase();
         const width = normalizeWidthCode(original.width || "");
         let key = null;
         if (system === "US") {
-          key = gender === "women" ? "us_w" : "us_m";
+          if (
+            ["girls", "boys", "babies"].includes(gender) ||
+            isKidsAgeBucket(age)
+          ) {
+            key = "us_k";
+          } else {
+            key = gender === "women" ? "us_w" : "us_m";
+          }
         } else if (system === "UK") {
           key = "uk";
         } else if (system === "EU") {
@@ -2077,7 +2108,7 @@
           key = "au";
         }
         if (!key) return null;
-        return { key, size: sizeValue, width, system, gender };
+        return { key, size: sizeValue, width, system, gender, age };
       }
 
       function applyOriginalSizeReference(data, options = {}) {
@@ -2088,6 +2119,7 @@
         const inputMap = {
           us_m: sizeUsMenInput,
           us_w: sizeUsWomenInput,
+          us_k: sizeUsKidsInput,
           uk: sizeUkInput,
           eu: sizeEuInput,
           au: sizeAuInput,
@@ -2129,6 +2161,41 @@
         return Array.isArray(data?.intended_for) ? data.intended_for : [];
       }
 
+      function isKidsAgeBucket(value) {
+        const normalized = String(value || "").trim().toLowerCase();
+        return ["kids", "toddler", "youth", "infant"].includes(normalized);
+      }
+
+      function isKidsSizeContext(data) {
+        const original = data?.original_size;
+        const originalGender = String(original?.gender || "")
+          .trim()
+          .toLowerCase();
+        const originalAge = String(original?.age || "")
+          .trim()
+          .toLowerCase();
+        if (
+          ["girls", "boys", "babies"].includes(originalGender) ||
+          isKidsAgeBucket(originalAge)
+        ) {
+          return true;
+        }
+        return getIntendedForValues(data).some((item) => {
+          const normalized = String(item || "").trim().toLowerCase();
+          return ["unisex kids", "girls", "boys", "babies"].includes(normalized);
+        });
+      }
+
+      function getPreferredUsSourceKey(data) {
+        if (isKidsSizeContext(data)) return "us_k";
+        const intended = getIntendedForValues(data).map((item) =>
+          String(item).toLowerCase(),
+        );
+        const isUnisex = intended.includes("unisex");
+        const isWomen = intended.includes("women") && !isUnisex;
+        return isWomen ? "us_w" : "us_m";
+      }
+
       function getSizeOffsets(data) {
         const intended = getIntendedForValues(data).map((item) =>
           String(item).toLowerCase(),
@@ -2142,12 +2209,7 @@
       }
 
       function getPreferredUsType(data) {
-        const intended = getIntendedForValues(data).map((item) =>
-          String(item).toLowerCase(),
-        );
-        const isUnisex = intended.includes("unisex");
-        const isWomen = intended.includes("women") && !isUnisex;
-        return isWomen ? "women" : "men";
+        return getPreferredUsSourceKey(data) === "us_w" ? "women" : "men";
       }
 
       function getSizeOffsetsForUsType(data, usType) {
@@ -2166,6 +2228,7 @@
         return {
           usMen: parseNumber(sizeUsMenInput?.value),
           usWomen: parseNumber(sizeUsWomenInput?.value),
+          usKids: parseNumber(sizeUsKidsInput?.value),
           uk: parseNumber(sizeUkInput?.value),
           eu: parseNumber(sizeEuInput?.value),
           au: parseNumber(sizeAuInput?.value),
@@ -2174,15 +2237,29 @@
 
       function resolveSizeBase(raw, preferred, data) {
         const hasValue = (value) => value !== null;
-        if (preferred === "us") preferred = "us_m";
-        if (preferred && hasValue(raw[preferred])) return preferred;
-        const preferredUsType = data ? getPreferredUsType(data) : "men";
-        if (preferredUsType === "women") {
-          if (hasValue(raw.usWomen)) return "us_w";
-          if (hasValue(raw.usMen)) return "us_m";
-        } else {
-          if (hasValue(raw.usMen)) return "us_m";
-          if (hasValue(raw.usWomen)) return "us_w";
+        const rawKeyMap = {
+          us_m: "usMen",
+          us_w: "usWomen",
+          us_k: "usKids",
+          uk: "uk",
+          eu: "eu",
+          au: "au",
+        };
+        if (preferred === "us") preferred = getPreferredUsSourceKey(data);
+        if (preferred) {
+          const preferredRawKey = rawKeyMap[preferred] || preferred;
+          if (hasValue(raw[preferredRawKey])) return preferred;
+        }
+        const preferredUsKey = data ? getPreferredUsSourceKey(data) : "us_m";
+        const fallbackOrder =
+          preferredUsKey === "us_w"
+            ? ["us_w", "us_m", "us_k"]
+            : preferredUsKey === "us_k"
+              ? ["us_k", "us_m", "us_w"]
+              : ["us_m", "us_k", "us_w"];
+        for (const key of fallbackOrder) {
+          const rawKey = rawKeyMap[key] || key;
+          if (hasValue(raw[rawKey])) return key;
         }
         if (hasValue(raw.uk)) return "uk";
         if (hasValue(raw.au)) return "au";
@@ -2191,20 +2268,24 @@
       }
 
       function convertSizeValues(raw, data, preferred) {
-        let { usMen, usWomen, uk, eu, au } = raw;
+        let { usMen, usWomen, usKids, uk, eu, au } = raw;
         let estimated = {
           usMen: false,
           usWomen: false,
+          usKids: false,
           uk: false,
           eu: false,
           au: false,
         };
         const source = resolveSizeBase(raw, preferred, data);
-        if (!source) return { usMen, usWomen, uk, eu, au, estimated, source };
+        if (!source) {
+          return { usMen, usWomen, usKids, uk, eu, au, estimated, source };
+        }
 
-        if (source === "us_m" || source === "us_w") {
+        if (source === "us_m" || source === "us_w" || source === "us_k") {
           const usType = source === "us_w" ? "women" : "men";
-          const baseUs = source === "us_w" ? usWomen : usMen;
+          const baseUs =
+            source === "us_w" ? usWomen : source === "us_k" ? usKids : usMen;
           const offsets = getSizeOffsetsForUsType(data, usType);
           uk = baseUs + offsets.usToUk;
           estimated.uk = true;
@@ -2213,7 +2294,8 @@
           au = baseUs + offsets.usToAu;
           estimated.au = true;
         } else {
-          const usType = getPreferredUsType(data);
+          const preferredUsKey = getPreferredUsSourceKey(data);
+          const usType = preferredUsKey === "us_w" ? "women" : "men";
           const offsets = getSizeOffsetsForUsType(data, usType);
           let baseUs = null;
           if (source === "uk") {
@@ -2224,9 +2306,12 @@
             baseUs = eu - offsets.usToEu;
           }
           if (baseUs !== null) {
-            if (usType === "women") {
+            if (preferredUsKey === "us_w") {
               usWomen = baseUs;
               estimated.usWomen = true;
+            } else if (preferredUsKey === "us_k") {
+              usKids = baseUs;
+              estimated.usKids = true;
             } else {
               usMen = baseUs;
               estimated.usMen = true;
@@ -2241,10 +2326,11 @@
         }
         usMen = roundToNearestHalf(usMen);
         usWomen = roundToNearestHalf(usWomen);
+        usKids = roundToNearestHalf(usKids);
         uk = roundToNearestHalf(uk);
         eu = roundToNearestHalf(eu);
         au = roundToNearestHalf(au);
-        return { usMen, usWomen, uk, eu, au, estimated, source };
+        return { usMen, usWomen, usKids, uk, eu, au, estimated, source };
       }
 
       function setSizeInputValue(input, value, sourceKey, inputKey) {
@@ -2271,6 +2357,12 @@
             values.source,
             "us_w",
           );
+          setSizeInputValue(
+            sizeUsKidsInput,
+            values.usKids,
+            values.source,
+            "us_k",
+          );
           setSizeInputValue(sizeUkInput, values.uk, values.source, "uk");
           setSizeInputValue(sizeEuInput, values.eu, values.source, "eu");
           setSizeInputValue(sizeAuInput, values.au, values.source, "au");
@@ -2284,6 +2376,7 @@
         const keyMap = {
           us_m: "usMen",
           us_w: "usWomen",
+          us_k: "usKids",
           uk: "uk",
           eu: "eu",
           au: "au",
@@ -2466,6 +2559,7 @@
         if (
           values.usMen === null &&
           values.usWomen === null &&
+          values.usKids === null &&
           values.uk === null &&
           values.eu === null
         ) {
@@ -2476,8 +2570,10 @@
         );
         const isUnisex = intended.includes("unisex");
         const isWomen = intended.includes("women") && !isUnisex;
+        const isKids = getPreferredUsSourceKey(data) === "us_k";
         const usMenVerified = isVerified(verifiedToggles.sizeUsMen);
         const usWomenVerified = isVerified(verifiedToggles.sizeUsWomen);
+        const usKidsVerified = isVerified(verifiedToggles.sizeUsKids);
         const ukVerified = isVerified(verifiedToggles.sizeUk);
         const euVerified = isVerified(verifiedToggles.sizeEu);
         const auVerified = isVerified(verifiedToggles.sizeAu);
@@ -2491,9 +2587,21 @@
         const womenOffsets = getSizeOffsetsForUsType(data, "women");
         let menValue = values.usMen;
         let womenValue = values.usWomen;
+        let kidsValue = values.usKids;
         let menEstimated = values.estimated?.usMen;
         let womenEstimated = values.estimated?.usWomen;
-        if (isUnisex) {
+        let kidsEstimated = values.estimated?.usKids;
+        if (isKids) {
+          if (kidsValue === null) {
+            const derivedKids = deriveUsFromValues(menOffsets);
+            if (derivedKids !== null) {
+              kidsValue = derivedKids;
+              kidsEstimated = true;
+            }
+          }
+          menValue = null;
+          womenValue = null;
+        } else if (isUnisex) {
           if (menValue === null) {
             const derivedMen = deriveUsFromValues(menOffsets);
             if (derivedMen !== null) {
@@ -2537,6 +2645,11 @@
           womenEstimated,
           usWomenVerified,
         );
+        const usKidsText = formatSizeValue(
+          kidsValue,
+          kidsEstimated,
+          usKidsVerified,
+        );
         const ukText = formatSizeValue(
           values.uk,
           values.estimated?.uk,
@@ -2553,7 +2666,11 @@
           auVerified,
         );
         const parts = [];
-        if (isUnisex) {
+        if (isKids) {
+          if (usKidsText !== null && isIncluded(includeToggles.sizeUsKids)) {
+            parts.push(`US Kids ${usKidsText}`);
+          }
+        } else if (isUnisex) {
           if (usMenText !== null && isIncluded(includeToggles.sizeUsMen)) {
             parts.push(`US M ${usMenText}`);
           }
@@ -2598,14 +2715,19 @@
         const input = String(text || "");
         const usMenMatch = input.match(/US\s*M\s*([0-9.]+)/i);
         const usWomenMatch = input.match(/US\s*W\s*([0-9.]+)/i);
+        const usKidsMatch = input.match(
+          /US\s*(?:K(?:ids?)?|Toddler|Youth|Infant)\s*([0-9.]+)/i,
+        );
         const usMatch = input.match(/US\s*([0-9.]+)/i);
         const ukMatch = input.match(/UK\s*([0-9.]+)/i);
         const euMatch = input.match(/EU\s*([0-9.]+)/i);
         const auMatch = input.match(/AU\s*([0-9.]+)/i);
+        const preferredUsKey = getPreferredUsSourceKey(data || currentData);
         const entries = [
           usMenMatch ? ["us_m", usMenMatch[1]] : null,
           usWomenMatch ? ["us_w", usWomenMatch[1]] : null,
-          usMatch ? ["us_m", usMatch[1]] : null,
+          usKidsMatch ? ["us_k", usKidsMatch[1]] : null,
+          usMatch ? [preferredUsKey, usMatch[1]] : null,
           ukMatch ? ["uk", ukMatch[1]] : null,
           euMatch ? ["eu", euMatch[1]] : null,
           auMatch ? ["au", auMatch[1]] : null,
@@ -2615,19 +2737,18 @@
           if (unique.find((item) => item.key === key)) return;
           unique.push({ key, value });
         });
-        const preferredKey =
-          getPreferredUsType(data || currentData) === "women" ? "us_w" : "us_m";
+        const preferredKey = preferredUsKey;
         const preferred =
           unique.find((item) => item.key === preferredKey) ||
+          unique.find((item) => item.key === "us_k") ||
           unique.find((item) => item.key === "us_m") ||
           unique.find((item) => item.key === "us_w");
         if (preferred) return preferred;
         if (unique.length === 1) return unique[0];
         const plainMatch = input.match(/^\s*([0-9]+(?:\.[0-9]+)?)/);
         if (plainMatch) {
-          const usType = getPreferredUsType(data || currentData);
           return {
-            key: usType === "women" ? "us_w" : "us_m",
+            key: preferredUsKey,
             value: plainMatch[1],
           };
         }
@@ -2645,6 +2766,9 @@
         } else if (base.key === "us_w") {
           sizeUsWomenInput.value = value;
           updateIncludeToggleForInput(sizeUsWomenInput);
+        } else if (base.key === "us_k") {
+          sizeUsKidsInput.value = value;
+          updateIncludeToggleForInput(sizeUsKidsInput);
         } else if (base.key === "uk") {
           sizeUkInput.value = value;
           updateIncludeToggleForInput(sizeUkInput);
@@ -2667,6 +2791,7 @@
         const clearInputs = [
           sizeUsMenInput,
           sizeUsWomenInput,
+          sizeUsKidsInput,
           sizeUkInput,
           sizeEuInput,
           sizeAuInput,
@@ -2694,6 +2819,9 @@
             } else if (base.key === "us_w") {
               sizeUsWomenInput.value = value;
               lastSizeEdited = "us_w";
+            } else if (base.key === "us_k") {
+              sizeUsKidsInput.value = value;
+              lastSizeEdited = "us_k";
             } else if (base.key === "uk") {
               sizeUkInput.value = value;
               lastSizeEdited = "uk";
@@ -2732,6 +2860,7 @@
         const originalKeyMap = {
           us_m: "usMen",
           us_w: "usWomen",
+          us_k: "usKids",
           uk: "uk",
           eu: "eu",
           au: "au",
@@ -2752,6 +2881,8 @@
           value = raw.usMen;
         } else if (source === "us_w") {
           value = raw.usWomen;
+        } else if (source === "us_k") {
+          value = raw.usKids;
         } else if (source === "uk") {
           value = raw.uk;
         } else if (source === "eu") {
@@ -3330,20 +3461,34 @@
         if (sizeText) {
           const usMenMatch = sizeText.match(/US\s*M\s*([0-9.]+)/i);
           const usWomenMatch = sizeText.match(/US\s*W\s*([0-9.]+)/i);
+          const usKidsMatch = sizeText.match(
+            /US\s*(?:K(?:ids?)?|Toddler|Youth|Infant)\s*([0-9.]+)/i,
+          );
           const usMatch = sizeText.match(/US\s*([0-9.]+)/i);
           const ukMatch = sizeText.match(/UK\s*([0-9.]+)/i);
           const euMatch = sizeText.match(/EU\s*([0-9.]+)/i);
           const auMatch = sizeText.match(/AU\s*([0-9.]+)/i);
           const widthMatch = sizeText.match(/Width\s*([A-Za-z0-9]+)/i);
           if (usMenMatch) setInputValue(sizeUsMenInput, usMenMatch[1]);
-          else if (usMatch) setInputValue(sizeUsMenInput, usMatch[1]);
           if (usWomenMatch) setInputValue(sizeUsWomenInput, usWomenMatch[1]);
+          if (usKidsMatch) setInputValue(sizeUsKidsInput, usKidsMatch[1]);
+          else if (usMatch) {
+            const preferredUsKey = getPreferredUsSourceKey(data);
+            if (preferredUsKey === "us_w") {
+              setInputValue(sizeUsWomenInput, usMatch[1]);
+            } else if (preferredUsKey === "us_k") {
+              setInputValue(sizeUsKidsInput, usMatch[1]);
+            } else {
+              setInputValue(sizeUsMenInput, usMatch[1]);
+            }
+          }
           if (ukMatch) setInputValue(sizeUkInput, ukMatch[1]);
           if (euMatch) setInputValue(sizeEuInput, euMatch[1]);
           if (auMatch) setInputValue(sizeAuInput, auMatch[1]);
           if (
             !usMenMatch &&
             !usWomenMatch &&
+            !usKidsMatch &&
             !usMatch &&
             !ukMatch &&
             !euMatch &&
@@ -3351,9 +3496,11 @@
           ) {
             const plainMatch = sizeText.match(/^\s*([0-9]+(?:\.[0-9]+)?)/);
             if (plainMatch) {
-              const preferred = getPreferredUsType(data);
-              if (preferred === "women") {
+              const preferred = getPreferredUsSourceKey(data);
+              if (preferred === "us_w") {
                 setInputValue(sizeUsWomenInput, plainMatch[1]);
+              } else if (preferred === "us_k") {
+                setInputValue(sizeUsKidsInput, plainMatch[1]);
               } else {
                 setInputValue(sizeUsMenInput, plainMatch[1]);
               }
@@ -3474,7 +3621,9 @@
         lastAutoSize = "";
         originalSizeRef = null;
         lastSizeEdited = currentData?.last_size_edited || null;
-        if (lastSizeEdited === "us") lastSizeEdited = "us_m";
+        if (lastSizeEdited === "us") {
+          lastSizeEdited = getPreferredUsSourceKey(currentData);
+        }
         includeDefaultsApplied = false;
         if (measurementTemplateSelect) {
           measurementTemplateSelect.value = "auto";
@@ -3501,10 +3650,11 @@
       }
 
       function clearOtherSizeInputs(sourceInput) {
-        const usInputs = [sizeUsMenInput, sizeUsWomenInput];
+        const usInputs = [sizeUsMenInput, sizeUsWomenInput, sizeUsKidsInput];
         const sizeInputs = [
           sizeUsMenInput,
           sizeUsWomenInput,
+          sizeUsKidsInput,
           sizeUkInput,
           sizeEuInput,
           sizeAuInput,
@@ -4316,6 +4466,7 @@
       const measurementInputs = [
         sizeUsMenInput,
         sizeUsWomenInput,
+        sizeUsKidsInput,
         sizeUkInput,
         sizeEuInput,
         sizeAuInput,
@@ -4348,6 +4499,7 @@
       const sizeGridInputs = [
         sizeUsMenInput,
         sizeUsWomenInput,
+        sizeUsKidsInput,
         sizeUkInput,
         sizeEuInput,
         sizeAuInput,
@@ -4364,6 +4516,10 @@
           if (input === sizeUsWomenInput) {
             originalSizeRef = null;
             lastSizeEdited = "us_w";
+          }
+          if (input === sizeUsKidsInput) {
+            originalSizeRef = null;
+            lastSizeEdited = "us_k";
           }
           if (input === sizeUkInput) {
             originalSizeRef = null;
