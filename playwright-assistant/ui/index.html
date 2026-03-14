@@ -1116,6 +1116,7 @@
             merged: incomingList,
             changed: true,
             addedCount: incomingList.length,
+            replacedCount: 0,
             addedLabels: incomingList
               .map((item) => normalizeMeasurementLabel(item))
               .filter(Boolean),
@@ -1126,31 +1127,47 @@
             merged: baseList,
             changed: false,
             addedCount: 0,
+            replacedCount: 0,
             addedLabels: [],
           };
         }
         const seen = new Set();
+        const labelIndexMap = new Map();
         const merged = [];
         baseList.forEach((item) => {
           const label = normalizeMeasurementLabel(item);
           if (label) seen.add(label);
           if (!String(item || "").trim()) return;
+          if (label) labelIndexMap.set(label, merged.length);
           merged.push(item);
         });
         let changed = merged.length !== baseList.length;
         let addedCount = 0;
+        let replacedCount = 0;
         const addedLabels = [];
         incomingList.forEach((item) => {
           if (!String(item || "").trim()) return;
           const label = normalizeMeasurementLabel(item);
-          if (label && seen.has(label)) return;
-          if (label) seen.add(label);
+          if (label && labelIndexMap.has(label)) {
+            const existingIndex = labelIndexMap.get(label);
+            if (merged[existingIndex] !== item) {
+              merged[existingIndex] = item;
+              changed = true;
+              replacedCount += 1;
+              addedLabels.push(label);
+            }
+            return;
+          }
+          if (label) {
+            seen.add(label);
+            labelIndexMap.set(label, merged.length);
+          }
           merged.push(item);
           changed = true;
           addedCount += 1;
           if (label) addedLabels.push(label);
         });
-        return { merged, changed, addedCount, addedLabels };
+        return { merged, changed, addedCount, replacedCount, addedLabels };
       }
 
       function getMatchScore(base, incoming) {
@@ -1249,14 +1266,18 @@
               merged,
               changed: mergedChanged,
               addedCount,
+              replacedCount,
               addedLabels,
             } = mergeMeasurementArrays(base[key], incomingValue);
             if (mergedChanged) {
               base[key] = merged;
               changed = true;
-              const label = addedCount > 0 ? `+${addedCount} lines` : "cleaned";
+              const details = [];
+              if (addedCount > 0) details.push(`+${addedCount} lines`);
+              if (replacedCount > 0) details.push(`~${replacedCount} updated`);
+              const label = details.length ? details.join(", ") : "cleaned";
               markChanged(key, label);
-              if (addedCount > 0) {
+              if (addedCount > 0 || replacedCount > 0) {
                 measurementLinesAdded = true;
               }
               if (addedLabels.length) {
@@ -4779,7 +4800,7 @@
               const details = result.changedKeys.length
                 ? ` Updated: ${result.changedKeys.join(", ")}.`
                 : "";
-              status.textContent = `Merged missing fields from ${file.name}.${details}`;
+              status.textContent = `Merged updates from ${file.name}.${details}`;
             }
             items[currentIndex].data = currentData;
             setMergedFieldKeys(result.changedFieldKeys || []);
@@ -4801,6 +4822,7 @@
               result.measurementIncomingLabels?.length
             ) {
               autoEnableIncludeTogglesFromMeasurements(currentData);
+              updateMeasurementsFromHelper();
             }
             applyMeasurementInputHighlights();
             updateFieldEditability();
