@@ -2594,9 +2594,8 @@
         }
         if (lower.includes("extra")) return "EEE";
         if (lower.includes("wide") || lower === "w") return "EE";
-        if (lower === "reg" || lower === "regular" || lower === "m") {
-          return "D";
-        }
+        if (lower === "m") return "M";
+        if (lower === "reg" || lower === "regular") return "D";
         const compact = lower.replace(/[^a-z0-9]/g, "");
         if (["us", "uk", "eu", "au"].includes(compact)) return "";
         if (compact === "d") return "D";
