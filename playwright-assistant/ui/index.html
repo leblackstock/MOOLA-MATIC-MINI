@@ -2196,27 +2196,158 @@
         return isWomen ? "us_w" : "us_m";
       }
 
-      function getSizeOffsets(data) {
-        const intended = getIntendedForValues(data).map((item) =>
-          String(item).toLowerCase(),
+      function buildLinearSizeTable({
+        start,
+        end,
+        step = 0.5,
+        ukOffset,
+        euOffset,
+        auOffset,
+      }) {
+        const entries = [];
+        for (let size = start; size <= end + 0.001; size += step) {
+          const rounded = Math.round(size * 2) / 2;
+          entries.push({
+            us: rounded,
+            uk: Math.round((rounded + ukOffset) * 2) / 2,
+            eu: Math.round((rounded + euOffset) * 2) / 2,
+            au: Math.round((rounded + auOffset) * 2) / 2,
+          });
+        }
+        return Object.freeze(entries);
+      }
+
+      const WOMEN_SIZE_CONVERSION_TABLE = buildLinearSizeTable({
+        start: 3,
+        end: 18,
+        ukOffset: -2,
+        euOffset: 31,
+        auOffset: 0,
+      });
+
+      const MEN_SIZE_CONVERSION_TABLE = buildLinearSizeTable({
+        start: 1,
+        end: 18,
+        ukOffset: -1,
+        euOffset: 32,
+        auOffset: -1,
+      });
+
+      const KIDS_EARLY_SIZE_CONVERSION_TABLE = Object.freeze([
+        { us: 4, uk: 3, eu: 19, au: 3 },
+        { us: 4.5, uk: 3.5, eu: 20, au: 3.5 },
+        { us: 5, uk: 4, eu: 21, au: 4 },
+        { us: 5.5, uk: 4.5, eu: 21.5, au: 4.5 },
+        { us: 6, uk: 5, eu: 22, au: 5 },
+        { us: 6.5, uk: 5.5, eu: 22.5, au: 5.5 },
+        { us: 7, uk: 6, eu: 23, au: 6 },
+        { us: 7.5, uk: 6.5, eu: 23.5, au: 6.5 },
+        { us: 8, uk: 7, eu: 24, au: 7 },
+        { us: 8.5, uk: 7.5, eu: 24.5, au: 7.5 },
+        { us: 9, uk: 8, eu: 25, au: 8 },
+        { us: 9.5, uk: 8.5, eu: 26, au: 8.5 },
+        { us: 10, uk: 9, eu: 27, au: 9 },
+        { us: 10.5, uk: 9.5, eu: 27.5, au: 9.5 },
+        { us: 11, uk: 10, eu: 28, au: 10 },
+        { us: 11.5, uk: 10.5, eu: 28.5, au: 10.5 },
+        { us: 12, uk: 11, eu: 29, au: 11 },
+        { us: 12.5, uk: 11.5, eu: 30, au: 11.5 },
+        { us: 13, uk: 12, eu: 31, au: 12 },
+        { us: 13.5, uk: 12.5, eu: 31.5, au: 12.5 },
+      ]);
+
+      const KIDS_YOUTH_SIZE_CONVERSION_TABLE = Object.freeze([
+        { us: 1, uk: 13, eu: 32, au: 13 },
+        { us: 2, uk: 1, eu: 33, au: 1 },
+        { us: 3, uk: 2, eu: 34, au: 2 },
+        { us: 4, uk: 3, eu: 35, au: 3 },
+        { us: 5, uk: 4, eu: 36, au: 4 },
+        { us: 6, uk: 5, eu: 37, au: 5 },
+        { us: 7, uk: 6, eu: 38, au: 6 },
+      ]);
+
+      function findSizeTableEntry(table, sourceKey, value) {
+        if (!table || !sourceKey) return null;
+        const parsedValue =
+          typeof value === "number" ? value : Number.parseFloat(String(value || ""));
+        if (!Number.isFinite(parsedValue)) return null;
+        return (
+          table.find((entry) => Math.abs(entry[sourceKey] - parsedValue) < 0.001) ||
+          null
         );
-        const isUnisex = intended.includes("unisex");
-        const isWomen = intended.includes("women") && !isUnisex;
-        if (isWomen) {
-          return { usToUk: -2, usToEu: 31, usToAu: 0 };
-        }
-        return { usToUk: -1, usToEu: 32, usToAu: -1 };
       }
 
-      function getPreferredUsType(data) {
-        return getPreferredUsSourceKey(data) === "us_w" ? "women" : "men";
+      function getKidsSizeStage(data) {
+        const age = String(data?.original_size?.age || "")
+          .trim()
+          .toLowerCase();
+        if (age === "youth") return "youth";
+        if (age === "infant" || age === "toddler") return "early";
+        return "";
       }
 
-      function getSizeOffsetsForUsType(data, usType) {
-        if (usType === "women") {
-          return { usToUk: -2, usToEu: 31, usToAu: 0 };
+      function getKidsSizeTableForLookup(sourceKey, value, data) {
+        const stage = getKidsSizeStage(data);
+        if (stage === "early") return KIDS_EARLY_SIZE_CONVERSION_TABLE;
+        if (stage === "youth") return KIDS_YOUTH_SIZE_CONVERSION_TABLE;
+
+        const parsedValue =
+          typeof value === "number" ? value : Number.parseFloat(String(value || ""));
+        if (!Number.isFinite(parsedValue)) return null;
+
+        if (sourceKey === "us") {
+          if (parsedValue <= 3) return KIDS_YOUTH_SIZE_CONVERSION_TABLE;
+          if (parsedValue >= 8) return KIDS_EARLY_SIZE_CONVERSION_TABLE;
+          return null;
         }
-        return getSizeOffsets(data);
+        if (sourceKey === "eu") {
+          if (parsedValue >= 32) return KIDS_YOUTH_SIZE_CONVERSION_TABLE;
+          if (parsedValue <= 31.5) return KIDS_EARLY_SIZE_CONVERSION_TABLE;
+          return null;
+        }
+        if (sourceKey === "uk" || sourceKey === "au") {
+          if (parsedValue >= 13 || parsedValue <= 2) {
+            return KIDS_YOUTH_SIZE_CONVERSION_TABLE;
+          }
+          if (parsedValue >= 7 && parsedValue <= 12.5) {
+            return KIDS_EARLY_SIZE_CONVERSION_TABLE;
+          }
+          return null;
+        }
+        return null;
+      }
+
+      function findKidsSizeTableEntry(sourceKey, value, data) {
+        const table = getKidsSizeTableForLookup(sourceKey, value, data);
+        if (!table) return null;
+        return findSizeTableEntry(table, sourceKey, value);
+      }
+
+      function getAdultSizeTable(preferredUsKey) {
+        return preferredUsKey === "us_w"
+          ? WOMEN_SIZE_CONVERSION_TABLE
+          : MEN_SIZE_CONVERSION_TABLE;
+      }
+
+      function findAdultSizeTableEntry(preferredUsKey, sourceKey, value) {
+        return findSizeTableEntry(getAdultSizeTable(preferredUsKey), sourceKey, value);
+      }
+
+      function findFirstTableEntryBySources(table, values) {
+        if (!table) return null;
+        if (values.uk !== null) {
+          const ukEntry = findSizeTableEntry(table, "uk", values.uk);
+          if (ukEntry) return ukEntry;
+        }
+        if (values.eu !== null) {
+          const euEntry = findSizeTableEntry(table, "eu", values.eu);
+          if (euEntry) return euEntry;
+        }
+        if (values.au !== null) {
+          const auEntry = findSizeTableEntry(table, "au", values.au);
+          if (auEntry) return auEntry;
+        }
+        return null;
       }
 
       function roundToNearestHalf(value) {
@@ -2282,46 +2413,79 @@
           return { usMen, usWomen, usKids, uk, eu, au, estimated, source };
         }
 
-        if (source === "us_m" || source === "us_w" || source === "us_k") {
-          const usType = source === "us_w" ? "women" : "men";
-          const baseUs =
-            source === "us_w" ? usWomen : source === "us_k" ? usKids : usMen;
-          const offsets = getSizeOffsetsForUsType(data, usType);
-          uk = baseUs + offsets.usToUk;
-          estimated.uk = true;
-          eu = baseUs + offsets.usToEu;
-          estimated.eu = true;
-          au = baseUs + offsets.usToAu;
-          estimated.au = true;
+        if (source === "us_k") {
+          const kidsEntry = findKidsSizeTableEntry("us", usKids, data);
+          if (kidsEntry) {
+            uk = kidsEntry.uk;
+            estimated.uk = true;
+            eu = kidsEntry.eu;
+            estimated.eu = true;
+            au = kidsEntry.au;
+            estimated.au = true;
+          }
+        } else if (source === "us_m" || source === "us_w") {
+          const baseUs = source === "us_w" ? usWomen : usMen;
+          const adultEntry = findAdultSizeTableEntry(source, "us", baseUs);
+          if (adultEntry) {
+            uk = adultEntry.uk;
+            estimated.uk = true;
+            eu = adultEntry.eu;
+            estimated.eu = true;
+            au = adultEntry.au;
+            estimated.au = true;
+          }
         } else {
           const preferredUsKey = getPreferredUsSourceKey(data);
-          const usType = preferredUsKey === "us_w" ? "women" : "men";
-          const offsets = getSizeOffsetsForUsType(data, usType);
-          let baseUs = null;
-          if (source === "uk") {
-            baseUs = uk - offsets.usToUk;
-          } else if (source === "au") {
-            baseUs = au - offsets.usToAu;
-          } else if (source === "eu") {
-            baseUs = eu - offsets.usToEu;
-          }
-          if (baseUs !== null) {
-            if (preferredUsKey === "us_w") {
-              usWomen = baseUs;
-              estimated.usWomen = true;
-            } else if (preferredUsKey === "us_k") {
-              usKids = baseUs;
+          if (preferredUsKey === "us_k") {
+            const sourceValue =
+              source === "uk" ? uk : source === "eu" ? eu : source === "au" ? au : null;
+            const sourceKey =
+              source === "uk" ? "uk" : source === "eu" ? "eu" : source === "au" ? "au" : "";
+            const kidsEntry = findKidsSizeTableEntry(sourceKey, sourceValue, data);
+            if (kidsEntry) {
+              usKids = kidsEntry.us;
               estimated.usKids = true;
-            } else {
-              usMen = baseUs;
-              estimated.usMen = true;
+              if (source !== "uk") {
+                uk = kidsEntry.uk;
+                estimated.uk = true;
+              }
+              if (source !== "eu") {
+                eu = kidsEntry.eu;
+                estimated.eu = true;
+              }
+              if (source !== "au") {
+                au = kidsEntry.au;
+                estimated.au = true;
+              }
             }
-            uk = baseUs + offsets.usToUk;
-            estimated.uk = true;
-            eu = baseUs + offsets.usToEu;
-            estimated.eu = true;
-            au = baseUs + offsets.usToAu;
-            estimated.au = true;
+          } else {
+            const adultEntry = findAdultSizeTableEntry(
+              preferredUsKey,
+              source,
+              source === "uk" ? uk : source === "eu" ? eu : au,
+            );
+            if (adultEntry) {
+              const baseUs = adultEntry.us;
+              if (preferredUsKey === "us_w") {
+                usWomen = baseUs;
+                estimated.usWomen = true;
+              } else {
+                usMen = baseUs;
+                estimated.usMen = true;
+              }
+              if (source !== "uk") {
+                uk = adultEntry.uk;
+                estimated.uk = true;
+              }
+              if (source !== "eu") {
+                eu = adultEntry.eu;
+                estimated.eu = true;
+              }
+              if (source !== "au") {
+                au = adultEntry.au;
+                estimated.au = true;
+              }
+            }
           }
         }
         usMen = roundToNearestHalf(usMen);
@@ -2577,14 +2741,6 @@
         const ukVerified = isVerified(verifiedToggles.sizeUk);
         const euVerified = isVerified(verifiedToggles.sizeEu);
         const auVerified = isVerified(verifiedToggles.sizeAu);
-        const deriveUsFromValues = (offsets) => {
-          if (values.uk !== null) return values.uk - offsets.usToUk;
-          if (values.eu !== null) return values.eu - offsets.usToEu;
-          if (values.au !== null) return values.au - offsets.usToAu;
-          return null;
-        };
-        const menOffsets = getSizeOffsetsForUsType(data, "men");
-        const womenOffsets = getSizeOffsetsForUsType(data, "women");
         let menValue = values.usMen;
         let womenValue = values.usWomen;
         let kidsValue = values.usKids;
@@ -2593,9 +2749,26 @@
         let kidsEstimated = values.estimated?.usKids;
         if (isKids) {
           if (kidsValue === null) {
-            const derivedKids = deriveUsFromValues(menOffsets);
-            if (derivedKids !== null) {
-              kidsValue = derivedKids;
+            const kidsEntry = findFirstTableEntryBySources(
+              getKidsSizeTableForLookup(
+                values.eu !== null
+                  ? "eu"
+                  : values.uk !== null
+                    ? "uk"
+                    : values.au !== null
+                      ? "au"
+                      : "",
+                values.eu !== null
+                  ? values.eu
+                  : values.uk !== null
+                    ? values.uk
+                    : values.au,
+                data,
+              ),
+              values,
+            );
+            if (kidsEntry) {
+              kidsValue = kidsEntry.us;
               kidsEstimated = true;
             }
           }
@@ -2603,33 +2776,45 @@
           womenValue = null;
         } else if (isUnisex) {
           if (menValue === null) {
-            const derivedMen = deriveUsFromValues(menOffsets);
-            if (derivedMen !== null) {
-              menValue = derivedMen;
+            const menEntry = findFirstTableEntryBySources(
+              MEN_SIZE_CONVERSION_TABLE,
+              values,
+            );
+            if (menEntry) {
+              menValue = menEntry.us;
               menEstimated = true;
             }
           }
           if (womenValue === null) {
-            const derivedWomen = deriveUsFromValues(womenOffsets);
-            if (derivedWomen !== null) {
-              womenValue = derivedWomen;
+            const womenEntry = findFirstTableEntryBySources(
+              WOMEN_SIZE_CONVERSION_TABLE,
+              values,
+            );
+            if (womenEntry) {
+              womenValue = womenEntry.us;
               womenEstimated = true;
             }
           }
         } else if (isWomen) {
           if (womenValue === null) {
-            const derivedWomen = deriveUsFromValues(womenOffsets);
-            if (derivedWomen !== null) {
-              womenValue = derivedWomen;
+            const womenEntry = findFirstTableEntryBySources(
+              WOMEN_SIZE_CONVERSION_TABLE,
+              values,
+            );
+            if (womenEntry) {
+              womenValue = womenEntry.us;
               womenEstimated = true;
             }
           }
           menValue = null;
         } else {
           if (menValue === null) {
-            const derivedMen = deriveUsFromValues(menOffsets);
-            if (derivedMen !== null) {
-              menValue = derivedMen;
+            const menEntry = findFirstTableEntryBySources(
+              MEN_SIZE_CONVERSION_TABLE,
+              values,
+            );
+            if (menEntry) {
+              menValue = menEntry.us;
               menEstimated = true;
             }
           }
