@@ -2702,6 +2702,29 @@
         return { lb, oz, totalPounds, hasValue };
       }
 
+      function getWeightTotalOunces(weightParts) {
+        if (!weightParts || !weightParts.hasValue) return null;
+        return Math.max(
+          0,
+          Math.round((weightParts.lb || 0) * 16 + (weightParts.oz || 0)),
+        );
+      }
+
+      function getWeightPartsFromTotalOunces(totalOunces) {
+        if (!Number.isFinite(totalOunces)) {
+          return { lb: null, oz: null, totalPounds: null, hasValue: false };
+        }
+        const roundedTotalOunces = Math.max(0, Math.round(totalOunces));
+        const lb = Math.floor(roundedTotalOunces / 16);
+        const oz = roundedTotalOunces % 16;
+        return {
+          lb,
+          oz,
+          totalPounds: roundedTotalOunces / 16,
+          hasValue: true,
+        };
+      }
+
       function addMeasurementLine(
         label,
         inches,
@@ -3484,9 +3507,15 @@
           }
         }
 
+        const previousWeightParts = getStoredMeasurementWeightParts(currentData);
         setFieldValue("measurements", lines);
         setFieldValue("measurements_imperial", imperial);
         setFieldValue("measurements_metric", metric);
+        syncShippingWeightFromChangedItemWeight(
+          values.weightParts,
+          previousWeightParts,
+          currentData,
+        );
         currentData.last_size_edited = lastSizeEdited || "";
         updateListperfectlyDescription(currentData);
         saveSession();
@@ -3544,7 +3573,45 @@
         const lb = lbMatch ? Number.parseFloat(lbMatch[1]) : null;
         const oz = ozMatch ? Number.parseFloat(ozMatch[1]) : null;
         if (lb === null && oz === null) return null;
-        return { lb, oz };
+        return {
+          lb,
+          oz,
+          totalPounds: (lb || 0) + (oz || 0) / 16,
+          hasValue: true,
+        };
+      }
+
+      function getStoredMeasurementWeightParts(data) {
+        const lines = Array.isArray(data?.measurements)
+          ? data.measurements
+          : parseList(data?.measurements);
+        for (const line of lines) {
+          if (!String(line || "").toLowerCase().includes("weight")) continue;
+          const parts = extractWeightParts(line);
+          if (parts) return parts;
+        }
+        return { lb: null, oz: null, totalPounds: null, hasValue: false };
+      }
+
+      function syncShippingWeightFromChangedItemWeight(
+        nextWeightParts,
+        previousWeightParts,
+        data = currentData,
+      ) {
+        if (!data) return;
+        const nextTotalOunces = getWeightTotalOunces(nextWeightParts);
+        const previousTotalOunces = getWeightTotalOunces(previousWeightParts);
+        if (nextTotalOunces === null || nextTotalOunces === previousTotalOunces) {
+          return;
+        }
+        const packagingTotalOunces =
+          (parseNumber(data.packaging_weight_lb) || 0) * 16 +
+          (parseNumber(data.packaging_weight_oz) || 0);
+        const shippingWeightParts = getWeightPartsFromTotalOunces(
+          nextTotalOunces + packagingTotalOunces,
+        );
+        setFieldValue("shipping_weight_lb", String(shippingWeightParts.lb));
+        setFieldValue("shipping_weight_oz", String(shippingWeightParts.oz));
       }
 
       function setInputValue(input, value) {
@@ -4244,20 +4311,6 @@
         }
         row.appendChild(input);
 
-        const button = document.createElement("button");
-        button.textContent = "Copy";
-        button.addEventListener("click", async () => {
-          try {
-            await navigator.clipboard.writeText(input.value);
-            button.textContent = "Copied";
-            setTimeout(() => (button.textContent = "Copy"), 1200);
-          } catch (err) {
-            button.textContent = "Copy failed";
-            setTimeout(() => (button.textContent = "Copy"), 1200);
-          }
-        });
-        row.appendChild(button);
-
         if (field.key) {
           fieldInputMap[field.key] = input;
           const handleFieldInput = () => {
@@ -4385,6 +4438,12 @@
             readOnly: true,
             countChars: true,
           },
+          { label: "Condition Status", key: "condition_status" },
+          {
+            label: "Pre-Owned Condition (Like New/Good/Fair/Poor/None)",
+            key: "pre_owned_condition",
+          },
+          { label: "Condition Notes", key: "condition", multiline: true },
           {
             label: "Buyer pays shipping price",
             key: "buyer_pays_shipping_price",
@@ -4424,12 +4483,6 @@
               Array.isArray(value) ? value.join(", ") : toStringValue(value),
             parse: (value) => parseList(value),
           },
-          { label: "Condition Status", key: "condition_status" },
-          {
-            label: "Pre-Owned Condition (Like New/Good/Fair/Poor/None)",
-            key: "pre_owned_condition",
-          },
-          { label: "Condition Notes", key: "condition", multiline: true },
           { label: "MSRP", key: "msrp" },
           { label: "UPC", key: "upc" },
           { label: "Quantity", key: "quantity" },
@@ -4471,6 +4524,8 @@
         const shippingFields = [
           { label: "Shipping Weight (lb)", key: "shipping_weight_lb" },
           { label: "Shipping Weight (oz)", key: "shipping_weight_oz" },
+          { label: "Packaging Weight (lb)", key: "packaging_weight_lb" },
+          { label: "Packaging Weight (oz)", key: "packaging_weight_oz" },
           { label: "Package Length (in)", key: "package_length" },
           { label: "Package Width (in)", key: "package_width" },
           { label: "Package Height (in)", key: "package_height" },

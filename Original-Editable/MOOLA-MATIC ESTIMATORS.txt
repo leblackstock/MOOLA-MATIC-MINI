@@ -52,6 +52,11 @@ STEP A2 — Packed size + weight (best effort)
 - Multiple books: 3–6 books ~6–12 lb packed; 10+ books often category E.
 - Fine china set: weight escalates fast; if set size unclear, ask ONE question (pieces or weight).
 - Art: unframed canvas light but oversize; framed glass heavier + fragile.
+- Estimate packaging weight separately when possible, then set shipping weight = item weight + packaging weight.
+- Footwear packaging-weight defaults (best point estimate):
+  - Toddler / very small shoes or boots: 0 lb 4 oz
+  - Most shoes / sneakers / loafers / sandals: 0 lb 8 oz
+  - Most boots / heavy footwear: 1 lb 0 oz
 
 STEP A3 — Carrier/service + cost (choose one best-point estimate)
 A) Very small/light

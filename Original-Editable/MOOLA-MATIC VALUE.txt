@@ -36,6 +36,9 @@ RULES
   (1) Buyer pays shipping
   (2) Free shipping
 - Always output shipping estimate, prep+packing estimate, fees estimate, labor estimate.
+- Estimate packaging weight separately during Value mode when item weight is known or can be reasonably inferred.
+- `shipping_weight_lb` / `shipping_weight_oz` should represent packed shipping weight.
+- `packaging_weight_lb` / `packaging_weight_oz` should represent the packaging-only estimate used to reach the packed shipping weight.
 - Apply the Market Price Sanity Check (ESTIMATORS) so free-shipping pricing stays competitive.
 - Do not output Types unless user explicitly triggers “Types”.
 - Estimate shipping weight and package dimensions for listing form use.
@@ -56,6 +59,7 @@ Identify (assumptions):
 
 - Shipping estimate (assumptions): $Z (Carrier/Service + brief reason)
 - Estimated shipping weight (assumptions): X lb Y oz
+- Estimated packaging weight (assumptions): X lb Y oz
 - Estimated package dimensions (assumptions): L x W x H in
 - Prep + packing estimate (assumptions): $P (brief reason)
 - Estimated fees (assumptions): $ (brief basis)

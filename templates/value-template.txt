@@ -19,6 +19,7 @@ Identify (assumptions):
 
 - Shipping estimate (assumptions): $<ship_cost> (<carrier_or_service> + <brief_reason>)
 - Estimated shipping weight (assumptions): <lb> lb <oz> oz
+- Estimated packaging weight (assumptions): <lb> lb <oz> oz
 - Estimated package dimensions (assumptions): <L> x <W> x <H> in
 - Prep + packing estimate (assumptions): $<pack_cost> (<brief_reason>)
 - Estimated fees (assumptions): $<fees> (<brief_basis>)

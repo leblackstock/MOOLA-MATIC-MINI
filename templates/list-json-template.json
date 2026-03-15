@@ -37,6 +37,8 @@
   "intended_for": ["<intended_for>"],
   "shipping_weight_lb": "<shipping_weight_lb_or_blank>",
   "shipping_weight_oz": "<shipping_weight_oz_or_blank>",
+  "packaging_weight_lb": "<packaging_weight_lb_or_blank>",
+  "packaging_weight_oz": "<packaging_weight_oz_or_blank>",
   "package_length": "<package_length_or_blank>",
   "package_width": "<package_width_or_blank>",
   "package_height": "<package_height_or_blank>",

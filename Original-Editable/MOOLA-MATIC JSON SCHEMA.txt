@@ -38,14 +38,14 @@ JSON FILE CONTENT (EXACT)
   shipping_cost_estimate, offer_recommendation, comps_day_range, time_to_sell_sentence, platforms, types_block, listing_body,
   listperfectly_description, question,
   sku, quantity, cogs, upc, brand, color, material, size_or_fit, original_size, style_features, country_of_origin, msrp, era_status, era_notes, style_tags,
-  condition_status, intended_for, shipping_weight_lb, shipping_weight_oz,
+  condition_status, intended_for, shipping_weight_lb, shipping_weight_oz, packaging_weight_lb, packaging_weight_oz,
   package_length, package_width, package_height, shipping_zip,
   purchase_date, purchase_location, notes, internal_notes
 
 FIELD TYPES (STRICT)
 - Strings: title, hook, description, tags_line, condition, cta, pricing_sentence, shipping_estimate_sentence, offer_recommendation, comps_day_range, time_to_sell_sentence,
   types_block, listing_body, listperfectly_description, question, sku, quantity, cogs, upc, brand, color, material, size_or_fit,
-  style_features, country_of_origin, msrp, era_status, era_notes, condition_status, shipping_weight_lb, shipping_weight_oz, package_length, package_width, package_height,
+  style_features, country_of_origin, msrp, era_status, era_notes, condition_status, shipping_weight_lb, shipping_weight_oz, packaging_weight_lb, packaging_weight_oz, package_length, package_width, package_height,
   shipping_zip, purchase_date, purchase_location, notes, internal_notes, shipping_cost_estimate, free_shipping_price, buyer_pays_shipping_price.
 - Arrays of strings: included_items, measurements, measurements_imperial, measurements_metric, tags, intended_for, style_tags.
 - Arrays of objects: platforms (each object has "platform" and "reason" strings).
@@ -105,8 +105,10 @@ FIELD RULES
 - condition_status = "New" or "Pre-Owned" if known; otherwise empty.
 - intended_for = array of intended-for values if known; otherwise []. Use ONLY these exact options:
   Unisex, Men, Women, Unisex Kids, Girls, Boys, Babies, Maternity, Pets, Cats, Dogs, None.
-- shipping_weight_lb = estimated shipping weight in lb if known; otherwise empty.
-- shipping_weight_oz = estimated shipping weight in oz if known; otherwise empty.
+- shipping_weight_lb = estimated packed shipping weight in lb (item + packaging) if known; otherwise empty.
+- shipping_weight_oz = estimated packed shipping weight in oz (item + packaging) if known; otherwise empty.
+- packaging_weight_lb = estimated packaging-only weight in lb if known; otherwise empty.
+- packaging_weight_oz = estimated packaging-only weight in oz if known; otherwise empty.
 - package_length = estimated package length if known; otherwise empty.
 - package_width = estimated package width if known; otherwise empty.
 - package_height = estimated package height if known; otherwise empty.

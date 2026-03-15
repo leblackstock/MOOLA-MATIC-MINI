@@ -70,6 +70,7 @@ JSON OUTPUT (DEFAULT FOR LIST MODE)
 - Populate measurement arrays in JSON (do not defer to UI).
 - Set `size_or_fit` to numeric size; append a space + width letter code when present.
 - JSON output rules and schema are defined in MOOLA-MATIC JSON SCHEMA.txt (follow it exactly).
+- Carry forward the Value-phase packaging estimate in JSON. `shipping_weight_*` is the packed total; `packaging_weight_*` is the packaging-only estimate.
 
 Ask at most ONE question at the end. If none needed, output exactly: None
 
