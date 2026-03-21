@@ -1,0 +1,42 @@
+# Adapter and Wrapper Layer
+
+Purpose
+- This folder contains the Stage 3 adapter, wrapper, and compatibility layer for the new system.
+
+Rules
+- Files in this folder are not canonical policy owners.
+- Wrappers must defer to canonical files in `../10-canonical/` and governance files in `../00-governance/`.
+- If a wrapper contains preserved operational behavior, that behavior must be traceable to:
+  - a canonical rule,
+  - an approved decision,
+  - or an explicit D-004 review outcome.
+
+Status classes
+- Hand-maintained wrapper: a thin compatibility or entry surface maintained directly.
+- Future-generated wrapper: a wrapper that should later be generated from canonical files.
+- Compatibility shim: a thin surface retained to keep old-vs-new behavior understandable.
+- Archival reference: a preserved legacy surface that is not active policy in the new system.
+
+Current Stage 3 files
+- `adapter-inventory.md`
+- `d004-wrapper-review.md`
+- `cursor/AGENTS.wrapper.md`
+- `cursor/cursorrules.wrapper.md`
+- `commands/run-moola.wrapper.md`
+- `commands/edit-moola.wrapper.md`
+
+Canonical dependencies
+- `../10-canonical/system/routing.md`
+- `../10-canonical/system/run-workflow.md`
+- `../10-canonical/system/edit-workflow.md`
+- `../10-canonical/system/maintenance-policy.md`
+- `../10-canonical/policies/default-platform-layer.md`
+- `../10-canonical/modes/value.md`
+- `../10-canonical/contracts/listing-response-contract.md`
+- `../10-canonical/contracts/listing-json.schema.json`
+
+Decision references
+- D-001
+- D-002
+- D-003
+- D-004

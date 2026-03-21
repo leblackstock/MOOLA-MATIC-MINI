@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moola-system-v2.local/contracts/listing-json.schema.json",
+  "title": "MOOLA Listing JSON Schema",
+  "$comment": "Stage 2 canonical schema. Finalized in the targeted blocker-resolution pass. All required listing and automation fields are included. Field-group traceability is recorded in 50-validation/traceability-matrix.md. Automation-only field semantics are bounded using selector, template, UI-label, and finished-output evidence.",
+  "x-provisional": false,
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "title",
+    "hook",
+    "description",
+    "included_items",
+    "measurements",
+    "measurements_imperial",
+    "measurements_metric",
+    "tags_line",
+    "tags",
+    "condition",
+    "cta",
+    "pricing_sentence",
+    "free_shipping_price",
+    "buyer_pays_shipping_price",
+    "shipping_estimate_sentence",
+    "shipping_cost_estimate",
+    "offer_recommendation",
+    "comps_day_range",
+    "time_to_sell_sentence",
+    "platforms",
+    "types_block",
+    "listing_body",
+    "listperfectly_description",
+    "question",
+    "sku",
+    "quantity",
+    "cogs",
+    "upc",
+    "brand",
+    "color",
+    "material",
+    "size_or_fit",
+    "original_size",
+    "style_features",
+    "country_of_origin",
+    "msrp",
+    "era_status",
+    "era_notes",
+    "style_tags",
+    "condition_status",
+    "pre_owned_condition",
+    "intended_for",
+    "shipping_weight_lb",
+    "shipping_weight_oz",
+    "packaging_weight_lb",
+    "packaging_weight_oz",
+    "package_length",
+    "package_width",
+    "package_height",
+    "shipping_zip",
+    "purchase_date",
+    "purchase_location",
+    "notes",
+    "internal_notes",
+    "fees_or_other_costs"
+  ],
+  "$defs": {
+    "stringField": {
+      "type": "string"
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "platformEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "platform",
+        "reason"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "originalSize": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "system",
+        "gender",
+        "age",
+        "size",
+        "width"
+      ],
+      "properties": {
+        "system": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "age": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string"
+        },
+        "width": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "properties": {
+    "title": { "$ref": "#/$defs/stringField" },
+    "hook": { "$ref": "#/$defs/stringField" },
+    "description": { "$ref": "#/$defs/stringField" },
+    "included_items": { "$ref": "#/$defs/stringArray" },
+    "measurements": { "$ref": "#/$defs/stringArray" },
+    "measurements_imperial": { "$ref": "#/$defs/stringArray" },
+    "measurements_metric": { "$ref": "#/$defs/stringArray" },
+    "tags_line": { "$ref": "#/$defs/stringField" },
+    "tags": { "$ref": "#/$defs/stringArray" },
+    "condition": { "$ref": "#/$defs/stringField" },
+    "cta": { "$ref": "#/$defs/stringField" },
+    "pricing_sentence": {
+      "$ref": "#/$defs/stringField",
+      "description": "Must contain both prices in one sentence."
+    },
+    "free_shipping_price": { "$ref": "#/$defs/stringField" },
+    "buyer_pays_shipping_price": { "$ref": "#/$defs/stringField" },
+    "shipping_estimate_sentence": { "$ref": "#/$defs/stringField" },
+    "shipping_cost_estimate": { "$ref": "#/$defs/stringField" },
+    "offer_recommendation": { "$ref": "#/$defs/stringField" },
+    "comps_day_range": { "$ref": "#/$defs/stringField" },
+    "time_to_sell_sentence": { "$ref": "#/$defs/stringField" },
+    "platforms": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/platformEntry" }
+    },
+    "types_block": { "$ref": "#/$defs/stringField" },
+    "listing_body": {
+      "$ref": "#/$defs/stringField",
+      "description": "Listing body excludes title and platform lines."
+    },
+    "listperfectly_description": {
+      "$ref": "#/$defs/stringField",
+      "description": "Description used by ListPerfectly autofill."
+    },
+    "question": { "$ref": "#/$defs/stringField" },
+    "sku": { "$ref": "#/$defs/stringField" },
+    "quantity": {
+      "type": "string",
+      "const": "1"
+    },
+    "cogs": { "$ref": "#/$defs/stringField" },
+    "upc": { "$ref": "#/$defs/stringField" },
+    "brand": { "$ref": "#/$defs/stringField" },
+    "color": { "$ref": "#/$defs/stringField" },
+    "material": { "$ref": "#/$defs/stringField" },
+    "size_or_fit": {
+      "$ref": "#/$defs/stringField",
+      "description": "Numeric size; append width code when printed on the item."
+    },
+    "original_size": {
+      "$ref": "#/$defs/originalSize"
+    },
+    "style_features": { "$ref": "#/$defs/stringField" },
+    "country_of_origin": { "$ref": "#/$defs/stringField" },
+    "msrp": { "$ref": "#/$defs/stringField" },
+    "era_status": {
+      "type": "string",
+      "enum": [
+        "Vintage",
+        "Antique",
+        "Modern",
+        "Unknown"
+      ]
+    },
+    "era_notes": { "$ref": "#/$defs/stringField" },
+    "style_tags": { "$ref": "#/$defs/stringArray" },
+    "condition_status": {
+      "type": "string",
+      "enum": [
+        "",
+        "New",
+        "Pre-Owned"
+      ]
+    },
+    "pre_owned_condition": {
+      "type": "string",
+      "enum": [
+        "",
+        "Like New",
+        "Good",
+        "Fair",
+        "Poor",
+        "None"
+      ],
+      "description": "Automation-required ListPerfectly field. Use one of the known UI-aligned pre-owned condition buckets. Use `None` when no pre-owned subcondition should be selected."
+    },
+    "intended_for": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Unisex",
+          "Men",
+          "Women",
+          "Unisex Kids",
+          "Girls",
+          "Boys",
+          "Babies",
+          "Maternity",
+          "Pets",
+          "Cats",
+          "Dogs",
+          "None"
+        ]
+      }
+    },
+    "shipping_weight_lb": { "$ref": "#/$defs/stringField" },
+    "shipping_weight_oz": { "$ref": "#/$defs/stringField" },
+    "packaging_weight_lb": { "$ref": "#/$defs/stringField" },
+    "packaging_weight_oz": { "$ref": "#/$defs/stringField" },
+    "package_length": { "$ref": "#/$defs/stringField" },
+    "package_width": { "$ref": "#/$defs/stringField" },
+    "package_height": { "$ref": "#/$defs/stringField" },
+    "shipping_zip": {
+      "$ref": "#/$defs/stringField",
+      "description": "Defaults to 30236 unless explicitly overridden."
+    },
+    "purchase_date": { "$ref": "#/$defs/stringField" },
+    "purchase_location": { "$ref": "#/$defs/stringField" },
+    "notes": {
+      "$ref": "#/$defs/stringField",
+      "description": "Exactly '<purchase_date> Purchased from <purchase_location>' or blank."
+    },
+    "internal_notes": {
+      "$ref": "#/$defs/stringField",
+      "description": "Internal item reference notes not used by Playwright/ListPerfectly."
+    },
+    "fees_or_other_costs": {
+      "$ref": "#/$defs/stringField",
+      "description": "Automation-required ListPerfectly total for non-shipping selling costs entered into the `Fees or Other Costs` field. This is a single dollar-amount string and may aggregate platform fees, payment-processing fees, labor, or other non-shipping costs when those estimates are used."
+    }
+  }
+}
