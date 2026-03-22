@@ -18,6 +18,27 @@ Applied approval record
 Current blockers
 - None.
 
+Post-cutover rewrite status
+- Approved decisions D-007 through D-010 are now implemented at the canonical Identify, Value, routing, Run, and platform-layer level.
+- Those decisions do not reopen cutover approval.
+- Those decisions established explicit Identify-only, Value-only, request-routed `/run-moola`, and sequential Identify+Value behavior without reopening cutover.
+
+Deferred post-cutover rewrite areas
+- Targeted List impact review is complete.
+- `10-canonical/contracts/listing-response-contract.md` requires no immediate canonical change.
+- `10-canonical/contracts/listing-json.schema.json` requires no immediate canonical change.
+- Broader List-specific canonical work remains deferred, including cross-category item-specific handling, title/description dependency logic, Types handling, and any future dedicated List owner decision.
+- Wrapper and adapter alignment for the active compatibility surfaces is complete.
+- Future generated wrapper surfaces remain deferred.
+- Validation/readiness updates for those deferred areas remain pending until those steps are implemented.
+
+Implemented validation coverage
+- Identify-only with photos is now covered as Identify-only without default platform attachment.
+- Value-only with photos is now covered as Value-only with one-sentence identification context and default platform attachment where active.
+- Identify+Value with photos is now covered as sequential Identify then Value with platform attachment after the Value portion where active.
+- Ambiguous image-led requests are now covered as ambiguity-handled rather than auto-bundled.
+- Cross-category miscellaneous-reseller handling is now covered at the canonical Identify/Value/routing level.
+
 Final status
 - Cutover approved and applied
 

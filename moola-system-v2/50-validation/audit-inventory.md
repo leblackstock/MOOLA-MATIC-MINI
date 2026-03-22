@@ -5,9 +5,9 @@ Purpose
 
 Audit scope
 - Stage 1 governance files
-- Stage 2 canonical policy, mode, contract, and schema files
+- Stage 2 and post-cutover canonical policy, mode, contract, and schema files
 - Stage 3 adapter and wrapper files
-- Approved decisions D-001 through D-006
+- Approved decisions D-001 through D-010
 - Deprecation and archival records
 - Traceability records
 
@@ -26,6 +26,7 @@ In-scope artifacts
 - `00-governance/decision-log.md`
 - `00-governance/deprecations.md`
 - `10-canonical/system/*.md`
+- `10-canonical/modes/identify.md`
 - `10-canonical/policies/default-platform-layer.md`
 - `10-canonical/modes/value.md`
 - `10-canonical/contracts/listing-response-contract.md`
@@ -35,6 +36,10 @@ In-scope artifacts
 - `30-adapters/commands/*.md`
 - `30-adapters/d004-wrapper-review.md`
 - `50-validation/traceability-matrix.md`
+- `50-validation/losslessness-assessment.md`
+- `50-validation/traceability-audit.md`
+- `50-validation/wrapper-policy-leak-review.md`
+- `50-validation/cutover-readiness.md`
 - `50-validation/stage-roadmap.md`
 
 Out-of-scope for this stage

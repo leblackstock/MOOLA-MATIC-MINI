@@ -28,15 +28,25 @@ Current Stage 3 files
 Canonical dependencies
 - `../10-canonical/system/routing.md`
 - `../10-canonical/system/run-workflow.md`
+- `../10-canonical/modes/identify.md`
+- `../10-canonical/modes/value.md`
 - `../10-canonical/system/edit-workflow.md`
 - `../10-canonical/system/maintenance-policy.md`
 - `../10-canonical/policies/default-platform-layer.md`
-- `../10-canonical/modes/value.md`
 - `../10-canonical/contracts/listing-response-contract.md`
 - `../10-canonical/contracts/listing-json.schema.json`
+
+Alignment note
+- Active wrappers in this folder are aligned to the canonical Identify/Value/routing rewrite.
+- Wrappers must not imply bundled Identify+Value by default, must not reattach the default platform layer to pure Identify by default, and must not treat image input alone as permission to run both Identify and Value.
+- Wrapper-specific operational behavior remains limited to explicitly reviewed items such as selector priority and Playwright UI handoff.
 
 Decision references
 - D-001
 - D-002
 - D-003
 - D-004
+- D-007
+- D-008
+- D-009
+- D-010

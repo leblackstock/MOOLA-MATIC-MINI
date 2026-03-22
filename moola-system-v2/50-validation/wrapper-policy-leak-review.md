@@ -39,6 +39,12 @@ Leak assessment
 - Remaining wrapper-only behaviors are visible, classified, and traceable.
 - The remaining non-canonical heuristics affect copy style or recommendation emphasis, not data validity or automation completeness.
 
+Implemented wrapper-alignment status
+- Active wrapper summaries are now aligned to the canonical Identify, Value, routing, Run, and platform-layer owners.
+- Active wrappers no longer imply bundled Identify+Value as the default `/run-moola` behavior.
+- Active wrappers no longer imply that pure Identify receives the default platform layer by default.
+- Active wrappers no longer imply that image input alone auto-triggers both Identify and Value.
+
 Actions still needed before or during later drafting
 - Decide whether deferred List copy/style heuristics should be promoted when List-mode canonical drafting occurs.
 - Decide whether deferred Vintage/Antique platform heuristics should be promoted when fuller platform-policy drafting occurs.

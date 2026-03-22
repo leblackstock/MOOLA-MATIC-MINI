@@ -34,11 +34,21 @@ Current Stage 1 files
 - `50-validation/traceability-matrix.md`
 - `50-validation/stage-roadmap.md`
 
-Current Stage 2 files
+Current Stage 2 baseline files
 - `10-canonical/policies/default-platform-layer.md`
 - `10-canonical/modes/value.md`
 - `10-canonical/contracts/listing-response-contract.md`
 - `10-canonical/contracts/listing-json.schema.json`
+
+Post-cutover canonical additions
+- `10-canonical/modes/identify.md`
+
+Post-cutover rewrite implementation highlights
+- Pure Identify now has an explicit canonical owner in `10-canonical/modes/identify.md`.
+- Pure Value has been narrowed to a one-sentence identification context rather than a full outward Identify block by default.
+- Routing and Run behavior now use request-based selection and explicit sequential Identify+Value composition rather than default bundled behavior.
+- The default platform layer now attaches separately and no longer attaches to pure Identify by default.
+- Validation/readiness artifacts record the implemented Identify / Value / routing rewrite and the currently deferred areas.
 
 Decision reference marker
 - Stage 1 files must not silently resolve unresolved semantic conflicts.
@@ -52,6 +62,10 @@ Current approved decision set
 - D-004 — Wrapper-only additive behavior is reviewed item-by-item, not promoted wholesale.
 - D-005 — Blocker-resolution outcomes finalize schema semantics and classify unresolved heuristics explicitly.
 - D-006 — Approved cutover activates `moola-system-v2` as the main system, confirms the schema as final, and keeps deferred heuristics non-canonical.
+- D-007 — Pure Identify excludes platform recommendations by default.
+- D-008 — Pure Value uses one-sentence identification context instead of a full outward Identify section by default.
+- D-009 — `/run-moola` routes by user request and does not auto-default to combined Identify+Value.
+- D-010 — The rewrite must use a universal resale core plus category-specific extension logic for a miscellaneous reseller.
 
 Traceability requirement
 - Every canonical file in the new system must support traceability back to legacy sources.

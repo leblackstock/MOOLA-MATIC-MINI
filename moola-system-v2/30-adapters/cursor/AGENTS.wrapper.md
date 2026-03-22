@@ -13,11 +13,16 @@ Canonical-first rule
 
 Run workflow trigger
 - Trigger: `/run-moola`
+- Routing summary:
+  - request-based canonical routing chooses Identify-only, Value-only, Identify+Value, or List-related workflow execution
+  - `/run-moola` does not auto-default to combined Identify+Value
+  - image input alone does not auto-trigger both Identify and Value
 - Canonical owners:
   - `../../10-canonical/system/routing.md`
   - `../../10-canonical/system/run-workflow.md`
-  - `../../10-canonical/policies/default-platform-layer.md`
+  - `../../10-canonical/modes/identify.md`
   - `../../10-canonical/modes/value.md`
+  - `../../10-canonical/policies/default-platform-layer.md`
   - `../../10-canonical/contracts/listing-response-contract.md`
   - `../../10-canonical/contracts/listing-json.schema.json`
 
@@ -36,3 +41,7 @@ Decision references
 - D-002
 - D-003
 - D-004
+- D-007
+- D-008
+- D-009
+- D-010

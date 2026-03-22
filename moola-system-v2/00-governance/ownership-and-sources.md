@@ -44,6 +44,24 @@ Approved Stage 2 topic ownership
 - Canonical List JSON response contract: `10-canonical/contracts/listing-response-contract.md`
 - Single canonical JSON schema with listing and automation fields: `10-canonical/contracts/listing-json.schema.json`
 
+Approved post-cutover Identify/Value rewrite-boundary ownership
+- Pure Identify-mode contract: `10-canonical/modes/identify.md`
+- Pure Value-mode contract: `10-canonical/modes/value.md`
+- Combined Identify+Value composition selection and ambiguity handling: `10-canonical/system/routing.md`
+- Combined Identify+Value execution sequencing inside Run workflows: `10-canonical/system/run-workflow.md`
+- Default platform recommendation layer and attachment rules: `10-canonical/policies/default-platform-layer.md`
+- Universal reseller scope, global boundaries, and category-extension principle at the system level: `10-canonical/system/identity-and-scope.md`
+- Canonical List JSON response behavior: `10-canonical/contracts/listing-response-contract.md`
+- Canonical listing-data structure: `10-canonical/contracts/listing-json.schema.json`
+
+Ownership notes for the rewrite boundary
+- Identify-specific behavior must not remain implicitly owned by routing prose, system-scope prose, or wrapper summaries when `10-canonical/modes/identify.md` owns that behavior explicitly.
+- Value-specific behavior must not rely on wrappers or routing files as de facto mode owners when `10-canonical/modes/value.md` owns that behavior explicitly.
+- Routing files may decide which operation runs, but they do not become the full owner of the Identify or Value mode contracts.
+- Run-workflow files may define execution sequence, but they do not become the full owner of Identify-only or Value-only output contracts.
+- Wrapper and adapter files are not policy owners and must remain thin summaries that point back to canonical files.
+- Category-specific detail handling belongs inside canonical mode owners as extension logic when relevant, not inside wrappers or evidence files.
+
 Legacy-source stance
 - `Original-Editable/*.txt` is treated as the primary legacy baseline for reconstructing canonical behavior.
 - `Original/*.txt` is treated as archival legacy reference material.
@@ -63,10 +81,16 @@ Open decision references
   - D-004 — Wrapper-only behavior is reviewed item-by-item, not promoted wholesale.
   - D-005 — Blocker-resolution outcomes finalize schema semantics and classify unresolved heuristics explicitly.
   - D-006 — Approved cutover activates `moola-system-v2` as the main system and keeps deferred heuristics non-canonical.
+  - D-007 — Pure Identify excludes platform recommendations by default.
+  - D-008 — Pure Value uses one-sentence identification context instead of a full outward Identify section by default.
+  - D-009 — `/run-moola` routes by user request and does not auto-default to combined Identify+Value.
+  - D-010 — The future rewrite must use a universal resale core plus category-specific extension logic for a miscellaneous reseller.
 
 Legacy-source anchors
 - `Original-Editable/PROJECT SYSTEM INSTRUCTIONS - MOOLA-MATIC.txt`
 - `Original-Editable/MOOLA-MATIC PROMPT.txt`
+- `Original-Editable/MOOLA-MATIC IDENTIFY.txt`
+- `Original-Editable/MOOLA-MATIC VALUE.txt`
 - `AGENTS.md`
 - `.cursorrules`
 - `.cursor/skills/moola-run/SKILL.md`

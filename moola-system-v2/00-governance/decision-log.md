@@ -218,11 +218,159 @@ Decision records
 - Approval required: No
 - Notes: This decision records the approved transition into the new main system and preserves the canonical-vs-optional boundary.
 
+## D-007
+- Topic: Pure Identify default platform boundary
+- Status: Approved
+- Needed from human: Resolved.
+- Affected legacy sources:
+  - `Original-Editable/MOOLA-MATIC IDENTIFY.txt`
+  - `Original-Editable/MOOLA-MATIC MODES.txt`
+  - `Original-Editable/MOOLA-MATIC PROMPT.txt`
+- Affected new files:
+  - `10-canonical/policies/default-platform-layer.md`
+  - `10-canonical/system/routing.md`
+  - future `10-canonical/modes/identify.md`
+  - `50-validation/traceability-matrix.md`
+  - `50-validation/losslessness-assessment.md`
+  - `50-validation/traceability-audit.md`
+  - `50-validation/stage-roadmap.md`
+- Old wording / old behavior:
+  - Platform recommendations are required by default on every item.
+  - Identify workflows may embed the default platform recommendation block.
+- New wording / new behavior:
+  - Pure Identify requests do not include platform recommendations by default.
+  - Platform recommendations remain part of Value, Identify+Value, and List workflows unless a higher-priority rule or user instruction disables them.
+  - Future rewrite planning must attach the platform layer explicitly in those workflows rather than infer it into pure Identify.
+- Reason for change:
+  - Preserve the platform recommendation layer while giving Identify a clean non-selling default boundary.
+- Risk if unresolved:
+  - Pure Identify cannot be rewritten cleanly without contradicting the current platform-layer architecture.
+- Risk level: High
+- Approval required: No
+- Notes: This decision records an approved planning boundary for the future rewrite and does not itself rewrite canonical implementation files.
+
+## D-008
+- Topic: Pure Value outward identification boundary
+- Status: Approved
+- Needed from human: Resolved.
+- Affected legacy sources:
+  - `Original-Editable/MOOLA-MATIC VALUE.txt`
+  - `Original-Editable/MOOLA-MATIC PROMPT.txt`
+  - `Original-Editable/MOOLA-MATIC MODES.txt`
+- Affected new files:
+  - `10-canonical/modes/value.md`
+  - future `10-canonical/modes/identify.md`
+  - `10-canonical/system/routing.md`
+  - `50-validation/traceability-matrix.md`
+  - `50-validation/losslessness-assessment.md`
+  - `50-validation/traceability-audit.md`
+  - `50-validation/stage-roadmap.md`
+- Old wording / old behavior:
+  - Value mode includes a full outward Identify block with `Identify (facts)` and `Identify (assumptions)` sections.
+  - Identification support and identification confidence gating are embedded directly in the visible Value output.
+- New wording / new behavior:
+  - Pure Value does not include a full outward Identify section by default.
+  - Pure Value must still include a one-sentence item identification context for valuation clarity.
+  - Identification may still be used internally to support valuation, but it should not expand into a separate full Identify report unless the user explicitly requests Identify+Value.
+- Reason for change:
+  - Separate pure Value from combined Identify+Value behavior while preserving valuation transparency and internal identification support.
+- Risk if unresolved:
+  - Value cannot be rewritten as a distinct operation without preserving the current outward Identify/Value blur.
+- Risk level: High
+- Approval required: No
+- Notes: This decision records an approved planning boundary for the future rewrite and does not itself rewrite canonical implementation files.
+
+## D-009
+- Topic: `/run-moola` default composition boundary
+- Status: Approved
+- Needed from human: Resolved.
+- Affected legacy sources:
+  - `commands/run-moola.md`
+  - `AGENTS.md`
+  - `.cursorrules`
+  - `.cursor/rules/moola-routing.mdc`
+  - `Original-Editable/MOOLA-MATIC MODES.txt`
+- Affected new files:
+  - `10-canonical/system/routing.md`
+  - `10-canonical/system/run-workflow.md`
+  - `30-adapters/commands/run-moola.wrapper.md`
+  - `30-adapters/cursor/AGENTS.wrapper.md`
+  - `30-adapters/cursor/cursorrules.wrapper.md`
+  - `30-adapters/adapter-inventory.md`
+  - `50-validation/traceability-matrix.md`
+  - `50-validation/losslessness-assessment.md`
+  - `50-validation/traceability-audit.md`
+  - `50-validation/stage-roadmap.md`
+- Old wording / old behavior:
+  - `/run-moola` defaults to combined Identify+Value behavior unless the user explicitly requests List.
+  - Ambiguous or image-led Run requests may therefore inherit combined behavior even when the user did not explicitly ask for both operations.
+- New wording / new behavior:
+  - `/run-moola` does not default automatically to combined Identify+Value behavior.
+  - `/run-moola` must route based on the user's request.
+  - If the request is ambiguous, the system must use its ambiguity-handling behavior rather than auto-running both.
+  - Image input remains evidence input and does not by itself force combined Identify+Value behavior.
+- Reason for change:
+  - Preserve `/run-moola` as a workflow entry point while removing accidental bundled behavior and making composition explicit.
+- Risk if unresolved:
+  - Wrapper-level defaults will continue to reintroduce bundled Identify+Value behavior even after the mode rewrite is planned.
+- Risk level: High
+- Approval required: No
+- Notes: This decision records an approved planning boundary for the future rewrite and does not itself rewrite canonical implementation files.
+
+## D-010
+- Topic: Cross-category miscellaneous reseller rewrite boundary
+- Status: Approved
+- Needed from human: Resolved.
+- Affected legacy sources:
+  - `Original-Editable/MOOLA-MATIC IDENTIFY.txt`
+  - `Original-Editable/MOOLA-MATIC VALUE.txt`
+  - `Original-Editable/MOOLA-MATIC LIST.txt`
+  - `Original-Editable/MOOLA-MATIC PROMPT.txt`
+  - `Original-Editable/MOOLA-MATIC ESTIMATORS.txt`
+  - `templates/measurements/measurements-boots.txt`
+  - `templates/measurements/measurements-shoes.txt`
+  - `templates/measurements/measurements-garments.txt`
+  - `templates/measurements/measurements-standard-lwh.txt`
+- Affected new files:
+  - `10-canonical/system/identity-and-scope.md`
+  - future `10-canonical/modes/identify.md`
+  - `10-canonical/modes/value.md`
+  - future List rewrite-planning surfaces and any later canonical List owner if needed
+  - `10-canonical/contracts/listing-json.schema.json`
+  - `50-validation/traceability-matrix.md`
+  - `50-validation/losslessness-assessment.md`
+  - `50-validation/traceability-audit.md`
+  - `50-validation/cutover-readiness.md`
+  - `50-validation/stage-roadmap.md`
+- Old wording / old behavior:
+  - The active system role is general reseller/listing support and already contains cross-category signals.
+  - Legacy estimator behavior covers varied categories such as jewelry, books, ceramics, art, small appliances, décor, and parts.
+  - Legacy measurement support includes shoes, boots, garments, and a standard L/W/H fallback.
+  - However, Identify/Value planning is not yet formalized around a universal resale core plus category-specific extension logic, and some supporting surfaces visibly overrepresent apparel/footwear patterns.
+- New wording / new behavior:
+  - The future Identify/Value rewrite must be designed for a miscellaneous reseller with highly varied inventory rather than a single dominant category.
+  - The rewritten architecture must use:
+    - a strong universal resale-identification and valuation core
+    - category-specific extension logic when relevant details depend on the item class
+  - The architecture must remain category-agnostic at the core, category-aware when needed, and must not hard-code every category into the base contract.
+  - Future List-impact review must explicitly assess category-specific item specifics, schema expectations, condition language, platform considerations, and title/description dependencies.
+  - Category examples such as apparel, footwear, jewelry, electronics, tools, collectibles, art/decor, parts/components, handmade items, and tobacco pipes are valid extension cases rather than new category-specific base contracts.
+- Reason for change:
+  - Prevent the future rewrite from overfitting to apparel/footwear patterns while preserving broad reseller behavior already evidenced in the legacy sources.
+- Risk if unresolved:
+  - The future Identify/Value rewrite could become category-biased, under-specify non-fashion items, or force unnecessary schema and workflow drift when miscellaneous inventory appears.
+- Risk level: High
+- Approval required: No
+- Notes: This decision records an approved planning boundary for the future rewrite and does not itself rewrite canonical implementation files.
+
 Legacy-source anchors
+- `Original-Editable/MOOLA-MATIC IDENTIFY.txt`
 - `Original-Editable/MOOLA-MATIC PROMPT.txt`
 - `Original-Editable/MOOLA-MATIC MODES.txt`
 - `Original-Editable/MOOLA-MATIC VALUE.txt`
 - `Original-Editable/MOOLA-MATIC JSON SCHEMA.txt`
+- `Original-Editable/MOOLA-MATIC ESTIMATORS.txt`
 - `commands/run-moola.md`
+- `AGENTS.md`
 - `.cursor/skills/moola-run/SKILL.md`
 - `.cursorrules`

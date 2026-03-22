@@ -73,6 +73,33 @@ Current system status
 - `moola-system-v2` is now the official current workflow system.
 - The legacy workflow remains preserved as legacy and archival reference material.
 
+Post-cutover semantic rewrite implementation status
+- Approved decisions D-007 through D-010 are now implemented in the canonical Identify, Value, routing, Run, and platform-layer files.
+- Pure Identify is now implemented as a non-platform-default operation.
+- Pure Value now uses one-sentence identification context instead of a full outward Identify section by default.
+- `/run-moola` now routes by user request rather than default-combined Identify+Value behavior.
+- The canonical Identify and Value owners now use a universal resale core plus category-specific extension logic rather than assuming a single dominant item class.
+- Current estimator breadth and measurement-template variety remain evidence for extension patterns, with `measurements-standard-lwh.txt` retained as the generic fallback shape.
+- Step 4 validation/readiness coverage now records:
+  - Identify-only with photos
+  - Value-only with photos
+  - Identify+Value with photos
+  - ambiguous image-led requests
+  - cross-category miscellaneous-reseller handling
+- Deferred next areas are:
+  - broader List-specific canonical work only where later evidence proves it is needed
+  - wrapper/adapter alignment to the rewritten canonical owners
+  - final validation/readiness updates for those deferred areas
+
+Targeted List impact review status
+- `10-canonical/contracts/listing-response-contract.md` is safe to leave unchanged now.
+- `10-canonical/contracts/listing-json.schema.json` is safe to leave unchanged now.
+- Existing List response-contract and schema behavior remain valid by reference under the current rewrite state.
+- Evidence-only or deferred areas remain:
+  - fashion-skewed Types behavior
+  - title/description dependency logic carried mainly by legacy List sources
+  - broader cross-category List-specific canonical handling if later justified
+
 Legacy-source anchors
 - prior planning analysis in this project
 - `commands/run-moola.md`

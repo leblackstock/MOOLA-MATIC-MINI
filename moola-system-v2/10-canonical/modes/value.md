@@ -4,10 +4,13 @@ Purpose
 - This file is the canonical owner of Value mode.
 
 Goal
-- Estimate resale value and profitability using best-effort identification, pricing, shipping, fees, labor, and profitability logic.
+- Estimate likely resale value and profitability using best-effort identification support, pricing logic, shipping logic, fee/labor assumptions, and resale-relevant valuation reasoning.
 
 Scope
 - Value mode is pricing-focused.
+- Value mode owns the pure Value contract.
+- Value mode owns the universal resale-valuation core.
+- Value mode owns category-specific valuation extension logic when relevant.
 - Value mode owns pricing and profitability behavior.
 - Value mode does not own the default platform recommendation layer.
 
@@ -15,10 +18,46 @@ Dependencies
 - Estimation rules must follow the canonical estimator policy derived from legacy estimator behavior.
 - If a default platform recommendation block is active, it appears outside this mode.
 
-Includes
+Universal resale-valuation core
+- Include, when available and relevant:
+  - one-sentence identification context for the item being valued
+  - likely value range
+  - basis for valuation through comps, sold-market evidence, or clearly stated pricing rationale
+  - condition effect on value
+  - completeness or included-accessories effect on value when relevant
+  - tested or working-status effect on value when relevant
+  - authenticity, material, rarity, age, model-demand, or collector-demand factors when relevant
+  - major factors that could raise or lower value materially
+  - confidence level
+  - assumptions or uncertainty notes
+  - shipping, fee, labor, profitability, and time-to-sell logic when relevant to the Value contract
+
+Category-specific extension model
+- Use the universal resale-valuation core for all item classes.
+- Add category-specific valuation reasoning only when the item class makes it relevant.
+- Category-specific extension logic is additive and selective, not a replacement for the universal core.
+- Example category extensions include:
+  - apparel and shoes
+    - brand demand, style relevance, size desirability, wear severity, outsole/heel/upper condition, material premiums
+  - jewelry
+    - metal value, stone presence or absence, signed or unsigned status, hallmark credibility, missing stones, clasp condition
+  - electronics
+    - tested status, functionality risk, model demand, included chargers or accessories, compatibility, damage severity, obsolescence
+  - tools and hardware
+    - brand demand, completeness, included attachments, rust, modifications, working condition, compatibility
+  - collectibles and media
+    - edition, printing/run, rarity, completeness, series demand, publisher relevance, collector demand
+  - art and decor
+    - maker or artist demand, medium, age, style appeal, signature, mounting/framing state, restoration, fragility and shipping friction
+  - parts and components
+    - exact compatibility, revision/version desirability, measurements, wear, missing pieces, replacement-market demand
+  - tobacco pipes
+    - maker demand, stamping quality, shape desirability, stem originality, chamber/rim condition, cracks, burnout, repairs, collectibility
+
+Core Value behavior
 - Identification confidence gate before pricing
-- Facts and assumptions block for item identification
-- Acquisition/purchase-detail gatekeeping
+- One-sentence identification context before the pricing output
+- Acquisition and purchase-detail gatekeeping
 - Two pricing strategies:
   - buyer pays shipping
   - free shipping
@@ -36,13 +75,14 @@ Includes
 
 Explicit exclusions
 - Platform recommendations by default
+- Full outward Identify-mode report by default
 - Types output unless the user explicitly asks for Types
 - Listing copy
 - List-mode JSON creation behavior
 - Raw JSON output
 
 Interaction with the default platform layer
-- Platform recommendations are still required by default on every item unless the user says `no platforms`.
+- Platform recommendations still attach by default where the approved architecture says they apply unless the user says `no platforms`.
 - When platform recommendations are active in a Value-oriented workflow, they must be output in the separate default platform layer after the Value block.
 - The presence of that separate block does not change the canonical Value-mode contract.
 
@@ -58,21 +98,26 @@ Output-assembly note
 Identification gate
 - If the item cannot be identified confidently enough for pricing, ask one clarifying question and stop.
 - Do not output pricing until the item is identified confidently enough.
+- Identification support may be used internally throughout Value mode, but pure Value does not become a separate full Identify report by default.
 
 Output rules
 - Plain text only.
 - No markdown headings beyond the labels required by this mode contract.
 - No emojis.
 - No extra sections.
-- Facts and assumptions must remain separated.
+- Keep assumptions and uncertainty explicit where they materially affect value.
 
 Exact output contract
 ```text
-Identify (facts):
-- (max 5 bullets)
+Item identified for valuation:
+- (one sentence identifying the item and the most value-relevant identity context)
 
-Identify (assumptions):
-- (max 3 bullets)
+Value basis:
+- (comps / sold-market evidence or pricing rationale)
+- (condition effect on value)
+- (major factor that raises or lowers value materially)
+- Confidence: (High / Medium / Low + brief reason)
+- Assumptions / uncertainty: (brief note or `None.`)
 
 - Likely sale price range (buyer pays shipping): $
 - Likely sale price range (free shipping): $
@@ -103,9 +148,20 @@ Pricing sanity check:
 
 Approved decision references
 - D-001 — Value mode excludes platforms by default; default platform guidance lives outside Value mode.
+- D-008 — Pure Value uses one-sentence identification context instead of a full outward Identify section by default.
+- D-010 — The future rewrite must use a universal resale core plus category-specific extension logic for a miscellaneous reseller.
+
+What this file does not own
+- Full Identify-mode output contract
+- Pure Identify-mode ownership
+- Routing selection logic or ambiguity handling
+- Run workflow sequencing or pass logging
+- Default platform-layer ownership
+- List JSON confirmation behavior or List JSON schema ownership
 
 Legacy-source anchors
 - `Original-Editable/MOOLA-MATIC VALUE.txt`
 - `Original-Editable/MOOLA-MATIC PROMPT.txt`
 - `Original-Editable/MOOLA-MATIC ESTIMATORS.txt`
 - `Original-Editable/MOOLA-MATIC MODES.txt`
+- `templates/value-template.txt`

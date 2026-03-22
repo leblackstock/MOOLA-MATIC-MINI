@@ -6,6 +6,7 @@ Purpose
 Current implementation scope
 - Stage 1 created the foundational system files under `system/`.
 - Stage 2 adds the first canonical policy, mode, contract, and schema files.
+- Post-cutover rewrite implementation added the explicit Identify owner and updated the canonical Identify / Value / routing / Run / platform-layer boundaries.
 
 Current canonical files
 - `system/identity-and-scope.md`
@@ -13,6 +14,7 @@ Current canonical files
 - `system/run-workflow.md`
 - `system/edit-workflow.md`
 - `system/maintenance-policy.md`
+- `modes/identify.md`
 - `policies/default-platform-layer.md`
 - `modes/value.md`
 - `contracts/listing-response-contract.md`
