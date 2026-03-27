@@ -35,8 +35,10 @@ Current files
   - thin operational guardrails for Identify, Value, routing, Run, ambiguity handling, and anti-rebundling
 - `list.md`
   - thin operational reminders for List behavior by reference to canonical contracts and schema
+- `fast-git-execution.md`
+  - execution-first Git rule for routine commit/push/sync tasks with minimal analysis and short reporting
 - `git-safety.md`
-  - Cline-specific shell and git safety guidance for conservative repo actions
+  - Cline-specific shell and git safety guidance that complements the fast Git execution rule
 
 Canonical anchors
 - `moola-system-v2/00-governance/ownership-and-sources.md`

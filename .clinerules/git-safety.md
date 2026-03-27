@@ -3,10 +3,12 @@
 Purpose
 - This file gives Cline thin operational safety rules for git and shell work in this repository.
 - It is about safe execution in this repo environment, not MOOLA workflow or business logic.
+- It complements `.clinerules/fast-git-execution.md`, which owns fast routine-Git intent handling and anti-over-analysis behavior.
 
 Scope
 - Applies to routine git status, branch, upstream, commit-prep, commit, and push tasks.
 - Does not override canonical workflow behavior owned inside `moola-system-v2/`.
+- It preserves shell safety and genuine blocker escalation without reintroducing slow routine-Git analysis.
 
 Simple-command discipline
 - Prefer one simple command at a time.
@@ -27,17 +29,20 @@ Routine git-check discipline
 - Do not invent extra diagnostics when the user asked for a simple repo action.
 
 Commit-prep guardrails
-- Do not commit unless explicitly asked.
+- For a clear `commit`, `push`, or combined Git intent, do not block routine execution when intended scope is already clear.
 - Do not amend unless explicitly asked.
-- Do not switch branches unless explicitly asked.
+- Do not switch branches unless the user’s clear Git intent requires it.
 - Keep repo actions conservative and limited to the user’s stated task.
 - Do not include unrelated files, unrelated changes, or workspace noise.
+- If intended file scope is genuinely ambiguous, ask specifically what belongs in the commit.
 
 Push guardrails
-- Do not push unless explicitly asked.
-- If a push task is simple and upstream is already configured, prefer minimal checks and then `git push`.
+- For a clear `push` intent, prefer the shortest safe path to get the work pushed.
+- Prefer `git pull --rebase` over unnecessary merge commits when integrating remote changes before push.
+- Do not introduce temporary worktrees, cherry-pick isolation branches, or elaborate cleanup unless a real Git problem makes them necessary.
 - Do not guess about remotes, branch names, or upstream targets.
-- If the repo state is ambiguous, stop and report instead of improvising a larger workflow.
+- If the repo state is genuinely ambiguous, stop and report the specific ambiguity instead of improvising a larger workflow.
+- If push would require a non-routine shared-history rewrite, hits protected-branch restrictions, or fails due to auth or permissions, stop and ask for the specific decision needed.
 
 Temp and junk exclusion discipline
 - Exclude `.tmp.driveupload/` and `.tmp.drivedownload/` from routine repo actions unless the user explicitly asks about them.
@@ -49,6 +54,7 @@ Ambiguity handling
 - Prefer safe clarification over speculative repo changes.
 
 What this file does not own
+- Fast routine-Git intent mapping or anti-over-analysis defaults
 - Identify, Value, or List workflow behavior
 - Routing or Run behavior
 - Canonical MOOLA business logic
