@@ -43,8 +43,13 @@
   "package_width": "<package_width_or_blank>",
   "package_height": "<package_height_or_blank>",
   "shipping_zip": "30236",
-  "notes": "<seller_notes_optional>",
+  "notes": "<purchase_line_and_optional_scrap_price_line>",
   "internal_notes": "",
+  "scrap_price": {
+    "amount": "<scrap_price_amount_or_blank>",
+    "effective_date": "<scrap_price_date_or_blank>",
+    "basis": "<scrap_price_basis_or_blank>"
+  },
   "purchase_date": "",
   "purchase_location": "",
   "tags": ["<tag_1>", "<tag_2>", "<tag_3>"],

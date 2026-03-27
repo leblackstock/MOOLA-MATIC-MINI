@@ -12,6 +12,14 @@ Identify (assumptions):
 - <assumption_2>
 - <assumption_3>
 
+Value basis:
+- <pricing_rationale_or_comp_basis>
+- Scrap value / market floor: $<scrap_price_or_omit_when_not_applicable>
+- <condition_effect_on_value>
+- <major_value_driver>
+- Confidence: <confidence_level_and_brief_reason>
+- Assumptions / uncertainty: <uncertainty_or_None>
+
 - Likely sale price range (buyer pays shipping): $<bps_range>
 - Likely sale price range (free shipping): $<fs_range>
 - Recommended list price (buyer pays shipping): $<bps_price>
@@ -32,6 +40,10 @@ Identify (assumptions):
 - Estimated net profit (after acquisition, buyer pays shipping): $<net_bps_or_NA>
 - Estimated net profit (after acquisition, free shipping): $<net_fs_or_NA>
 - Time-to-sell estimate: <brief_tts>
+
+Notes:
+<purchase_date> Purchased from <purchase_location>
+Scrap price $00.00 on MM/DD/YYYY
 
 Pricing sanity check:
 - <sanity_line>
