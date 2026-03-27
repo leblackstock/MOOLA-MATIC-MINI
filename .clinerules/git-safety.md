@@ -4,6 +4,7 @@ Purpose
 - This file gives Cline thin operational safety rules for git and shell work in this repository.
 - It is about safe execution in this repo environment, not MOOLA workflow or business logic.
 - It complements `.clinerules/fast-git-execution.md`, which owns fast routine-Git intent handling and anti-over-analysis behavior.
+- It also complements `.clinerules/do-not-revert-without-consent.md`, which owns preservation-first handling for unexpected or unclear repo state.
 
 Scope
 - Applies to routine git status, branch, upstream, commit-prep, commit, and push tasks.
@@ -40,6 +41,7 @@ Push guardrails
 - For a clear `push` intent, prefer the shortest safe path to get the work pushed.
 - Prefer `git pull --rebase` over unnecessary merge commits when integrating remote changes before push.
 - Do not introduce temporary worktrees, cherry-pick isolation branches, or elaborate cleanup unless a real Git problem makes them necessary.
+- Do not revert, discard, reset, clean, or delete unexpected repo state without explicit user consent.
 - Do not guess about remotes, branch names, or upstream targets.
 - If the repo state is genuinely ambiguous, stop and report the specific ambiguity instead of improvising a larger workflow.
 - If push would require a non-routine shared-history rewrite, hits protected-branch restrictions, or fails due to auth or permissions, stop and ask for the specific decision needed.
@@ -52,9 +54,11 @@ Ambiguity handling
 - If a repo action would require guessing, stop and report the ambiguity.
 - If a command fails unexpectedly, report the failure clearly before expanding the workflow.
 - Prefer safe clarification over speculative repo changes.
+- Unexpected or unrelated changes must be preserved by default rather than cleaned up speculatively.
 
 What this file does not own
 - Fast routine-Git intent mapping or anti-over-analysis defaults
+- Preservation-first policy for destructive cleanup decisions
 - Identify, Value, or List workflow behavior
 - Routing or Run behavior
 - Canonical MOOLA business logic

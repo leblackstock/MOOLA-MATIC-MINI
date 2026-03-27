@@ -37,6 +37,8 @@ Current files
   - thin operational reminders for List behavior by reference to canonical contracts and schema
 - `fast-git-execution.md`
   - execution-first Git rule for routine commit/push/sync tasks with minimal analysis and short reporting
+- `do-not-revert-without-consent.md`
+  - preservation-first Git rule that forbids reverting or discarding unexpected repo state without explicit user consent
 - `git-safety.md`
   - Cline-specific shell and git safety guidance that complements the fast Git execution rule
 
