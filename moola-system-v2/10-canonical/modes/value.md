@@ -23,6 +23,7 @@ Universal resale-valuation core
   - one-sentence identification context for the item being valued
   - likely value range
   - basis for valuation through comps, sold-market evidence, or clearly stated pricing rationale
+  - meaningful scrap value or scrap-price floor when relevant and reliably determinable for the valuation date
   - condition effect on value
   - completeness or included-accessories effect on value when relevant
   - tested or working-status effect on value when relevant
@@ -54,10 +55,19 @@ Category-specific extension model
   - tobacco pipes
     - maker demand, stamping quality, shape desirability, stem originality, chamber/rim condition, cracks, burnout, repairs, collectibility
 
+Scrap-value rule
+- When an item has a meaningful scrap price, include that scrap price in the Value result.
+- This most commonly applies where scrap value is a real market floor, such as precious-metal jewelry, but the rule also applies to any other item class where scrap value is materially relevant.
+- Scrap price used in Value mode must be current as of the same date the value estimate is made.
+- Do not present stale scrap pricing as current.
+- If current scrap pricing cannot be determined reliably for the valuation date, do not invent a scrap price.
+- When current scrap pricing cannot be determined reliably, omit the scrap-price output and keep uncertainty explicit where material.
+
 Core Value behavior
 - Identification confidence gate before pricing
 - One-sentence identification context before the pricing output
 - Acquisition and purchase-detail gatekeeping
+- Notes section with purchased details and, when relevant, current scrap-price notation in the approved order
 - Two pricing strategies:
   - buyer pays shipping
   - free shipping
@@ -95,6 +105,13 @@ Acquisition and purchase-details rule
 Output-assembly note
 - If the user says `skip profit`, omit the profit-rule, max-purchase-price, and net-profit lines from the final output.
 
+Notes section rule
+- When purchase details are present, the notes section begins with `<purchase_date> Purchased from <purchase_location>`.
+- When a meaningful scrap price is included, the next notes line must be exactly `Scrap price $00.00 on MM/DD/YYYY`.
+- Place the scrap-price line after the purchased line.
+- If current scrap pricing cannot be determined reliably for the valuation date, do not include the scrap-price line.
+- Do not fabricate the amount or date in the scrap-price line.
+
 Identification gate
 - If the item cannot be identified confidently enough for pricing, ask one clarifying question and stop.
 - Do not output pricing until the item is identified confidently enough.
@@ -114,6 +131,7 @@ Item identified for valuation:
 
 Value basis:
 - (comps / sold-market evidence or pricing rationale)
+- Scrap value / market floor: $ (if meaningful and current scrap pricing is reliably determined for the valuation date)
 - (condition effect on value)
 - (major factor that raises or lowers value materially)
 - Confidence: (High / Medium / Low + brief reason)
@@ -139,6 +157,10 @@ Value basis:
 - Estimated net profit (after acquisition, buyer pays shipping): $ (or N/A if acquisition unknown)
 - Estimated net profit (after acquisition, free shipping): $ (or N/A if acquisition unknown)
 - Time-to-sell estimate: (brief + main driver)
+
+Notes:
+<purchase_date> Purchased from <purchase_location>
+Scrap price $00.00 on MM/DD/YYYY
 
 Pricing sanity check:
 - One line stating whether the free-shipping price stayed competitive (and if it was capped, say so and recommend buyer-pays-shipping if needed).

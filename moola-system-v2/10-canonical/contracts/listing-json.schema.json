@@ -116,6 +116,29 @@
           "type": "string"
         }
       }
+    },
+    "scrapPrice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "effective_date"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/stringField",
+          "description": "Scrap price amount used in valuation output."
+        },
+        "effective_date": {
+          "$ref": "#/$defs/stringField",
+          "description": "MM/DD/YYYY valuation-date or effective-date for the scrap price used."
+        },
+        "basis": {
+          "$ref": "#/$defs/stringField",
+          "description": "Optional scrap-price basis or context such as metal, purity, weight, or pricing-source note."
+        }
+      },
+      "description": "Optional scrap-price data for items where scrap value is a meaningful market floor. If present, amount and effective_date must reflect current pricing for the same date as the value estimate. Omit this object instead of inventing scrap pricing when current valuation-date pricing cannot be determined reliably."
     }
   },
   "properties": {
@@ -241,11 +264,14 @@
     "purchase_location": { "$ref": "#/$defs/stringField" },
     "notes": {
       "$ref": "#/$defs/stringField",
-      "description": "Exactly '<purchase_date> Purchased from <purchase_location>' or blank."
+      "description": "Use '<purchase_date> Purchased from <purchase_location>' when purchase details are present. If a current scrap price is reliably determined for the same valuation date, append a newline followed by exactly 'Scrap price $00.00 on MM/DD/YYYY'. The scrap-price line must appear after the purchased line. Omit the scrap-price line instead of inventing current scrap pricing. Do not include offer text, serial numbers, or other unrelated content."
     },
     "internal_notes": {
       "$ref": "#/$defs/stringField",
       "description": "Internal item reference notes not used by Playwright/ListPerfectly."
+    },
+    "scrap_price": {
+      "$ref": "#/$defs/scrapPrice"
     },
     "fees_or_other_costs": {
       "$ref": "#/$defs/stringField",
