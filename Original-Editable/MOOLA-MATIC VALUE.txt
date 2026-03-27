@@ -40,6 +40,7 @@ RULES
 - Do NOT treat low weight alone as a reason to omit scrap price for precious-metal jewelry.
 - Scrap pricing used in Value output MUST be current as of the same date as the valuation.
 - If current scrap pricing cannot be determined reliably for that valuation date, do not invent it.
+- Working runtime method note for silver spot checks: Stooq `XAGUSD` daily quote worked for retrieving a live silver spot value; compute sterling scrap as `(grams / 31.1034768) * 0.925 * spot_price_per_troy_oz` and report the same-date result in both the scrap reasoning and the notes line.
 - Always output shipping estimate, prep+packing estimate, fees estimate, labor estimate.
 - Estimate packaging weight separately during Value mode when item weight is known or can be reasonably inferred.
 - `shipping_weight_lb` / `shipping_weight_oz` should represent packed shipping weight.
